@@ -1,3 +1,24 @@
+# Data
+/Data
+/Processed
+*.xlsm
+*.xlsx
+*.rds
+
+# Jobs
+/Jobs
+*.sh
+*.sh.*
+
+# Documents
+/Figures
+/Meeting_logs
+/Literature
+/Brief
+*.pdf
+*.pptx
+*.docx
+
 # History files
 .Rhistory
 .Rapp.history
