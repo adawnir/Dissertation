@@ -18,8 +18,11 @@
 *.pdf
 *.pptx
 *.docx
+.DS_Store
+
 
 # History files
+
 .Rhistory
 .Rapp.history
 
