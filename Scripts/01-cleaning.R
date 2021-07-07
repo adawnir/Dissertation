@@ -272,7 +272,7 @@ all(chem_lux[rownames(chem_gs),"Family"]==chem_gs$Family)
 chem_lux$Family = factor(chem_lux$Family, levels = unique(chem_lux$Family))
 levels(chem_lux$Family)
 chem_fra$Family = factor(chem_fra$Family,
-                             levels = levels(chem_fra$Family))
+                             levels = unique(chem_lux$Family))
 levels(chem_fra$Family)
 chem_gs$Family = factor(chem_gs$Family, levels = unique(chem_lux$Family))
 levels(chem_gs$Family)
