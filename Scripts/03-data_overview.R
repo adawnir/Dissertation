@@ -2,8 +2,9 @@
 ## Rin Wada 8 July
 
 # Load packages
-library(openxlsx)
 library(tidyverse)
+library(colorspace)
+library(RColorBrewer)
 
 # Initialise
 rm(list=ls())
