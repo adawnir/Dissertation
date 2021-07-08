@@ -14,6 +14,9 @@ setwd(path)
 source("functions.R")
 source("graph_param.R")
 
+# Load data
+annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
+
 covars_lux = readRDS(paste0("../Data/",filepaths[1],"/Participant_covariate_info.rds"))
 chem_lux = readRDS(paste0("../Data/",filepaths[1],"/Chemical_compound_info.rds"))
 expo_lux = readRDS(paste0("../Data/",filepaths[1],"/Exposure_matrix_raw.rds"))
@@ -28,8 +31,8 @@ expo_gs = readRDS(paste0("../Data/",filepaths[3],"/Exposure_matrix_raw.rds"))
 
 ## Family sibling ID
 # Descriptive
-table(covars_lux$Family.ID)
-table(table(covars_lux$Family.ID))
+table(covars_lux$annot.ID)
+table(table(covars_lux$annot.ID))
 
 table(covars_fra$Siblings.Groups)
 table(table(covars_fra$Siblings.Groups))
