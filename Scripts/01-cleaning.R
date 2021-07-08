@@ -302,8 +302,8 @@ chem_gs$LOD = ifelse(is.infinite(chem_gs$LOD),0,chem_gs$LOD)
 
 ## Save chemical family annotation as named list
 annot = chem_gs$Family
-annot = chem_gs$Compound
-saveRDS(annot, "../Processed/Exposure_annotation.rds")
+names(annot) = chem_gs$Compound
+saveRDS(annot, "../Processed/Chemical_compound_family_annotation.rds")
 
 ifelse(dir.exists("../Processed"),"",dir.create("../Processed"))
 ifelse(dir.exists("../Processed/Luxembourg"),"",dir.create("../Processed/Luxembourg"))
