@@ -1,4 +1,4 @@
-## Data exploration and aata cleaning
+## Data cleaning
 ## Rin Wada 24 May
 
 # Load packages
@@ -6,11 +6,6 @@ library(openxlsx)
 library(tidyverse)
 
 ### Prepare data (LUX) ----
-# Initialisation
-rm(list=ls())
-path=dirname(rstudioapi::getActiveDocumentContext()$path)
-setwd(path)
-
 # Initialise
 rm(list=ls())
 path=dirname(rstudioapi::getActiveDocumentContext()$path)
@@ -32,14 +27,15 @@ colnames(covars) = c("Family.ID", "Sibling.ID", "Indiv.ID", "Age", "Gender","Wei
 table(covars$Gender, useNA = "ifany")
 # Recoding gender
 covars$Gender[which(covars$Gender=="Jules")] = "Male"
+covars$Gender = factor(covars$Gender)
 table(covars$Gender, useNA = "ifany")
 
 ## Area
-covar_lux$Area = "Luxembourg"
-covar_lux$Department = "Luxembourg"
-covar_lux$Region = "Luxembourg"
-covar_lux$Country = "Luxembourg"
-covar_lux$Batch = "LUX"
+covars$Area = "Luxembourg"
+covars$Department = factor("Luxembourg")
+covars$Region = factor("Luxembourg")
+covars$Country = factor("Luxembourg")
+covars$Batch = factor("LUX")
 
 ## Exposure matrix
 expo = mydata[1:39,8:ncol(mydata)]
@@ -139,16 +135,17 @@ covars$Age = as.numeric(covars$Age)
 table(covars$Gender, useNA = "ifany")
 # Recoding gender
 covars$Gender = ifelse(covars$Gender=="M", "Male", "Female")
+covars$Gender = factor(covars$Gender)
 table(covars$Gender, useNA = "ifany")
 
 ## Area
 table(covars$Area, useNA = "ifany")
 
 area = read.csv("../Dictionaries/French_area_codes.csv")
-covars$Region = area$Region[which(covars$Area %in% area$Code.Commune)]
-covars$Department = area$Department[which(covars$Area %in% area$Code.Commune)]
-covars$Country = "France"
-covars$Batch = "FRA"
+covars$Region = factor(area$Region[which(covars$Area %in% area$Code.Commune)])
+covars$Department = factor(area$Department[which(covars$Area %in% area$Code.Commune)])
+covars$Country = factor("France")
+covars$Batch = factor("FRA")
 
 ## Exposure matrix
 expo = mydata[1:142,6:ncol(mydata)]
@@ -235,15 +232,16 @@ covars$Siblings.Groups = gsub("Isolate$", "Isolated",covars$Siblings.Groups)
 table(covars$Gender, useNA = "ifany")
 # Recoding gender
 covars$Gender = ifelse(covars$Gender=="M", "Male", ifelse(covars$Gender=="H", "Male", "Female"))
+covars$Gender = factor(covars$Gender)
 table(covars$Gender, useNA = "ifany")
 
 ## Area
 covars$Area = "Grande-Synthe"
 area = read.csv("../Dictionaries/French_area_codes.csv")
-covars$Region = area$Region[which(covars$Area %in% area$Code.Commune)]
-covars$Department = area$Department[which(covars$Area %in% area$Code.Commune)]
-covars$Country = "France"
-covars$Batch = "GS"
+covars$Region = factor(area$Region[which(covars$Area %in% area$Code.Commune)])
+covars$Department = factor(area$Department[which(covars$Area %in% area$Code.Commune)])
+covars$Country = factor("France")
+covars$Batch = factor("GS")
 
 ## Exposure matrix
 expo = mydata[1:44,5:ncol(mydata)]
