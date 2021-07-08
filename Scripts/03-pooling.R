@@ -18,16 +18,16 @@ source("graph_param.R")
 annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 
 covars_lux = readRDS(paste0("../Processed/",filepaths[1],"/Participant_covariate_info_thresh.rds"))
-chem_lux = readRDS(paste0("../Data/",filepaths[1],"/Chemical_compound_info.rds"))
-expo_lux = readRDS(paste0("../Data/",filepaths[1],"/Exposure_matrix_raw.rds"))
+chem_lux = readRDS(paste0("../Processed/",filepaths[1],"/Chemical_compound_info.rds"))
+expo_lux = readRDS(paste0("../Processed/",filepaths[1],"/Exposure_matrix_raw.rds"))
 
 covars_fra = readRDS(paste0("../Processed/",filepaths[2],"/Participant_covariate_info_thresh.rds"))
-chem_fra = readRDS(paste0("../Data/",filepaths[2],"/Chemical_compound_info.rds"))
-expo_fra = readRDS(paste0("../Data/",filepaths[2],"/Exposure_matrix_raw.rds"))
+chem_fra = readRDS(paste0("../Processed/",filepaths[2],"/Chemical_compound_info.rds"))
+expo_fra = readRDS(paste0("../Processed/",filepaths[2],"/Exposure_matrix_raw.rds"))
 
 covars_gs = readRDS(paste0("../Processed/",filepaths[3],"/Participant_covariate_info_thresh.rds"))
-chem_gs = readRDS(paste0("../Data/",filepaths[3],"/Chemical_compound_info.rds"))
-expo_gs = readRDS(paste0("../Data/",filepaths[3],"/Exposure_matrix_raw.rds"))
+chem_gs = readRDS(paste0("../Processed/",filepaths[3],"/Chemical_compound_info.rds"))
+expo_gs = readRDS(paste0("../Processed/",filepaths[3],"/Exposure_matrix_raw.rds"))
 
 # Merge covariate information
 covars = bind_rows(covars_lux, covars_fra, covars_gs) %>%
@@ -70,6 +70,12 @@ chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
 # Number of chemical compounds with 90% or more nd or NA
 sum(chem$nd_prop + chem$NA_prop>=0.9)
 
+# Save data sets
+ifelse(dir.exists(paste0("../Processed/",filepaths[4])),"",dir.create(paste0("../Processed/",filepaths[4])))
+saveRDS(covars, paste0("../Processed/",filepaths[4],"/Participant_covariate_info_thresh.rds"))
+saveRDS(chem, paste0("../Processed/",filepaths[4],"/Chemical_compound_info.rds"))
+saveRDS(expo, paste0("../Processed/",filepaths[4],"/Exposure_matrix_raw.rds"))
+
 # Filter out >=90% nd or NA
 expo = expo[,which(chem$nd_prop + chem$NA_prop<0.9)]
 chem = chem[which(chem$nd_prop + chem$NA_prop<0.9),]
@@ -78,10 +84,8 @@ ncol(expo)
 max(rowSums(is.na(expo))/nrow(expo))
 
 # Save data sets
-ifelse(dir.exists(paste0("../Processed/",filepaths[4])),"",dir.create(paste0("../Processed/",filepaths[4])))
-saveRDS(covars_lux, paste0("../Processed/",filepaths[4],"/Participant_covariate_info_thresh.rds"))
-saveRDS(chem_lux, paste0("../Processed/",filepaths[4],"/Chemical_compound_info_thresh.rds"))
-saveRDS(expo_lux, paste0("../Processed/",filepaths[4],"/Exposure_matrix_raw_thresh.rds"))
+saveRDS(chem, paste0("../Processed/",filepaths[4],"/Chemical_compound_info_thresh.rds"))
+saveRDS(expo, paste0("../Processed/",filepaths[4],"/Exposure_matrix_raw_thresh.rds"))
 
 ## Recoding nd
 # Replace nd with random values from 0 to minimum detection (Gaussian)
@@ -180,6 +184,12 @@ chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
 # Number of chemical compounds with 90% or more nd or NA
 sum(chem$nd_prop + chem$NA_prop>=0.9)
 
+# Save data sets
+ifelse(dir.exists(paste0("../Processed/",filepaths[5])),"",dir.create(paste0("../Processed/",filepaths[5])))
+saveRDS(covars_lux, paste0("../Processed/",filepaths[5],"/Participant_covariate_info_thresh.rds"))
+saveRDS(chem_lux, paste0("../Processed/",filepaths[5],"/Chemical_compound_info.rds"))
+saveRDS(expo_lux, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw.rds"))
+
 # Filter out >=90% nd or NA
 expo = expo[,which(chem$nd_prop + chem$NA_prop<0.9)]
 chem = chem[which(chem$nd_prop + chem$NA_prop<0.9),]
@@ -188,8 +198,6 @@ ncol(expo)
 max(rowSums(is.na(expo))/nrow(expo))
 
 # Save data sets
-ifelse(dir.exists(paste0("../Processed/",filepaths[5])),"",dir.create(paste0("../Processed/",filepaths[5])))
-saveRDS(covars_lux, paste0("../Processed/",filepaths[5],"/Participant_covariate_info_thresh.rds"))
 saveRDS(chem_lux, paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
 saveRDS(expo_lux, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw_thresh.rds"))
 
