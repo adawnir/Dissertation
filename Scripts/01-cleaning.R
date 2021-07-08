@@ -300,6 +300,11 @@ chem_lux$LOD = ifelse(is.infinite(chem_lux$LOD),0,chem_lux$LOD)
 chem_fra$LOD = ifelse(is.infinite(chem_fra$LOD),0,chem_fra$LOD)
 chem_gs$LOD = ifelse(is.infinite(chem_gs$LOD),0,chem_gs$LOD)
 
+## Save chemical family annotation as named list
+annot = chem_gs$Family
+annot = chem_gs$Compound
+saveRDS(annot, "../Processed/Exposure_annotation.rds")
+
 ifelse(dir.exists("../Processed"),"",dir.create("../Processed"))
 ifelse(dir.exists("../Processed/Luxembourg"),"",dir.create("../Processed/Luxembourg"))
 saveRDS(covar_lux, "../Processed/Luxembourg/Participant_covariate_info.rds")
