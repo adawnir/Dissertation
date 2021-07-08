@@ -188,10 +188,10 @@ ncol(expo)
 max(rowSums(is.na(expo))/nrow(expo))
 
 # Save data sets
-ifelse(dir.exists(paste0("../Processed/",filepaths[4])),"",dir.create(paste0("../Processed/",filepaths[4])))
-saveRDS(covars_lux, paste0("../Processed/",filepaths[4],"/Participant_covariate_info_thresh.rds"))
-saveRDS(chem_lux, paste0("../Processed/",filepaths[4],"/Chemical_compound_info_thresh.rds"))
-saveRDS(expo_lux, paste0("../Processed/",filepaths[4],"/Exposure_matrix_raw_thresh.rds"))
+ifelse(dir.exists(paste0("../Processed/",filepaths[5])),"",dir.create(paste0("../Processed/",filepaths[5])))
+saveRDS(covars_lux, paste0("../Processed/",filepaths[5],"/Participant_covariate_info_thresh.rds"))
+saveRDS(chem_lux, paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
+saveRDS(expo_lux, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw_thresh.rds"))
 
 ## Recoding nd
 # Replace nd with random values from 0 to minimum detection (Gaussian)
@@ -226,4 +226,4 @@ rownames(expo) = covars$Indiv.ID
 
 summary(expo)
 # Save data sets
-saveRDS(expo_lux, paste0("../Processed/",filepaths[4],"/Exposure_matrix_ndimp_thresh.rds"))
+saveRDS(expo_lux, paste0("../Processed/",filepaths[5],"/Exposure_matrix_ndimp_thresh.rds"))
