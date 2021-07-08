@@ -123,6 +123,23 @@ covars_gs = covars_gs = covars_gs %>%
   mutate_if(is.character, as.factor)
 str(covars_gs)
 
+ifelse(dir.exists("../Processed/"),"",dir.create("../Processed/"))
+ifelse(dir.exists(paste0("../Processed/",filepaths[1])),"",dir.create(paste0("../Processed/",filepaths[1])))
+ifelse(dir.exists(paste0("../Processed/",filepaths[2])),"",dir.create(paste0("../Processed/",filepaths[2])))
+ifelse(dir.exists(paste0("../Processed/",filepaths[3])),"",dir.create(paste0("../Processed/",filepaths[3])))
+
+saveRDS(covars_lux, paste0("../Processed/",filepaths[1],"/Participant_covariate_info_thresh.rds"))
+saveRDS(covars_fra,  paste0("../Processed/",filepaths[2],"/Participant_covariate_info_thresh.rds"))
+saveRDS(covars_gs,  paste0("../Processed/",filepaths[3],"/Participant_covariate_info_thresh.rds"))
+
+saveRDS(chem_lux, paste0("../Processed/",filepaths[1],"/Chemical_compound_info.rds"))
+saveRDS(chem_fra,  paste0("../Processed/",filepaths[2],"/Chemical_compound_info.rds"))
+saveRDS(chem_gs,  paste0("../Processed/",filepaths[3],"/Chemical_compound_info.rds"))
+
+saveRDS(expo_lux, paste0("../Processed/",filepaths[1],"/Exposure_matrix_raw.rds"))
+saveRDS(expo_fra,  paste0("../Processed/",filepaths[2],"/Exposure_matrix_raw.rds"))
+saveRDS(expo_gs,  paste0("../Processed/",filepaths[3],"/Exposure_matrix_raw.rds"))
+
 ### Inclusion/exclusion criteria (Chemical compound) ----
 # Number of chemical compounds with 90% or more nd or NA
 sum(chem_lux$nd_prop + chem_lux$NA_prop>=0.9)
@@ -141,20 +158,6 @@ chem_gs = chem_gs[which(chem_gs$nd_prop + chem_gs$NA_prop<0.9),]
 ncol(expo_lux)
 ncol(expo_fra)
 ncol(expo_gs)
-
-### Save data sets ----
-ifelse(dir.exists("../Processed/"),"",dir.create("../Processed/"))
-ifelse(dir.exists(paste0("../Processed/",filepaths[1])),"",dir.create(paste0("../Processed/",filepaths[1])))
-ifelse(dir.exists(paste0("../Processed/",filepaths[2])),"",dir.create(paste0("../Processed/",filepaths[2])))
-ifelse(dir.exists(paste0("../Processed/",filepaths[3])),"",dir.create(paste0("../Processed/",filepaths[3])))
-
-saveRDS(covars_lux, paste0("../Processed/",filepaths[1],"/Participant_covariate_info_thresh.rds"))
-saveRDS(covars_fra,  paste0("../Processed/",filepaths[2],"/Participant_covariate_info_thresh.rds"))
-saveRDS(covars_gs,  paste0("../Processed/",filepaths[3],"/Participant_covariate_info_thresh.rds"))
-
-saveRDS(chem_lux, paste0("../Processed/",filepaths[1],"/Chemical_compound_info_thresh.rds"))
-saveRDS(chem_fra,  paste0("../Processed/",filepaths[2],"/Chemical_compound_info_thresh.rds"))
-saveRDS(chem_gs,  paste0("../Processed/",filepaths[3],"/Chemical_compound_info_thresh.rds"))
 
 saveRDS(expo_lux, paste0("../Processed/",filepaths[1],"/Exposure_matrix_raw_thresh.rds"))
 saveRDS(expo_fra,  paste0("../Processed/",filepaths[2],"/Exposure_matrix_raw_thresh.rds"))
