@@ -31,7 +31,7 @@ covars$Gender = factor(covars$Gender)
 table(covars$Gender, useNA = "ifany")
 
 ## Area
-covars$Area = "Luxembourg"
+covars$Area = factor("Luxembourg")
 covars$Department = factor("Luxembourg")
 covars$Region = factor("Luxembourg")
 covars$Country = factor("Luxembourg")
@@ -236,7 +236,7 @@ covars$Gender = factor(covars$Gender)
 table(covars$Gender, useNA = "ifany")
 
 ## Area
-covars$Area = "Grande-Synthe"
+covars$Area = factor("Grande-Synthe")
 area = read.csv("../Dictionaries/French_area_codes.csv")
 covars$Region = factor(area$Region[which(covars$Area %in% area$Code.Commune)])
 covars$Department = factor(area$Department[which(covars$Area %in% area$Code.Commune)])
