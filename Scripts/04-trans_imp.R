@@ -1,4 +1,4 @@
-## Log transformation, imputation and scaling
+## Log transformation and imputation
 ## Rin Wada 8 July
 
 # Load packages
