@@ -17,34 +17,13 @@ source("graph_param.R")
 # Load data
 annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 
-covars_lux = readRDS(paste0("../Processed/",filepaths[1],"/Participant_covariate_info_thresh.rds"))
-chem_lux = readRDS(paste0("../Processed/",filepaths[1],"/Chemical_compound_info_thresh.rds"))
-expo_lux = readRDS(paste0("../Processed/",filepaths[1],"/Exposure_matrix_ndimp_thresh.rds"))
-
-covars_fra = readRDS(paste0("../Processed/",filepaths[2],"/Participant_covariate_info_thresh.rds"))
-chem_fra = readRDS(paste0("../Processed/",filepaths[2],"/Chemical_compound_info_thresh.rds"))
-expo_fra = readRDS(paste0("../Processed/",filepaths[2],"/Exposure_matrix_ndimp_thresh.rds"))
-
-covars_gs = readRDS(paste0("../Processed/",filepaths[3],"/Participant_covariate_info_thresh.rds"))
-chem_gs = readRDS(paste0("../Processed/",filepaths[3],"/Chemical_compound_info_thresh.rds"))
-expo_gs = readRDS(paste0("../Processed/",filepaths[3],"/Exposure_matrix_ndimp_thresh.rds"))
-
-covars_pooled3 = readRDS(paste0("../Processed/",filepaths[4],"/Participant_covariate_info_thresh.rds"))
-chem_pooled3 = readRDS(paste0("../Processed/",filepaths[4],"/Chemical_compound_info_thresh.rds"))
-expo_pooled3 = readRDS(paste0("../Processed/",filepaths[4],"/Exposure_matrix_ndimp_thresh.rds"))
-
-covars_pooled2 = readRDS(paste0("../Processed/",filepaths[5],"/Participant_covariate_info_thresh.rds"))
-chem_pooled2 = readRDS(paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
-expo_pooled2 = readRDS(paste0("../Processed/",filepaths[5],"/Exposure_matrix_ndimp_thresh.rds"))
-
 ### LOD, Detection rate and concentration range ----
 ifelse(dir.exists("../Exports"), "", dir.create("../Exports"))
-suffix = c("lux","fra","gs","pooled3","pooled2")
 for (i in 1:length(batches)){
-  expo = eval(parse(text = paste0("expo_",suffix[i])))
-  chem = eval(parse(text = paste0("chem_",suffix[i])))
+  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh.rds"))
+  chem = readRDS(paste0("../Processed/",filepaths[i],"/Chemical_compound_info_thresh.rds"))
   annot_sub = annot[colnames(expo)]
-  all(colnames(expo)[k] == rownames(chem)[k])
+  all(colnames(expo) == rownames(chem))
   mytable=NULL
   for (k in 1:length(colnames(expo))){
     print(colnames(expo)[k])
@@ -74,7 +53,7 @@ for (i in 1:length(batches)){
 }
 
 ### Covariate----
-covars = covars_pooled3
+covars = readRDS(paste0("../Processed/",filepaths[4],"/Participant_covariate_info_thresh.rds"))
 mytable=NULL
 out = sum(unique(covars$Family.ID)!="Isolated")
 for (k in c("LUX","FRA","GS")){
@@ -157,7 +136,7 @@ mymean=formatC(mean(covars$Weight, na.rm=TRUE), format="f", digits=2)
 mysd=formatC(sd(covars$Weight, na.rm=TRUE), format="f", digits=2)
 out=paste0(mymean, " (", mysd, ")")
 for (k in c("LUX","FRA","GS")){
-  if (k = "LUX"){
+  if (k == "LUX"){
     mymean=formatC(mean(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
     mysd=formatC(sd(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
     out=c(out, paste0(mymean, " (", mysd, ")"))
