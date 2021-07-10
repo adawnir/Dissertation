@@ -127,7 +127,7 @@ rownames(expo) = covars$Indiv.ID
 
 summary(expo)
 # Save data sets
-saveRDS(expo_lux, paste0("../Processed/",filepaths[4],"/Exposure_matrix_ndimp_thresh.rds"))
+saveRDS(expo, paste0("../Processed/",filepaths[4],"/Exposure_matrix_ndimp_thresh.rds"))
 
 
 ### Pooled2 (LUX/FRA/GS) ----
@@ -198,8 +198,8 @@ ncol(expo)
 max(rowSums(is.na(expo))/nrow(expo))
 
 # Save data sets
-saveRDS(chem_lux, paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
-saveRDS(expo_lux, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw_thresh.rds"))
+saveRDS(chem, paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
+saveRDS(expo, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw_thresh.rds"))
 
 ## Recoding nd
 # Replace nd with random values from 0 to minimum detection (Gaussian)
@@ -234,4 +234,4 @@ rownames(expo) = covars$Indiv.ID
 
 summary(expo)
 # Save data sets
-saveRDS(expo_lux, paste0("../Processed/",filepaths[5],"/Exposure_matrix_ndimp_thresh.rds"))
+saveRDS(expo, paste0("../Processed/",filepaths[5],"/Exposure_matrix_ndimp_thresh.rds"))
