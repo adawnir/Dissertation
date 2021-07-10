@@ -142,8 +142,9 @@ table(covars$Gender, useNA = "ifany")
 table(covars$Area, useNA = "ifany")
 
 area = read.csv("../Dictionaries/French_area_codes.csv")
-covars$Region = factor(area$Region[which(covars$Area %in% area$Code.Commune)])
-covars$Department = factor(area$Department[which(covars$Area %in% area$Code.Commune)])
+rownames(area) = area$Code.Commune
+covars$Region = factor(area[covars$Area,"Region"])
+covars$Department = factor(area[covars$Area,"Department"])
 covars$Country = factor("France")
 covars$Batch = factor("FRA")
 
@@ -238,8 +239,9 @@ table(covars$Gender, useNA = "ifany")
 ## Area
 covars$Area = factor("Grande-Synthe")
 area = read.csv("../Dictionaries/French_area_codes.csv")
-covars$Region = factor(area$Region[which(covars$Area %in% area$Code.Commune)])
-covars$Department = factor(area$Department[which(covars$Area %in% area$Code.Commune)])
+rownames(area) = area$Code.Commune
+covars$Region = factor(area[covars$Area,"Region"])
+covars$Department = factor(area[covars$Area,"Department"])
 covars$Country = factor("France")
 covars$Batch = factor("GS")
 
