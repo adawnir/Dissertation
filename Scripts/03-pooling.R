@@ -186,9 +186,9 @@ sum(chem$nd_prop + chem$NA_prop>=0.9)
 
 # Save data sets
 ifelse(dir.exists(paste0("../Processed/",filepaths[5])),"",dir.create(paste0("../Processed/",filepaths[5])))
-saveRDS(covars_lux, paste0("../Processed/",filepaths[5],"/Participant_covariate_info_thresh.rds"))
-saveRDS(chem_lux, paste0("../Processed/",filepaths[5],"/Chemical_compound_info.rds"))
-saveRDS(expo_lux, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw.rds"))
+saveRDS(covars, paste0("../Processed/",filepaths[5],"/Participant_covariate_info_thresh.rds"))
+saveRDS(chem, paste0("../Processed/",filepaths[5],"/Chemical_compound_info.rds"))
+saveRDS(expo, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw.rds"))
 
 # Filter out >=90% nd or NA
 expo = expo[,which(chem$nd_prop + chem$NA_prop<0.9)]
