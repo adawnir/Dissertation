@@ -10,8 +10,7 @@ rm(list=ls())
 path=dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(path)
 
-# Load custom functions and parameters
-source("functions.R")
+# Load custom parameters
 source("graph_param.R")
 
 # Load data
