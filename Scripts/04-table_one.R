@@ -74,76 +74,136 @@ for (i in 1:length(batches)){
 }
 
 ### Covariate----
-# Total number of families
-sum(covars_lux$Family.ID=="Isolated") + sum(table(table(covars_lux$Family.ID[which(covars_lux$Family.ID!="Isolated")])))
-sum(covars_fra$Family.ID=="Isolated") + sum(table(table(covars_fra$Family.ID[which(covars_fra$Family.ID!="Isolated")])))
-sum(covars_gs$Family.ID=="Isolated") + sum(table(table(covars_gs$Family.ID[which(covars_gs$Family.ID!="Isolated")])))
-
-# Number of each type of family
-table(table(covars_lux$Family.ID))
-table(table(covars_fra$Family.ID))
-table(table(covars_gs$Family.ID))
-
-# Age (Mean, SD)
-cat(round(mean(covars_lux$Age, na.rm = T),2),
-    " (", round(sd(covars_lux$Age, na.rm = T),2), ")\n", sep = "")
-cat(round(mean(covars_fra$Age, na.rm = T),2),
-    " (", round(sd(covars_fra$Age, na.rm = T),2), ")\n", sep = "")
-cat(round(mean(covars_gs$Age, na.rm = T),2),
-    " (", round(sd(covars_gs$Age, na.rm = T),2), ")\n", sep = "")
-
-# Age (NA %)
-cat(sum(is.na(covars_lux$Age)),
-    " (", round(sum(is.na(covars_lux$Age))/length(covars_lux$Age)*100,2), "%)\n", sep = "")
-cat(sum(is.na(covars_fra$Age)),
-    " (", round(sum(is.na(covars_fra$Age))/length(covars_fra$Age)*100,2), "%)\n", sep = "")
-cat(sum(is.na(covars_gs$Age)),
-    " (", round(sum(is.na(covars_gs$Age))/length(covars_gs$Age)*100,2), "%)\n", sep = "")
-
-# Gender (N, %)
-table(covars_lux$Gender, useNA = "ifany")
-round(prop.table(table(covars_lux$Gender, useNA = "ifany"))*100,2)
-
-table(covars_fra$Gender, useNA = "ifany")
-round(prop.table(table(covars_fra$Gender, useNA = "ifany"))*100,2)
-
-table(covars_gs$Gender, useNA = "ifany")
-round(prop.table(table(covars_gs$Gender, useNA = "ifany"))*100,2)
-
-# Gender (NA %)
-cat(sum(is.na(covars_lux$Gender)),
-    " (", round(sum(is.na(covars_lux$Gender))/length(covars_lux$Gender)*100,2), "%)\n", sep = "")
-cat(sum(is.na(covars_fra$Gender)),
-    " (", round(sum(is.na(covars_fra$Gender))/length(covars_fra$Gender)*100,2), "%)\n", sep = "")
-cat(sum(is.na(covars_gs$Gender)),
-    " (", round(sum(is.na(covars_gs$Gender))/length(covars_gs$Gender)*100,2), "%)\n", sep = "")
-
-# Table 1
-# N
-nrow(covars)
-# Families & number of isolated
-table(table(covars$Family.ID))
-# Age
-cat(round(mean(covars$Age, na.rm = T),2),
-    " (", round(sd(covars$Age, na.rm = T),2), ")\n", sep = "")
-cat(sum(is.na(covars$Age)),
-    " (", round(sum(is.na(covars$Age))/length(covars$Age)*100,2), "%)\n", sep = "")
-# Gender
-table(covars$Gender, useNA = "ifany")
-round(prop.table(table(covars$Gender, useNA = "ifany"))*100,2)
-cat(sum(is.na(covars$Gender)),
-    " (", round(sum(is.na(covars$Gender))/length(covars$Gender)*100,2), "%)\n", sep = "")
-
+covars = covars_pooled3
 mytable=NULL
-for (k in 1:length(colnames(mat_pooled3))){
-  print(colnames(mat_pooled3)[k])
-  tmp=ContinuousTest3(x=mat_pooled3[,k], y=covar_pooled3$Batch)
-  mytable=rbind(mytable, tmp)
-  rownames(mytable)[nrow(mytable)]=colnames(mat_pooled3)[k]
+out = sum(unique(covars$Family.ID)!="Isolated")
+for (k in c("LUX","FRA","GS")){
+  myn = sum(unique(covars$Family.ID[covars$Batch==k])!="Isolated")
+  out=c(out, myn)
 }
-colnames(mytable)=c(rep("Mean (sd)",3), "LUX vs FRA", "LUX vs GS", "FRA vs GS")
-mytable[,4:6]=ReformatScientificNotation(mytable[,4:6])
-ifelse(dir.exists("../Exports"), "", dir.create("../Exports"))
-ifelse(dir.exists("../Exports/Pooled3"), "", dir.create("../Exports/Pooled3"))
-SaveExcelWithSuperscripts(cbind(rownames(mytable),mytable), "../Exports/Pooled3/Table1.xlsx")
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Families with siblings, N"
 
+myn = sum(covars$Family.ID=="Isolated")
+myp = formatC(myn/length(covars$Family.ID)*100, format = "f", digits = 1)
+out = paste0(myn, " (", myp, "%)")
+for (k in c("LUX","FRA","GS")){
+  myn = sum(covars$Family.ID[covars$Batch==k]=="Isolated")
+  myp = formatC(myn/sum(covars$Batch==k), format = "f", digits = 1)
+  out=c(out, paste0(myn, " (", myp, "%)"))
+}
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Only child, N (%)"
+
+mymean=formatC(mean(covars$Age, na.rm=TRUE), format="f", digits=2)
+mysd=formatC(sd(covars$Age, na.rm=TRUE), format="f", digits=2)
+out=paste0(mymean, " (", mysd, ")")
+for (k in c("LUX","FRA","GS")){
+  mymean=formatC(mean(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
+  mysd=formatC(sd(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
+  out=c(out, paste0(mymean, " (", mysd, ")"))
+}
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Age (years), Mean (SD)"
+
+myn = sum(is.na(covars$Age))
+myp = formatC(myn/length(covars$Age)*100, format = "f", digits = 1)
+out = paste0(myn, " (", myp, "%)")
+for (k in c("LUX","FRA","GS")){
+  myn = sum(is.na(covars$Age[covars$Batch==k]))
+  myp = formatC(myn/sum(covars$Batch==k)*100, format = "f", digits = 1)
+  out=c(out, paste0(myn, " (", myp, "%)"))
+}
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Missing, N (%)"
+
+mytable=rbind(mytable, rep(NA, ncol(mytable)))
+rownames(mytable)[nrow(mytable)]="Gender, N (%)"
+
+myn = sum(covars$Gender=="Female", na.rm = T)
+myp = formatC(myn/length(covars$Gender)*100, format = "f", digits = 1)
+out = paste0(myn, " (", myp, "%)")
+for (k in c("LUX","FRA","GS")){
+  myn = sum(covars$Gender[covars$Batch==k]=="Female", na.rm = T)
+  myp = formatC(myn/sum(covars$Batch==k)*100, format = "f", digits = 1)
+  out=c(out, paste0(myn, " (", myp, "%)"))
+}
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Female"
+
+myn = sum(covars$Gender=="Male", na.rm = T)
+myp = formatC(myn/length(covars$Gender)*100, format = "f", digits = 1)
+out = paste0(myn, " (", myp, "%)")
+for (k in c("LUX","FRA","GS")){
+  myn = sum(covars$Gender[covars$Batch==k]=="Male", na.rm = T)
+  myp = formatC(myn/sum(covars$Batch==k)*100, format = "f", digits = 1)
+  out=c(out, paste0(myn, " (", myp, "%)"))
+}
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Male"
+
+myn = sum(is.na(covars$Gender))
+myp = formatC(myn/length(covars$Gender)*100, format = "f", digits = 1)
+out = paste0(myn, " (", myp, "%)")
+for (k in c("LUX","FRA","GS")){
+  myn = sum(is.na(covars$Gender[covars$Batch==k]))
+  myp = formatC(myn/sum(covars$Batch==k)*100, format = "f", digits = 1)
+  out=c(out, paste0(myn, " (", myp, "%)"))
+}
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Missing, N (%)"
+
+mymean=formatC(mean(covars$Weight, na.rm=TRUE), format="f", digits=2)
+mysd=formatC(sd(covars$Weight, na.rm=TRUE), format="f", digits=2)
+out=paste0(mymean, " (", mysd, ")")
+for (k in c("LUX","FRA","GS")){
+  if (k = "LUX"){
+    mymean=formatC(mean(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
+    mysd=formatC(sd(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
+    out=c(out, paste0(mymean, " (", mysd, ")"))
+  } else {out = c(out, "-")}
+}
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Sample weight (mg), Mean (SD)"
+
+myn = sum(is.na(covars$Weight))
+myp = formatC(myn/length(covars$Weight)*100, format = "f", digits = 1)
+out = paste0(myn, " (", myp, "%)")
+for (k in c("LUX","FRA","GS")){
+  myn = sum(is.na(covars$Weight[covars$Batch==k]))
+  myp =  formatC(myn/sum(covars$Batch==k)*100, format = "f", digits = 1)
+  out=c(out, paste0(myn, " (", myp, "%)"))
+}
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Missing, N (%)"
+
+mymean=formatC(mean(covars$Length, na.rm=TRUE), format="f", digits=2)
+mysd=formatC(sd(covars$Length, na.rm=TRUE), format="f", digits=2)
+out=paste0(mymean, " (", mysd, ")")
+for (k in c("LUX","FRA","GS")){
+  if (k == "LUX"){
+    mymean=formatC(mean(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
+    mysd=formatC(sd(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
+    out=c(out, paste0(mymean, " (", mysd, ")"))
+  } else {out = c(out, "-")}
+}
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Sample length (cm), Mean (SD)"
+
+myn = sum(is.na(covars$Length))
+myp = formatC(myn/length(covars$Length)*100, format = "f", digits = 1)
+out = paste0(myn, " (", myp, "%)")
+for (k in c("LUX","FRA","GS")){
+  myn = sum(is.na(covars$Length[covars$Batch==k]))
+  myp = formatC(myn/sum(covars$Batch==k)*100, format = "f", digits = 1)
+  out=c(out, paste0(myn, " (", myp, "%)"))
+}
+mytable=rbind(mytable, out)
+rownames(mytable)[nrow(mytable)]="Missing, N (%)"
+out = nrow(covars)
+for (k in c("LUX","FRA","GS")){
+  out=c(out, sum(covars$Batch==k))
+}
+colnames(mytable)=paste0(c("Pooled","Luxembourg","France","Grande-Synthe"),
+                         " (N=",out,")")
+SaveExcelWithSuperscripts(cbind(rownames(mytable),mytable), "../Exports/Table1_covariates.xlsx")
