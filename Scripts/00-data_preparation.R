@@ -39,7 +39,7 @@ covars$Batch = factor("LUX")
 
 ## Exposure matrix
 expo = mydata[1:39,8:ncol(mydata)]
-rownames(expo) = expo$Indiv.ID
+rownames(expo) = covars$Indiv.ID
 expo = na_if(expo, "No result")
 
 # Translate chemical names to English
