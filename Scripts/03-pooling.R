@@ -50,7 +50,8 @@ saveRDS(extract_diff, paste0("../Results/",filepaths[4],"/Chemical_compound_info
 
 # Merge chemical compound information
 expo = bind_rows(expo_lux, expo_fra, expo_gs)
-expo = expo[covars$Indiv.ID,]
+expo = expo[rownames(covars),]
+all(rownames(expo)==rownames(covars))
 
 chem = full_join(chem_lux, chem_fra, by = "Compound", suffix = c(".lux", ".fra")) %>%
   full_join(chem_gs, by = "Compound") %>%
@@ -123,14 +124,14 @@ expo = rbind(tmp, tmp2, tmp3)
 
 # Convert to numeric (Replace any characters with NaN and add rownames)
 expo = apply(expo, 2, as.numeric)
-rownames(expo) = covars$Indiv.ID
+rownames(expo) = rownames(covars)
 
 summary(expo)
 # Save data sets
 saveRDS(expo, paste0("../Processed/",filepaths[4],"/Exposure_matrix_ndimp_thresh.rds"))
 
 
-### Pooled2 (LUX/FRA/GS) ----
+### Pooled2 (LUX/GS) ----
 # Initialise
 rm(list=ls())
 path=dirname(rstudioapi::getActiveDocumentContext()$path)
@@ -167,7 +168,8 @@ dim(extract_diff)
 
 # Merge chemical compound information
 expo = bind_rows(expo_lux, expo_gs)
-expo = expo[covars$Indiv.ID,]
+expo = expo[rownames(covars),]
+all(rownames(expo)==rownames(covars))
 
 chem = full_join(chem_lux, chem_gs, by = "Compound", suffix = c(".lux", ".gs")) %>%
   mutate(Family = coalesce(Family.lux,Family.gs)) %>%
@@ -184,10 +186,6 @@ chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
 # Number of chemical compounds with 90% or more nd or NA
 sum(chem$nd_prop + chem$NA_prop>=0.9)
 
-# Add rownames
-rownames(covars) = covars$Indiv.ID
-rownames(expo) = covars$Indiv.ID
-
 # Save data sets
 ifelse(dir.exists(paste0("../Processed/",filepaths[5])),"",dir.create(paste0("../Processed/",filepaths[5])))
 saveRDS(covars, paste0("../Processed/",filepaths[5],"/Participant_covariate_info_thresh.rds"))
@@ -200,8 +198,6 @@ chem = chem[which(chem$nd_prop + chem$NA_prop<0.9),]
 ncol(expo)
 
 max(rowSums(is.na(expo))/nrow(expo))
-
-rownames(expo) = covars$Indiv.ID
 
 # Save data sets
 saveRDS(chem, paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
@@ -236,7 +232,7 @@ expo = rbind(tmp, tmp3)
 
 # Convert to numeric (Replace any characters with NaN and add rownames)
 expo = apply(expo, 2, as.numeric)
-rownames(expo) = covars$Indiv.ID
+rownames(expo) = rownames(covars)
 
 summary(expo)
 # Save data sets

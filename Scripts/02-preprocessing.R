@@ -113,19 +113,19 @@ covars_gs = covars_gs = covars_gs %>%
   mutate_if(is.character, as.factor)
 str(covars_gs)
 
-# Adjust chemical matrices
-expo_lux = expo_lux[covars_lux$Indiv.ID,]
-expo_fra = expo_fra[covars_fra$Indiv.ID,]
-expo_gs = expo_gs[covars_gs$Indiv.ID,]
-
 # Add rownames
 rownames(covars_lux) = covars_lux$Indiv.ID
 rownames(covars_fra) = covars_fra$Indiv.ID
 rownames(covars_gs) = covars_gs$Indiv.ID
 
-rownames(expo_lux) = covars_lux$Indiv.ID
-rownames(expo_fra) = covars_fra$Indiv.ID
-rownames(expo_gs) = covars_gs$Indiv.ID
+# Adjust chemical matrices
+expo_lux = expo_lux[rownames(covars_lux),]
+expo_fra = expo_fra[rownames(covars_fra),]
+expo_gs = expo_gs[rownames(covars_gs),]
+
+all(rownames(covars_lux)==rownames(rownames(expo_lux)))
+all(rownames(covars_fra)==rownames(rownames(expo_fra)))
+all(rownames(covars_gs)==rownames(rownames(expo_gs)))
 
 ifelse(dir.exists("../Processed/"),"",dir.create("../Processed/"))
 ifelse(dir.exists(paste0("../Processed/",filepaths[1])),"",dir.create(paste0("../Processed/",filepaths[1])))
@@ -163,11 +163,6 @@ ncol(expo_lux)
 ncol(expo_fra)
 ncol(expo_gs)
 
-# Add rownames
-rownames(expo_lux) = covars_lux$Indiv.ID
-rownames(expo_fra) = covars_fra$Indiv.ID
-rownames(expo_gs) = covars_gs$Indiv.ID
-
 saveRDS(expo_lux, paste0("../Processed/",filepaths[1],"/Exposure_matrix_raw_thresh.rds"))
 saveRDS(expo_fra,  paste0("../Processed/",filepaths[2],"/Exposure_matrix_raw_thresh.rds"))
 saveRDS(expo_gs,  paste0("../Processed/",filepaths[3],"/Exposure_matrix_raw_thresh.rds"))
@@ -189,13 +184,13 @@ for(k in 1:ncol(expo_gs)){
 
 # Convert to numeric (Replace any characters with NaN and add rownames)
 expo_lux = apply(expo_lux, 2, as.numeric)
-rownames(expo_lux) = covars_lux$Indiv.ID
+rownames(expo_lux) = rownames(covars_lux)
 
 expo_fra = apply(expo_fra, 2, as.numeric)
-rownames(expo_fra) = covars_fra$Indiv.ID
+rownames(expo_fra) = rownames(covars_fra)
 
 expo_gs = apply(expo_gs, 2, as.numeric)
-rownames(expo_gs) = covars_gs$Indiv.ID
+rownames(expo_gs) = rownames(covars_gs)
 
 # Save data sets
 saveRDS(expo_lux, paste0("../Processed/",filepaths[1],"/Exposure_matrix_ndimp_thresh.rds"))
