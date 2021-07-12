@@ -44,10 +44,6 @@ min(covars_lux$Weight, na.rm = T)
 covars_lux = covars_lux[-which(covars_lux$Weight < 35),]
 min(covars_lux$Weight, na.rm = T)
 
-# Adjust chemical matrices
-expo_lux = expo_lux[covars_lux$Indiv.ID,]
-expo_gs = expo_gs[covars_gs$Indiv.ID,]
-
 # Randomly sampling 2 children out of 3-4 child groups
 set.seed(280621)
 covars_lux = covars_lux[which(group_sample(covars_lux$Family.ID, covars_lux$Family.ID, 2)),]
@@ -57,12 +53,6 @@ nrow(covars_lux)
 nrow(covars_fra)
 nrow(covars_gs)
 
-# Adjust chemical matrices
-expo_lux = expo_lux[covars_lux$Indiv.ID,]
-expo_fra = expo_fra[covars_fra$Indiv.ID,]
-expo_gs = expo_gs[covars_gs$Indiv.ID,]
-
-### Covariate infromation ---- 
 # Recoding Family Sibling ID
 covars_lux$Family.ID = ifelse(covars_lux$Sibling.ID=="Only child","Isolated",covars_lux$Family.ID)
 covars_lux$Sibling.ID = ifelse(covars_lux$Sibling.ID=="Only child","Isolated",covars_lux$Sibling.ID)
@@ -123,6 +113,20 @@ covars_gs = covars_gs = covars_gs %>%
   mutate_if(is.character, as.factor)
 str(covars_gs)
 
+# Adjust chemical matrices
+expo_lux = expo_lux[covars_lux$Indiv.ID,]
+expo_fra = expo_fra[covars_fra$Indiv.ID,]
+expo_gs = expo_gs[covars_gs$Indiv.ID,]
+
+# Add rownames
+rownames(covars_lux) = covars_lux$Indiv.ID
+rownames(covars_fra) = covars_fra$Indiv.ID
+rownames(covars_gs) = covars_gs$Indiv.ID
+
+rownames(expo_lux) = covars_lux$Indiv.ID
+rownames(expo_fra) = covars_fra$Indiv.ID
+rownames(expo_gs) = covars_gs$Indiv.ID
+
 ifelse(dir.exists("../Processed/"),"",dir.create("../Processed/"))
 ifelse(dir.exists(paste0("../Processed/",filepaths[1])),"",dir.create(paste0("../Processed/",filepaths[1])))
 ifelse(dir.exists(paste0("../Processed/",filepaths[2])),"",dir.create(paste0("../Processed/",filepaths[2])))
@@ -158,6 +162,11 @@ chem_gs = chem_gs[which(chem_gs$nd_prop + chem_gs$NA_prop<0.9),]
 ncol(expo_lux)
 ncol(expo_fra)
 ncol(expo_gs)
+
+# Add rownames
+rownames(expo_lux) = covars_lux$Indiv.ID
+rownames(expo_fra) = covars_fra$Indiv.ID
+rownames(expo_gs) = covars_gs$Indiv.ID
 
 saveRDS(expo_lux, paste0("../Processed/",filepaths[1],"/Exposure_matrix_raw_thresh.rds"))
 saveRDS(expo_fra,  paste0("../Processed/",filepaths[2],"/Exposure_matrix_raw_thresh.rds"))
