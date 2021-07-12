@@ -65,8 +65,8 @@ for (i in 1:length(batches)){
   
   ifelse(dir.exists("../Results"),"",dir.create("../Results"))
   ifelse(dir.exists(paste0("../Results/",filepaths[i])),"",dir.create(paste0("../Results/",filepaths[i])))
-  saveRDS(pvals, paste0("../Results/",filepaths[i],"/univar_covar_pvals.rds"))
-  saveRDS(betas, paste0("../Results/",filepaths[i],"/univar_covar_betas.rds"))
+  saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_exposure_covariate_pvals.rds"))
+  saveRDS(betas, paste0("../Results/",filepaths[i],"/Univariate_exposure_covariate_betas.rds"))
 }
 
 
@@ -97,6 +97,7 @@ for (i in 1:length(batches)){
   expo = ifelse(expo=="nd",1,0)
   # Exclude chemicals with 0% non-detects
   expo = expo[,which(colSums(expo,na.rm = TRUE)!=0)]
+  saveRDS(expo, paste0("../Processed/",filepaths[i],"/Exposure_matrix_nd.rds"))
   
   ncol(expo) * ncol(X) # number of tests
   betas = pvals = NULL
@@ -133,8 +134,8 @@ for (i in 1:length(batches)){
     abline(h = -log10(0.05/length(betas[,n])), lty = 2)
   }
   dev.off()
-  saveRDS(pvals, paste0("../Results/",filepaths[i],"/univar_nd_covar_pvals.rds"))
-  saveRDS(betas, paste0("../Results/",filepaths[i],"/univar_nd_covar_betas.rds"))
-  assign(paste0("betas_",suffix[i]),betas)
-  assign(paste0("pvals_",suffix[i]),pvals)
+  saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_detection_covariate_pvals.rds"))
+  saveRDS(betas, paste0("../Results/",filepaths[i],"/Univariate_detection_covariate_betas.rds"))
+  # assign(paste0("betas_",suffix[i]),betas)
+  # assign(paste0("pvals_",suffix[i]),pvals)
 }
