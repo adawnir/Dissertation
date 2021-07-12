@@ -38,7 +38,7 @@ for (i in 1:length(batches)){
              annotation_names_row = FALSE, annotation_names_col = FALSE, 
              annotation_row = mat_col,annotation_col = mat_col, annotation_colors = mat_colors)
     dev.off()
-  }
+    }
   {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix_clustered.pdf"), width = 14, height = 12)
     pheatmap(cor,
              show_rownames = FALSE, show_colnames = FALSE, border_color = NA,
