@@ -30,9 +30,7 @@ for (i in 1:length(batches)){
     lod = formatC(chem$LOD[k], format="e", digits=2)
     detect_rate = formatC(1-(chem$nd_prop[k]+chem$NA_prop[k]), format="f", digits=2)
     q = quantile(expo[,k], na.rm = T)
-    q = ifelse(sapply(q, function(x) round(x,2)) <= 0.1,
-               formatC(q, format="e", digits=2),
-               formatC(q, format="f", digits=2))
+    q = flex_format(q, 2, 0.1)
     if(i %in% c(4,5)){
       missing_rate = formatC(chem$NA_prop[k], format="f", digits=2)
       tmp=c(lod,detect_rate,missing_rate,q)
