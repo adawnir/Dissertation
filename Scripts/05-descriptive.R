@@ -46,8 +46,6 @@ for (i in 1:length(batches)){
              annotation_row = mat_col,annotation_col = mat_col, annotation_colors = mat_colors)
     dev.off()
     }
-  # assign(paste0("expo_",suffix[i]),expo)
- 
   ### PCA for visualisation ----
   mypca=PCA(expo)
   
