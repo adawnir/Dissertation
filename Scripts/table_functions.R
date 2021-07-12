@@ -2,19 +2,19 @@ ContinuousTest3=function(x, y){
   # By status
   out=NULL
   for (k in c("LUX","FRA","GS")){
-    mymean=formatC(mean(x[y==k], na.rm=TRUE), format="f", digits=2)
-    mysd=formatC(sd(x[y==k], na.rm=TRUE), format="f", digits=2)
+    mymean=formatC(10^mean(x[y==k], na.rm=TRUE), format="f", digits=2)
+    mysd=formatC(10^sd(x[y==k], na.rm=TRUE), format="f", digits=2)
     out=c(out, paste0(mymean, " (", mysd, ")"))
   }
   
   # T-test
-  mytest1=t.test(x=x[which(y=="LUX")], y=x[which(y=="FRA")], alternative="two.sided")
-  mytest2=t.test(x=x[which(y=="LUX")], y=x[which(y=="GS")], alternative="two.sided")
-  mytest3=t.test(x=x[which(y=="FRA")], y=x[which(y=="GS")], alternative="two.sided")
-  mypval1=formatC(mytest1$p.value, format="e", digits=2)
-  mypval2=formatC(mytest2$p.value, format="e", digits=2)
-  mypval3=formatC(mytest3$p.value, format="e", digits=2)
-  out=c(out, mypval1, mypval2, mypval3)
+  f1='x ~ y'
+  f0='x ~ 1'
+  model1=lm(as.formula(f1))
+  model0=lm(as.formula(f0))
+  mytest=anova(model0, model1, test = 'Chisq')
+  mypval=formatC(mytest$`Pr(>Chi)`[2], format="e", digits=2)
+  out=c(out, mypval)
   
   return(out)
 }
@@ -23,8 +23,8 @@ ContinuousTest2=function(x, y){
   # By status
   out=NULL
   for (k in c("LUX","GS")){
-    mymean=formatC(mean(x[y==k], na.rm=TRUE), format="f", digits=2)
-    mysd=formatC(sd(x[y==k], na.rm=TRUE), format="f", digits=2)
+    mymean=formatC(10^mean(x[y==k], na.rm=TRUE), format="f", digits=2)
+    mysd=formatC(10^sd(x[y==k], na.rm=TRUE), format="f", digits=2)
     out=c(out, paste0(mymean, " (", mysd, ")"))
   }
   
