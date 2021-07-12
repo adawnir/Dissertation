@@ -29,6 +29,13 @@ rtruncnorm = function(n, mean = 0, sd = 1, min = -Inf, max = Inf){
   qnorm(x, mean, sd)
 }
 
+# Flexible formatting
+flex_format = function(f, digits = 2, thresh = 0.1){
+  ifelse(sapply(f, function(x) round(x,digits)) <= thresh,
+         formatC(f, format="e", digits=2),
+         formatC(f, format="f", digits=2))
+}
+
 # Create PCA score plot
 CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL,pch=19){
   if (is.null(comp)){
