@@ -30,7 +30,7 @@ for (i in 1:length(batches)){
   
   cor = cor(expo, method = "spearman")
   ifelse(dir.exists(paste0("../Figures/",filepaths[i])),"",dir.create(paste0("../Figures/",filepaths[i])))
-  {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix.pdf"), width = 14)
+  {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix.pdf"), width = 14, height = 12)
     pheatmap(cor,
              show_rownames = FALSE, show_colnames = FALSE, border_color = NA,
              cluster_rows = FALSE, cluster_cols = FALSE,
@@ -38,7 +38,7 @@ for (i in 1:length(batches)){
              annotation_row = mat_col,annotation_col = mat_col, annotation_colors = mat_colors)
     dev.off()
   }
-  {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix_clustered.pdf"), width = 14)
+  {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix_clustered.pdf"), width = 14, height = 12)
     pheatmap(cor,
              show_rownames = FALSE, show_colnames = FALSE, border_color = NA,
              treeheight_row = 0, treeheight_col = 0,
