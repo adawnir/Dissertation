@@ -21,6 +21,7 @@ suffix = c("lux","fra","gs","pooled3","pooled2")
 for (i in 1:length(batches)){
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
+  print(all(rownames(expo)==rownames(covars)))
   ### Correlation matrix ----
   annot_sub = annot[colnames(expo)]
   mat_col = data.frame(Family = annot_sub)
