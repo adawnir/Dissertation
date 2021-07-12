@@ -184,6 +184,10 @@ chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
 # Number of chemical compounds with 90% or more nd or NA
 sum(chem$nd_prop + chem$NA_prop>=0.9)
 
+# Add rownames
+rownames(covars) = covars$Indiv.ID
+rownames(expo) = covars$Indiv.ID
+
 # Save data sets
 ifelse(dir.exists(paste0("../Processed/",filepaths[5])),"",dir.create(paste0("../Processed/",filepaths[5])))
 saveRDS(covars, paste0("../Processed/",filepaths[5],"/Participant_covariate_info_thresh.rds"))
@@ -196,6 +200,8 @@ chem = chem[which(chem$nd_prop + chem$NA_prop<0.9),]
 ncol(expo)
 
 max(rowSums(is.na(expo))/nrow(expo))
+
+rownames(expo) = covars$Indiv.ID
 
 # Save data sets
 saveRDS(chem, paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
