@@ -140,6 +140,7 @@ tmp5 = chem_pooled2$nd_prop + chem_pooled2$NA_prop
 names(tmp5) = chem_pooled2$Compound
 
 prop = list(tmp1, tmp2, tmp3, tmp4, tmp5)
+prop = lapply(prop, function(x) 1-x)
 sorted_prop = lapply(prop, sort)
 N=list(NULL, NULL, NULL, NULL, NULL)
 thrseq=seq(0,1,by=0.05)
