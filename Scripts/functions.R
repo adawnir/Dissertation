@@ -44,6 +44,7 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL,pch=19
     comp=matrix(c(1,2,1,3,2,3), byrow=TRUE, ncol=2)
   }
   compare = sapply(type, function(x) x==type)
+  compare[which(type=="Isolated"),which(type=="Isolated")] = FALSE
   start = which(compare, arr.ind=TRUE)[,1]
   end = which(compare, arr.ind=TRUE)[,2]
   if (!is.null(filename)){
@@ -55,7 +56,7 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL,pch=19
     ycomp=comp[k,2]
     S = mypca$ind$coord[,c(xcomp,ycomp)]
     plot(S, pch=pch, cex=0.7, las=1, 
-         col=ifelse(is.na(type), "grey", mycolours[type]),
+         col=mycolours[type],
          xlab=paste0("Comp ",xcomp," (", round(ev[xcomp], digits=2), "% e.v.)"),
          ylab=paste0("Comp ",ycomp," (", round(ev[ycomp], digits=2), "% e.v.)"))
     segments(S[start,1],S[start,2],S[end,1],S[end,2], col = alpha("grey",0.5))
@@ -74,6 +75,41 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL,pch=19
     dev.off()
   }
 }
+
+CreateScorePlot2=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=19, legend=TRUE){
+  if (is.null(comp)){
+    comp=matrix(c(1,2,1,3,2,3), byrow=TRUE, ncol=2)
+  }
+  compare = sapply(type, function(x) x==type)
+  compare[which(type=="Isolated"),which(type=="Isolated")] = FALSE
+  start = which(compare, arr.ind=TRUE)[,1]
+  end = which(compare, arr.ind=TRUE)[,2]
+  if (!is.null(filename)){
+    pdf(paste0(filename), width=19, height=5) 
+  }
+  par(mfrow=c(1,4))
+  for (k in 1:nrow(comp)){
+    xcomp=comp[k,1]
+    ycomp=comp[k,2]
+    S = mypca$ind$coord[,c(xcomp,ycomp)]
+    plot(S, pch=pch, cex=0.7, las=1, 
+         col=mycolours[type],
+         xlab=paste0("Comp ",xcomp," (", round(ev[xcomp], digits=2), "% e.v.)"),
+         ylab=paste0("Comp ",ycomp," (", round(ev[ycomp], digits=2), "% e.v.)"))
+    abline(v=axTicks(1), lty=3, col="grey")
+    abline(h=axTicks(2), lty=3, col="grey")
+  }
+  if (isTRUE(legend)){
+    plot(0, 0, type = 'l', bty = 'n', xaxt = 'n', yaxt = 'n', xlab = "", ylab = "")
+    legend("left", col=mycolours,
+           pch=pch, pt.cex=0.7, legend=names(mycolours), bty = "n")
+  }
+  if (!is.null(filename)){
+    print("Saved to filename")
+    dev.off()
+  }
+}
+
 
 # Create clustering dendrogram graph
 ClusteringToGraph=function(covars,myphylo){
