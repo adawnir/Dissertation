@@ -22,6 +22,9 @@ for (i in 1:length(batches)){
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
   print(all(rownames(expo)==rownames(covars)))
+  
+  covars$Region = droplevels(covars$Region)
+  covars$Department = droplevels(covars$Department)
   ### Correlation matrix ----
   annot_sub = annot[colnames(expo)]
   mat_col = data.frame(Family = annot_sub)
@@ -49,7 +52,7 @@ for (i in 1:length(batches)){
     dev.off()
     }
   ### PCA for visualisation ----
-  mypca=PCA(expo)
+  mypca=PCA(expo, graph = FALSE)
   
   {pdf(paste0("../Figures/",filepaths[i],"/PCA_scree_plot.pdf"))
     par(mar=c(5,5,1,1))
@@ -61,13 +64,30 @@ for (i in 1:length(batches)){
     dev.off()
   }
   ev=mypca$eig[,2]
-  families=unique(covars$Family.ID)
-  families.number = as.numeric(gsub(".*[A-Z](\\d+).*", "\\1", covars$Family.ID))
+  families=unique(as.character(covars$Family.ID))
   mycolours=brewer.pal(n=12,name='Paired')
-  mycolours=colorRampPalette(mycolours)(length(families[families!="Isolated"]))
-  names(mycolours)=families[families!="Isolated"]
-  CreateScorePlot(mypca=mypca, type=families.number, mycolours=mycolours,
+  mycolours=c(colorRampPalette(mycolours)(length(families[families!="Isolated"])),"grey")
+  names(mycolours)=c(families[families!="Isolated"],"Isolated")
+  CreateScorePlot(mypca=mypca, type=as.character(covars$Family.ID), mycolours=mycolours,
                   filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot.pdf"))
+  if (i %in% 4:5){
+    CreateScorePlot2(mypca=mypca, type=as.character(covars$Batch),
+                     mycolours=batch.colours[levels(covars$Batch)],
+                     filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_batch.pdf"))
+  }
+  if (i==4){
+    mycolours=brewer.pal(n=12,name='Paired')
+    mycolours=colorRampPalette(mycolours)(length(levels(covars$Region)))
+    names(mycolours) = levels(covars$Region)
+    CreateScorePlot2(mypca=mypca, type=as.character(covars$Region), mycolours=mycolours,
+                    filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_region.pdf"))
+    mycolours=brewer.pal(n=12,name='Paired')
+    mycolours=colorRampPalette(mycolours)(length(levels(covars$Department)))
+    names(mycolours) = levels(covars$Department)
+    CreateScorePlot2(mypca=mypca, type=as.character(covars$Department), mycolours=mycolours,
+                     filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_depart.pdf"))
+  }
+  
   mycor=cor(expo, mypca$ind$coord)
 
   {pdf(paste0("../Figures/",filepaths[i],"/PCA_correlation_circle.pdf"), width=14, height=5)
