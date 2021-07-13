@@ -67,10 +67,11 @@ covars_lux$Sibling.ID[which(covars_lux$Family.ID!="Isolated")] = ave(tmp, tmp, F
 table(covars_lux$Family.ID)
 table(covars_lux$Sibling.ID)
 str(covars_lux)
+
 covars_lux = covars_lux %>%
   select(Indiv.ID, Age, Gender, Family.ID, Sibling.ID, Weight, Length,
          Area, Department, Region, Country, Batch) %>%
-  mutate_if(is.character, as.factor)
+  mutate_if(is.character, factor.order)
 str(covars_lux)
 
 # Recoding Family Sibling ID
@@ -89,7 +90,7 @@ str(covars_fra)
 covars_fra = covars_fra = covars_fra %>%
   select(Indiv.ID, Age, Gender, Family.ID, Sibling.ID,
          Area, Department, Region, Country, Batch) %>%
-  mutate_if(is.character, as.factor)
+  mutate_if(is.character, factor.order)
 str(covars_fra)
 
 # Recoding Family Sibling ID
@@ -110,7 +111,7 @@ str(covars_gs)
 covars_gs = covars_gs = covars_gs %>%
   select(Indiv.ID, Age, Gender, Family.ID, Sibling.ID,
          Area, Department, Region, Country, Batch) %>%
-  mutate_if(is.character, as.factor)
+  mutate_if(is.character, factor.order)
 str(covars_gs)
 
 # Add rownames
