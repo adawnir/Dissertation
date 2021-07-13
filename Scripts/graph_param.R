@@ -10,4 +10,5 @@ names(annot.colours) = chem_family
 
 filepaths = c("Luxembourg", "France", "GrandeSynthe", "Pooled3", "Pooled2")
 batches = c("Luxembourg", "France", "Grande-Synthe", "Pooled (LUX/FRA/GS)", "Pooled (LUX/GS)")
-batch.colours = c("tomato", "royalblue", "forestgreen", "navy", "darkgoldenrod")
+batch.colours = c("tomato", "royalblue", "forestgreen", "mediumpurple", "darkgoldenrod")
+names(batch.colours) = c("LUX","FRA","GS","Pooled3","Pooled2")
