@@ -39,7 +39,7 @@ flex_format = function(f, digits = 2, thresh = 0.1){
 }
 
 # Create PCA score plot
-CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL,pch=19){
+CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL,pch=19, legend = TRUE){
   if (is.null(comp)){
     comp=matrix(c(1,2,1,3,2,3), byrow=TRUE, ncol=2)
   }
@@ -48,9 +48,9 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL,pch=19
   start = which(compare, arr.ind=TRUE)[,1]
   end = which(compare, arr.ind=TRUE)[,2]
   if (!is.null(filename)){
-    pdf(paste0(filename), width=14, height=5) 
+    pdf(paste0(filename), width=19, height=5) 
   }
-  par(mfrow=c(1,3))
+  par(mfrow=c(1,4))
   for (k in 1:nrow(comp)){
     xcomp=comp[k,1]
     ycomp=comp[k,2]
@@ -62,13 +62,11 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL,pch=19
     segments(S[start,1],S[start,2],S[end,1],S[end,2], col = alpha("grey",0.5))
     abline(v=axTicks(1), lty=3, col="grey")
     abline(h=axTicks(2), lty=3, col="grey")
-    # if (k==1){
-    #   legend("top", col=c(mycolours), 
-    #          pch=c(rep(19,length(families))), 
-    #          # cex=0.7,
-    #          pt.cex=c(rep(0.5,length(families)),1), 
-    #          legend=c(families), ncol=10, bg="white")
-    # }
+  }
+  if (isTRUE(legend)){
+    plot(0, 0, type = 'l', bty = 'n', xaxt = 'n', yaxt = 'n', xlab = "", ylab = "")
+    legend("left", col=mycolours, ncol = ceiling(length(mycolours)/15),
+           pch=pch, pt.cex=0.7, legend=names(mycolours), bty = "n")
   }
   if (!is.null(filename)){
     print("Saved to filename")
