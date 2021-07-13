@@ -53,10 +53,12 @@ for (i in 1:length(batches)){
   for (n in 1:ncol(betas)){
     plot(betas[,n], -log10(pvals[,n]), pch=19,
          col=ifelse(pvals[,n] < 0.05/length(betas[,n]), annot.colours[annot_sub], "grey"),
-         cex.lab=1, cex = 0.7, xlim = c(-max(abs(betas[,n])), max(abs(betas[,n]))),
+         cex.lab=1, cex = 0.7,
+         ylim = c(0, max(-log10(pvals[,n]))+0.25),
+         xlim = c(-max(abs(betas[,n]))-0.4, max(abs(betas[,n]))+0.4),
          ylab=expression(-log[10](p-value)), 
          xlab=substitute(paste(beta,"(",tmp,")"), list(tmp = colnames(betas)[n])))
-    text(betas[,n]+sign(betas[,n])*0.15, -log10(pvals[,n]),
+    text(betas[,n]+sign(betas[,n])*0.1, -log10(pvals[,n])+0.25,
          labels = ifelse(pvals[,n] < 0.05/length(betas[,n]), rownames(betas), ""),
          col = annot.colours[annot_sub])
     abline(h = -log10(0.05/length(betas[,n])), lty = 2)
@@ -125,10 +127,12 @@ for (i in 1:length(batches)){
   for (n in 1:ncol(betas)){
     plot(betas[,n], -log10(pvals[,n]), pch=19,
          col=ifelse(pvals[,n] < 0.05/length(betas[,n]), annot.colours[annot_sub], "grey"),
-         cex.lab=1, cex = 0.7, xlim = c(-max(abs(betas[,n])), max(abs(betas[,n]))),
+         cex.lab=1, cex = 0.7,
+         ylim = c(0, max(-log10(pvals[,n])+0.25)),
+         xlim = c(-max(abs(betas[,n])), max(abs(betas[,n]))),
          ylab=expression(-log[10](p-value)), 
          xlab=substitute(paste(beta,"(",tmp,")"), list(tmp = colnames(betas)[n])))
-    text(betas[,n]+sign(betas[,n])*5.5, -log10(pvals[,n]),
+    text(betas[,n]+sign(betas[,n])*5, -log10(pvals[,n])+0.25,
          labels = ifelse(pvals[,n] < 0.05/length(betas[,n]), rownames(betas), ""),
          col = annot.colours[annot_sub])
     abline(h = -log10(0.05/length(betas[,n])), lty = 2)
