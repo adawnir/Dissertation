@@ -27,15 +27,15 @@ colnames(covars) = c("Family.ID", "Sibling.ID", "Indiv.ID", "Age", "Gender","Wei
 table(covars$Gender, useNA = "ifany")
 # Recoding gender
 covars$Gender[which(covars$Gender=="Jules")] = "Male"
-covars$Gender = factor(covars$Gender)
+covars$Gender = covars$Gender
 table(covars$Gender, useNA = "ifany")
 
 ## Area
-covars$Area = factor("Luxembourg")
-covars$Department = factor("Luxembourg")
-covars$Region = factor("Luxembourg")
-covars$Country = factor("Luxembourg")
-covars$Batch = factor("LUX")
+covars$Area = "Luxembourg"
+covars$Department = "Luxembourg"
+covars$Region = "Luxembourg"
+covars$Country = "Luxembourg"
+covars$Batch = "LUX"
 
 ## Exposure matrix
 expo = mydata[1:39,8:ncol(mydata)]
@@ -135,7 +135,7 @@ covars$Age = as.numeric(covars$Age)
 table(covars$Gender, useNA = "ifany")
 # Recoding gender
 covars$Gender = ifelse(covars$Gender=="M", "Male", "Female")
-covars$Gender = factor(covars$Gender)
+covars$Gender = covars$Gender
 table(covars$Gender, useNA = "ifany")
 
 ## Area
@@ -143,10 +143,10 @@ table(covars$Area, useNA = "ifany")
 
 area = read.csv("../Dictionaries/French_area_codes.csv")
 rownames(area) = area$Code.Commune
-covars$Region = factor(area[covars$Area,"Region"])
-covars$Department = factor(area[covars$Area,"Department"])
-covars$Country = factor("France")
-covars$Batch = factor("FRA")
+covars$Region = area[covars$Area,"Region"]
+covars$Department = area[covars$Area,"Department"]
+covars$Country = "France"
+covars$Batch = "FRA"
 
 ## Exposure matrix
 expo = mydata[1:142,6:ncol(mydata)]
@@ -233,17 +233,17 @@ covars$Siblings.Groups = gsub("Isolate$", "Isolated",covars$Siblings.Groups)
 table(covars$Gender, useNA = "ifany")
 # Recoding gender
 covars$Gender = ifelse(covars$Gender=="M", "Male", ifelse(covars$Gender=="H", "Male", "Female"))
-covars$Gender = factor(covars$Gender)
+covars$Gender = covars$Gender
 table(covars$Gender, useNA = "ifany")
 
 ## Area
-covars$Area = factor("Grande-Synthe")
+covars$Area = "Grande-Synthe"
 area = read.csv("../Dictionaries/French_area_codes.csv")
 rownames(area) = area$Code.Commune
-covars$Region = factor(area[covars$Area,"Region"])
-covars$Department = factor(area[covars$Area,"Department"])
-covars$Country = factor("France")
-covars$Batch = factor("GS")
+covars$Region = area[covars$Area,"Region"]
+covars$Department = area[covars$Area,"Department"]
+covars$Country = "France"
+covars$Batch = "GS"
 
 ## Exposure matrix
 expo = mydata[1:44,5:ncol(mydata)]
