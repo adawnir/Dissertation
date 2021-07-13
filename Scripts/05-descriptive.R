@@ -30,6 +30,7 @@ for (i in 1:length(batches)){
   names(mat_colors$Family) = unique(annot_sub)
   
   cor = cor(expo, method = "spearman")
+  
   ifelse(dir.exists(paste0("../Figures/",filepaths[i])),"",dir.create(paste0("../Figures/",filepaths[i])))
   {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix.pdf"), width = 14, height = 12)
     pheatmap(cor,
@@ -41,10 +42,10 @@ for (i in 1:length(batches)){
     }
   {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix_clustered.pdf"), width = 14, height = 12)
     pheatmap(cor,
-             show_rownames = FALSE, show_colnames = FALSE, border_color = NA,
-             treeheight_row = 0, treeheight_col = 0,
-             annotation_names_row = FALSE, annotation_names_col = FALSE, 
-             annotation_row = mat_col,annotation_col = mat_col, annotation_colors = mat_colors)
+           show_rownames = FALSE, show_colnames = FALSE, border_color = NA,
+           treeheight_row = 0, treeheight_col = 0,
+           annotation_names_row = FALSE, annotation_names_col = FALSE, 
+           annotation_row = mat_col,annotation_col = mat_col, annotation_colors = mat_colors)
     dev.off()
     }
   ### PCA for visualisation ----
