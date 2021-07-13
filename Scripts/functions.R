@@ -15,6 +15,8 @@ group_sample = function(x,group,n, exclude = NULL){
   return(as.logical(tmp))
 }
 
+factor.order = function(x) {factor(x, levels = unique(x))}
+
 # Compare multiple vectors and ignore NA
 is.equal = function(mylist) {
   check.eq = sapply(mylist[-1], function(x) {x == mylist[[1]]})
@@ -44,13 +46,13 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL,pch=19
   compare = sapply(type, function(x) x==type)
   start = which(compare, arr.ind=TRUE)[,1]
   end = which(compare, arr.ind=TRUE)[,2]
-  pdf(paste0(filename), width=14, height=5)
+  if (!is.null(filename)){
+    pdf(paste0(filename), width=14, height=5) 
+  }
   par(mfrow=c(1,3))
   for (k in 1:nrow(comp)){
     xcomp=comp[k,1]
     ycomp=comp[k,2]
-    if (!is.null(filename)){
-    }
     S = mypca$ind$coord[,c(xcomp,ycomp)]
     plot(S, pch=pch, cex=0.7, las=1, 
          col=ifelse(is.na(type), "grey", mycolours[type]),
@@ -68,6 +70,7 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL,pch=19
     # }
   }
   if (!is.null(filename)){
+    print("Saved to filename")
     dev.off()
   }
 }
