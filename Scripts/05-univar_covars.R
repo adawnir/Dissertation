@@ -126,10 +126,10 @@ for (j in colnames(pvals_pooled3)){
       axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
            col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
     }
-    legend("topleft", lty = c(rep(2,2)),
+    legend("top", lty = c(rep(2,2)),
            col=c(darken(batch.colours[4], 0.5), "grey"),
            legend = c("Bonferroni threshold","Nominal threshold"),
-           bg="white", cex = 0.7)
+           bg="white", cex = 0.8, horiz = TRUE)
     dev.off()
   }
 }
@@ -161,10 +161,10 @@ for (j in colnames(pvals_pooled2)){
       axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
            col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
     }
-    legend("topleft", lty = c(rep(2,2)),
+    legend("top", lty = c(rep(2,2)),
            col=c(darken(batch.colours[5], 0.5), "grey"),
            legend = c("Bonferroni threshold","Nominal threshold"),
-           bg="white", cex = 0.7)
+           bg="white", cex = 0.8, horiz = TRUE)
     dev.off()
   }
 }
@@ -185,7 +185,7 @@ annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 suffix = c("lux","fra","gs","pooled3","pooled2")
 for (i in 1:length(batches)){
   # Load data
-  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_raw.rds"))
+  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_raw_thresh.rds"))
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
   print(all(rownames(expo)==rownames(covars)))
   if (i==1){
@@ -229,7 +229,7 @@ for (i in 1:length(batches)){
          xlim = c(-max(abs(betas[,n])), max(abs(betas[,n]))),
          ylab=expression(-log[10](p-value)), 
          xlab=substitute(paste(beta,"(",tmp,")"), list(tmp = colnames(betas)[n])))
-    text(betas[,n]+sign(betas[,n])*0.5, -log10(pvals[,n])+0.25,
+    text(betas[,n]+sign(betas[,n])*0.1, -log10(pvals[,n])+0.25,
          labels = ifelse(pvals[,n] < 0.05/length(betas[,n]), rownames(betas), ""),
          col = annot.colours[annot_sub])
     abline(h = -log10(0.05/length(betas[,n])), lty = 2)
@@ -283,7 +283,7 @@ for (j in colnames(pvals_pooled3)){
     abline(v = xseq, lty = 3, col = "grey", lwd = 0.7)
     abline(h = -log10(0.05/nrow(pvals_pooled3)), lty = 2, col = darken(batch.colours[4], 0.5))
     for(i in 1:length(xseq)){
-      axis(1, at=xseq[i], labels = rownames(pvals_pooled3)[i], las=2, cex.axis = 0.7,
+      axis(1, at=xseq[i], labels = rownames(pvals_pooled3)[i], las=2, cex.axis = 0.8,
            col.axis = ifelse(isTRUE(pvals_pooled3[i,j] < 0.05/nrow(pvals_pooled3)),
                              darken(annot.colours[(annot_sub)[i]], amount=0.5),"black"))
     }
@@ -294,10 +294,10 @@ for (j in colnames(pvals_pooled3)){
       axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
            col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
     }
-    legend("topleft", lty = c(rep(2,2)),
+    legend("top", lty = c(rep(2,2)),
            col=c(darken(batch.colours[4], 0.5), "grey"),
            legend = c("Bonferroni threshold","Nominal threshold"),
-           bg="white", cex = 0.7)
+           bg="white", cex = 0.8, horiz = TRUE)
     dev.off()
   }
 }
@@ -318,7 +318,7 @@ for (j in colnames(pvals_pooled2)){
     abline(v = xseq, lty = 3, col = "grey", lwd = 0.7)
     abline(h = -log10(0.05/nrow(pvals_pooled2)), lty = 2, col = darken(batch.colours[5], 0.5))
     for(i in 1:length(xseq)){
-      axis(1, at=xseq[i], labels = rownames(pvals_pooled2)[i], las=2, cex.axis = 0.7,
+      axis(1, at=xseq[i], labels = rownames(pvals_pooled2)[i], las=2, cex.axis = 0.8,
            col.axis = ifelse(isTRUE(pvals_pooled2[i,j] < 0.05/nrow(pvals_pooled2)),
                              darken(annot.colours[(annot_sub)[i]], amount=0.5),"black"))
     }
@@ -329,10 +329,10 @@ for (j in colnames(pvals_pooled2)){
       axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
            col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
     }
-    legend("topleft", lty = c(rep(2,2)),
+    legend("top", lty = c(rep(2,2)),
            col=c(darken(batch.colours[5], 0.5), "grey"),
            legend = c("Bonferroni threshold","Nominal threshold"),
-           bg="white", cex = 0.7)
+           bg="white", cex = 0.8, horiz = TRUE)
     dev.off()
   }
 }

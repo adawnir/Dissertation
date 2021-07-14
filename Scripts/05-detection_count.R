@@ -21,9 +21,11 @@ annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 suffix = c("lux","fra","gs","pooled3","pooled2")
 for (i in 1:length(batches)){
   # Load data
-  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_raw.rds"))
+  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_raw_thresh.rds"))
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
   print(all(rownames(expo)==rownames(covars)))
+  # Relevel gender
+  covars$Gender = relevel(covars$Gender, "Female")
   # Count non-detects for each participant
   covars$nd_count = apply(expo, 1, function(x) sum(x=="nd", na.rm = T))
   # Association with gender
@@ -76,7 +78,7 @@ for (i in 1:length(batches)){
                 xlab = "Number of non-detects", ylab = "", main = NULL,
                 cex.axis = 0.7, horizontal = TRUE) 
       }
-      legend("right", bty="n", cex=1.5,legend=paste0("p=", pval))
+      legend("topright", bty="n", cex=1.5,legend=paste0("p=", pval))
     }
     dev.off()
     }

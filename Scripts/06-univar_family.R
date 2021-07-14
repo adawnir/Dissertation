@@ -92,12 +92,12 @@ options(scipen=999)
     axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
-  legend("bottomright", pch=c(rep(19,3),17, rep(NA,5)), lty = c(rep(NA,4),rep(2,5)),
+  legend("top", pch=c(rep(19,3),17, rep(NA,5)), lty = c(rep(NA,4),rep(2,5)),
          col=c(batch.colours[1:4],darken(batch.colours[1:4], 0.5), "grey"),
          legend = c(batches[1:4],
                     paste0("Bonferroni threshold (",c("LUX","FRA","GS","Pooled"),")"),
                     "Nominal threshold"),
-         bg="white", cex = 0.7, ncol = 2)
+         bg="white", cex = 0.8, ncol = 5)
   dev.off()
 }
 
@@ -129,12 +129,12 @@ options(scipen=999)
     axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
-  legend("bottomright", pch=c(rep(19,2),17, rep(NA,4)), lty = c(rep(NA,3),rep(2,4)),
+  legend("top", pch=c(rep(19,2),17, rep(NA,4)), lty = c(rep(NA,3),rep(2,4)),
          col=c(batch.colours[c(1,3,5)],darken(batch.colours[c(1,3,5)], 0.5), "grey"),
          legend = c(batches[c(1,3,5)],
                     paste0("Bonferroni threshold (",c("LUX","GS","Pooled"),")"),
                     "Nominal threshold"),
-         bg="white", cex = 0.7, ncol = 2)
+         bg="white", cex = 0.8, ncol = 5)
   dev.off()
 }
 options(scipen=0)
@@ -212,7 +212,7 @@ xseq = seq(1, nrow(values))
     abline(h = bonf[i], lty = 2, col = darken(batch.colours[i], 0.5))
   }
   for(i in 1:length(xseq)){
-    axis(1, at=xseq[i], labels = rownames(values)[i], las=2, cex.axis = 0.6,
+    axis(1, at=xseq[i], labels = rownames(values)[i], las=2, cex.axis = 0.8,
          col.axis = ifelse(isTRUE(values[i,4] > bonf[4]),
                            darken(annot.colours[(annot_sub)[i]], amount=0.5),"black"))
   }
@@ -223,12 +223,12 @@ xseq = seq(1, nrow(values))
     axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
-  legend("topright", pch=c(rep(19,3),17, rep(NA,5)), lty = c(rep(NA,4),rep(2,5)),
+  legend("top", pch=c(rep(19,3),17, rep(NA,5)), lty = c(rep(NA,4),rep(2,5)),
          col=c(batch.colours[1:4],darken(batch.colours[1:4], 0.5), "grey"),
          legend = c(batches[1:4],
                     paste0("Bonferroni threshold (",c("LUX","FRA","GS","Pooled"),")"),
                     "Nominal threshold"),
-         bg="white", cex = 0.7, ncol = 2)
+         bg="white", cex = 0.8, ncol = 5)
   dev.off()
 }
 
@@ -248,7 +248,7 @@ xseq = seq(1, nrow(values))
     abline(h = bonf[i], lty = 2, col = darken(batch.colours[i], 0.5))
   }
   for(i in 1:length(xseq)){
-    axis(1, at=xseq[i], labels = rownames(values)[i], las=2, cex.axis = 0.6,
+    axis(1, at=xseq[i], labels = rownames(values)[i], las=2, cex.axis = 0.8,
          col.axis = ifelse(isTRUE(values[i,5] > bonf[5]),
                            darken(annot.colours[(annot_sub)[i]], amount=0.5),"black"))
   }
@@ -259,12 +259,12 @@ xseq = seq(1, nrow(values))
     axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
-  legend("topright", pch=c(rep(19,2),17, rep(NA,4)), lty = c(rep(NA,3),rep(2,4)),
+  legend("top", pch=c(rep(19,2),17, rep(NA,4)), lty = c(rep(NA,3),rep(2,4)),
          col=c(batch.colours[c(1,3,5)],darken(batch.colours[c(1,3,5)], 0.5), "grey"),
          legend = c(batches[c(1,3,5)],
                     paste0("Bonferroni threshold (",c("LUX","GS","Pooled"),")"),
                     "Nominal threshold"),
-         bg="white", cex = 0.7, ncol = 2)
+         bg="white", cex = 0.8, ncol = 5)
   dev.off()
 }
 
@@ -366,7 +366,7 @@ for (i in 1:length(batches)){
              pch=c(rep(19,length(levels(covars$Batch))),15),
              pt.cex=c(rep(0.5,length(levels(covars$Batch))),1),
              legend=c(levels(covars$Batch), "Overall"),
-             ncol=length(levels(covars$Batch))+1, bg="white")
+             ncol=length(levels(covars$Batch))+1, bg="white", cex = 0.8)
       dev.off()
     }
   }
@@ -418,7 +418,7 @@ for (i in 1:length(batches)){
       legend("top", col=c(mycolours, "black"),
              pch=c(rep(19,length(levels(covars$Region))),15),
              pt.cex=c(rep(0.5,length(levels(covars$Region))),1),
-             legend=c(levels(covars$Region), "Overall"),
+             legend=c(levels(covars$Region), "Overall"), cex = 0.8,
              ncol=5, bg="white")
       dev.off()
     }
@@ -451,7 +451,7 @@ for (i in 1:length(batches)){
       legend("top", col=c(mycolours, "black"),
              pch=c(rep(19,length(levels(covars$Department))),15),
              pt.cex=c(rep(0.5,length(levels(covars$Department))),1),
-             legend=c(levels(covars$Department), "Overall"),
+             legend=c(levels(covars$Department), "Overall"), cex = 0.8,
              ncol=5, bg="white")
       dev.off()
     }
@@ -637,7 +637,7 @@ for (i in 1:length(batches)){
       abline(v = xseq, lty = 3, col = "grey", lwd = 0.7)
       abline(h = -log10(0.05/nrow(pvals)), lty = 2, col = darken(batch.colours[4], 0.5))
       for(k in 1:length(xseq)){
-        axis(1, at=xseq[k], labels = rownames(pvals)[k], las=2, cex.axis = 0.7,
+        axis(1, at=xseq[k], labels = rownames(pvals)[k], las=2, cex.axis = 0.8,
              col.axis = ifelse(isTRUE(pvals[k,j] < 0.05/nrow(pvals)),
                                darken(annot.colours[(annot_sub)[k]], amount=0.5),"black"))
       }
@@ -648,10 +648,11 @@ for (i in 1:length(batches)){
         axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
              col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
       }
-      legend("topleft", lty = c(rep(2,2)),
+      legend("top", lty = c(rep(2,2)),
              col=c(darken(batch.colours[i], 0.5), "grey"),
              legend = c("Bonferroni threshold","Nominal threshold"),
-             bg="white", cex = 0.7)
+             horiz = TRUE,
+             bg="white", cex = 0.8)
       dev.off()
     }
   }
@@ -736,7 +737,7 @@ xseq = seq(1, nrow(values))
   par(mar=c(20,5,1,1))
   plot(values[,1], pch=19, las=1, xaxt="n", type = "n",
        ylim = c(0,1),
-       xlab="", ylab="Intra-Class Correlation within families", cex.lab=1.5,
+       xlab="", ylab="Intra-Class Correlation within families", cex.lab=1.2,
        panel.first=abline(v=xseq,lty=3,col="grey"),
        col=batch.colours[1])
   points(values[,1], pch = 19, col = batch.colours[1], cex = 0.8)
@@ -754,10 +755,11 @@ xseq = seq(1, nrow(values))
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5),
          cex.axis=0.9)
   }
-  legend("topright", pch=c(rep(19,3),17),
+  legend("top", pch=c(rep(19,3),17),
          col=batch.colours[1:4],
          legend = batches[1:4],
-         bg="white", cex = 0.7, ncol = 2)
+         horiz = TRUE,
+         bg="white", cex = 0.8)
   dev.off()
 }
 
@@ -765,7 +767,7 @@ xseq = seq(1, nrow(values))
   par(mar=c(20,5,1,1))
   plot(values[,1], pch=19, las=1, xaxt="n", type = "n",
        ylim = c(0,1),
-       xlab="", ylab="Intra-Class Correlation within families", cex.lab=1.5,
+       xlab="", ylab="Intra-Class Correlation within families", cex.lab=1.2,
        panel.first=abline(v=xseq,lty=3,col="grey"),
        col=batch.colours[1])
   points(values[,1], pch = 19, col = batch.colours[1], cex = 0.8)
@@ -782,10 +784,11 @@ xseq = seq(1, nrow(values))
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5),
          cex.axis=0.9)
   }
-  legend("topright", pch=c(rep(19,2),17),
+  legend("top", pch=c(rep(19,2),17),
          col=batch.colours[c(1,3,5)],
          legend = batches[c(1,3,5)],
-         bg="white", cex = 0.7, ncol = 2)
+         horiz = TRUE,
+         bg="white", cex = 0.8)
   dev.off()
 }
 
@@ -793,7 +796,7 @@ annot_sub=annot[names(icc_batch_pooled2)]
 {pdf("../Figures/Pooled2/Intra_class_correlation_batch_univariate_expo_cont.pdf", width=14, height=8)
   par(mar=c(20,5,1,1))
   plot(icc_batch_pooled2, pch=19, cex=1, las=1, xaxt="n",
-       xlab="", ylab="Intra-Class Correlation with batch", cex.lab=1.5,
+       xlab="", ylab="Intra-Class Correlation with batch", cex.lab=1.2,
        panel.first=abline(v=1:length(icc_batch_pooled2),lty=3,col="grey"),
        col=annot.colours[annot_sub])
   for (k in 1:length(icc_batch_pooled2)){
@@ -814,7 +817,7 @@ annot_sub=annot[names(icc_batch_pooled3)]
 {pdf("../Figures/Pooled3/Intra_class_correlation_batch_univariate_expo_cont.pdf", width=14, height=8)
   par(mar=c(20,5,1,1))
   plot(icc_batch_pooled3, pch=19, cex=1, las=1, xaxt="n",
-       xlab="", ylab="Intra-Class Correlation with batch", cex.lab=1.5,
+       xlab="", ylab="Intra-Class Correlation with batch", cex.lab=1.2,
        panel.first=abline(v=1:length(icc_batch_pooled3),lty=3,col="grey"),
        col=annot.colours[annot_sub])
   for (k in 1:length(icc_batch_pooled3)){
@@ -835,7 +838,7 @@ annot_sub=annot[names(icc_region)]
 {pdf("../Figures/Pooled3/Intra_class_correlation_region_univariate_expo_cont.pdf", width=14, height=8)
   par(mar=c(20,5,1,1))
   plot(icc_region, pch=19, cex=1, las=1, xaxt="n",
-       xlab="", ylab="Intra-Class Correlation with region", cex.lab=1.5,
+       xlab="", ylab="Intra-Class Correlation with region", cex.lab=1.2,
        panel.first=abline(v=1:length(icc_region),lty=3,col="grey"),
        col=annot.colours[annot_sub])
   for (k in 1:length(icc_region)){
