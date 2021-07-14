@@ -297,6 +297,7 @@ for (i in 1:length(batches)){
   }
   colnames(family_sd)=colnames(expo)
   rownames(family_sd)=families
+  
   overall_sd=apply(expo,2,sd)
   
   mycolours=brewer.pal(n=12,name='Paired')
@@ -452,6 +453,205 @@ for (i in 1:length(batches)){
              pt.cex=c(rep(0.5,length(levels(covars$Department))),1),
              legend=c(levels(covars$Department), "Overall"),
              ncol=5, bg="white")
+      dev.off()
+    }
+  }
+}
+
+### Within-family absolute difference ----
+# Initialise
+rm(list=ls())
+path=dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(path)
+
+# Load custom
+source("functions.R")
+source("graph_param.R")
+
+# Load data sets
+annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
+
+suffix = c("lux","fra","gs","pooled3","pooled2")
+for (i in 1:length(batches)){
+  # Load data
+  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
+  covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh_no_isolated.rds"))
+  print(all(rownames(expo)==rownames(covars)))
+  
+  families=unique(covars$Family.ID)
+  family_diff=matrix(NA, nrow=length(families), ncol=ncol(expo))
+  for (p in 1:ncol(expo)){
+    for (f in 1:length(families)){
+      family_diff[f,p]=abs(expo[covars$Family.ID==families[f],p][1]-expo[covars$Family.ID==families[f],p][2])
+    }
+  }
+  colnames(family_diff)=colnames(expo)
+  rownames(family_diff)=families
+  
+  # Relationship with age
+  age_mu=rep(NA, length(families))
+  for (f in 1:length(families)){
+    age_mu[f]=mean(covars$Age[covars$Family.ID==families[f]])
+  }
+  names(age_mu)=families
+  age_diff=rep(NA, length(families))
+  for (f in 1:length(families)){
+    age_diff[f]=abs(covars$Age[covars$Family.ID==families[f]][1]-covars$Age[covars$Family.ID==families[f]][2])
+  }
+  names(age_diff)=families
+  gender_diff=rep(NA, length(families))
+  for (f in 1:length(families)){
+    tmp=covars$Gender[covars$Family.ID==families[f]]
+    if (length(unique(tmp))==1){
+      if (unique(tmp)=="Male"){
+        gender_diff[f]=1
+      }
+      if (unique(tmp)=="Female"){
+        gender_diff[f]=2
+      }
+    } else {
+      gender_diff[f]=3
+    } 
+  }
+  names(gender_diff)=families
+  if (i==1){
+    weight_mu=rep(NA, length(families))
+    for (f in 1:length(families)){
+      weight_mu[f]=mean(covars$Weight[covars$Family.ID==families[f]])
+    }
+    names(weight_mu)=families
+    weight_diff=rep(NA, length(families))
+    for (f in 1:length(families)){
+      weight_diff[f]=abs(covars$Weight[covars$Family.ID==families[f]][1]-covars$Weight[covars$Family.ID==families[f]][2])
+    }
+    names(weight_diff)=families
+    length_mu=rep(NA, length(families))
+    for (f in 1:length(families)){
+      length_mu[f]=mean(covars$Length[covars$Family.ID==families[f]])
+    }
+    names(length_mu)=families
+    length_diff=rep(NA, length(families))
+    for (f in 1:length(families)){
+      length_diff[f]=abs(covars$Length[covars$Family.ID==families[f]][1]-covars$Length[covars$Family.ID==families[f]][2])
+    }
+    names(length_diff)=families
+  }
+  if (i %in% 4:5){
+    Batch=rep(NA, length(families))
+    for (f in 1:length(families)){
+      tmp=covars$Batch[covars$Family.ID==families[f]]
+      if (length(unique(tmp))==1){
+        Batch[f] = unique(tmp)
+      }
+    }
+    names(Batch)=families
+  }
+  if (i == 4){
+    Region=rep(NA, length(families))
+    Department=rep(NA, length(families))
+    for (f in 1:length(families)){
+      tmp=covars$Region[covars$Family.ID==families[f]]
+      if (length(unique(tmp))==1){
+        Region[f] = unique(tmp)
+      }
+      tmp=covars$Department[covars$Family.ID==families[f]]
+      if (length(unique(tmp))==1){
+        Department[f] = unique(tmp)
+      }
+    }
+    names(Region)=families
+    names(Department)=families
+  }
+  pvals = NULL
+  for (k in 1:ncol(family_diff)){
+    model = lm(family_diff[,k] ~ age_mu)
+    pvals = c(pvals, summary(model)$coefficients[2,4])
+  }
+  for (k in 1:ncol(family_diff)){
+    model = lm(family_diff[,k] ~ age_diff)
+    pvals = c(pvals, summary(model)$coefficients[2,4])
+  }
+  for (k in 1:ncol(family_diff)){
+    model1 = lm(family_diff[,k] ~ gender_diff)
+    model0 = lm(family_diff[,k] ~ 1)
+    pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
+  }
+  if (i==1){
+    for (k in 1:ncol(family_diff)){
+      model = lm(family_diff[,k] ~ weight_mu)
+      pvals = c(pvals, summary(model)$coefficients[2,4])
+    }
+    for (k in 1:ncol(family_diff)){
+      model = lm(family_diff[,k] ~ weight_diff)
+      pvals = c(pvals, summary(model)$coefficients[2,4])
+    }
+    for (k in 1:ncol(family_diff)){
+      model = lm(family_diff[,k] ~ length_mu)
+      pvals = c(pvals, summary(model)$coefficients[2,4])
+    }
+    for (k in 1:ncol(family_diff)){
+      model = lm(family_diff[,k] ~ length_diff)
+      pvals = c(pvals, summary(model)$coefficients[2,4])
+    }
+  }
+  if (i %in% 4:5){
+    for (k in 1:ncol(family_diff)){
+      model1 = lm(family_diff[,k] ~ Batch)
+      model0 = lm(family_diff[,k] ~ 1)
+      pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
+    }
+  }
+  if (i==4){
+    for (k in 1:ncol(family_diff)){
+      model1 = lm(family_diff[,k] ~ Region)
+      model0 = lm(family_diff[,k] ~ 1)
+      pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
+    }
+    for (k in 1:ncol(family_diff)){
+      model1 = lm(family_diff[,k] ~ Department)
+      model0 = lm(family_diff[,k] ~ 1)
+      pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
+    }
+  }
+  X = c("age_mu","age_diff","gender_diff")
+  if (i==1){X = c(X, "weight_mu","weight_diff","length_mu","length_diff")}
+  if (i %in% 4:5){X = c(X, "Batch")}
+  if (i==4){X = c(X, "Region","Department")}
+  # If p-value = 0 replace with smallest double in R
+  pvals = ifelse(pvals ==0, .Machine$double.xmin, pvals)
+  pvals = matrix(pvals, nrow = ncol(family_diff), ncol = length(X))
+  rownames(pvals)=colnames(family_diff)
+  colnames(pvals)= X
+  saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_family_diff_covariate_pvals.rds"))
+  annot_sub = annot[rownames(pvals)]
+  # Manhattan plot
+  xseq = seq(1, nrow(pvals))
+  for (j in colnames(pvals)){
+    {pdf(paste0("../Figures/",filepaths[i],"/Univariate__family_diff_",j,".pdf"), width=14, height=8)
+      par(mar=c(20,5,1,1))
+      plot(-log10(pvals[,j]),
+           pch = ifelse(i %in% 4:5, 17, 19), col=annot.colours[annot_sub],
+           xaxt="n", xlab="", ylab = expression(-log[10](italic(p))), cex.lab=1.5,
+           ylim = c(min(-log10(pvals[,j]), na.rm = TRUE),-log10(0.05/nrow(pvals))+0.1))
+      abline(h = -log10(0.05), lty = 2, col = "grey")
+      abline(v = xseq, lty = 3, col = "grey", lwd = 0.7)
+      abline(h = -log10(0.05/nrow(pvals)), lty = 2, col = darken(batch.colours[4], 0.5))
+      for(k in 1:length(xseq)){
+        axis(1, at=xseq[k], labels = rownames(pvals)[k], las=2, cex.axis = 0.7,
+             col.axis = ifelse(isTRUE(pvals[k,j] < 0.05/nrow(pvals)),
+                               darken(annot.colours[(annot_sub)[k]], amount=0.5),"black"))
+      }
+      xgroup=c(which(!duplicated(annot_sub))-0.5, length(rownames(pvals))+0.5)
+      axis(side=1, line=8, at=xgroup, labels=NA)
+      tmp=apply(rbind(xgroup[-length(xgroup)],xgroup[-1]),2,mean)
+      for (k in 1:length(unique(annot_sub))){
+        axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
+             col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
+      }
+      legend("topleft", lty = c(rep(2,2)),
+             col=c(darken(batch.colours[i], 0.5), "grey"),
+             legend = c("Bonferroni threshold","Nominal threshold"),
+             bg="white", cex = 0.7)
       dev.off()
     }
   }
