@@ -128,6 +128,11 @@ all(rownames(covars_lux)==rownames(rownames(expo_lux)))
 all(rownames(covars_fra)==rownames(rownames(expo_fra)))
 all(rownames(covars_gs)==rownames(rownames(expo_gs)))
 
+# Detection rate
+chem_lux$detect_rate = 1-(chem_lux$nd_prop + chem_lux$NA_prop)
+chem_fra$detect_rate = 1-(chem_fra$nd_prop + chem_fra$NA_prop)
+chem_gs$detect_rate = 1-(chem_gs$nd_prop + chem_gs$NA_prop)
+
 ifelse(dir.exists("../Processed/"),"",dir.create("../Processed/"))
 ifelse(dir.exists(paste0("../Processed/",filepaths[1])),"",dir.create(paste0("../Processed/",filepaths[1])))
 ifelse(dir.exists(paste0("../Processed/",filepaths[2])),"",dir.create(paste0("../Processed/",filepaths[2])))
@@ -146,11 +151,6 @@ saveRDS(expo_fra,  paste0("../Processed/",filepaths[2],"/Exposure_matrix_raw.rds
 saveRDS(expo_gs,  paste0("../Processed/",filepaths[3],"/Exposure_matrix_raw.rds"))
 
 ### Inclusion/exclusion criteria (Chemical compound) ----
-# Detection rate
-chem_lux$detect_rate = 1-(chem_lux$nd_prop + chem_lux$NA_prop)
-chem_fra$detect_rate = 1-(chem_fra$nd_prop + chem_fra$NA_prop)
-chem_gs$detect_rate = 1-(chem_gs$nd_prop + chem_gs$NA_prop)
-
 # Number of chemical compounds with more than 10% detected
 sum(chem_lux$detect_rate>0.1)
 sum(chem_fra$detect_rate>0.1)
