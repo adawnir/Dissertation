@@ -19,7 +19,7 @@ annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 
 ### LOD, Detection rate and concentration range ----
 ifelse(dir.exists("../Exports"), "", dir.create("../Exports"))
-for (i in 1:length(batches)){
+for (i in 1:3){
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh.rds"))
   chem = readRDS(paste0("../Processed/",filepaths[i],"/Chemical_compound_info_thresh.rds"))
   annot_sub = annot[colnames(expo)]
@@ -27,14 +27,11 @@ for (i in 1:length(batches)){
   mytable=NULL
   for (k in 1:length(colnames(expo))){
     print(colnames(expo)[k])
-    lod = formatC(chem$LOD[k], format="e", digits=2)
+    lod = flex_format(chem$LOD[k], 2, 0.1)
     detect_rate = formatC(1-(chem$nd_prop[k]+chem$NA_prop[k]), format="f", digits=2)
     q = quantile(expo[,k], na.rm = T)
     q = flex_format(q, 2, 0.1)
-    if(i %in% c(4,5)){
-      missing_rate = formatC(chem$NA_prop[k], format="f", digits=2)
-      tmp=c(lod,detect_rate,missing_rate,q)
-    } else {tmp=c(lod,detect_rate,q)}
+    tmp=c(lod,detect_rate,q)
     if(!duplicated(annot_sub)[k]){
       mytable=rbind(mytable, rep(NA,length(tmp)))
       rownames(mytable)[nrow(mytable)]=as.character(annot_sub[k])
@@ -42,9 +39,7 @@ for (i in 1:length(batches)){
     mytable=rbind(mytable, tmp)
     rownames(mytable)[nrow(mytable)]=colnames(expo)[k]
   }
-  if(i %in% c(4,5)){
-    colnames(mytable)=c("LOD (pg/mg)","Detection rate","Missing rate","Min", "Q1","Q2","Q3","Max")
-  } else {colnames(mytable)=c("LOD (pg/mg)","Detection rate","Min", "Q1","Q2","Q3","Max")}
+  colnames(mytable)=c("LOD (pg/mg)","Detection rate","Min", "Q1","Q2","Q3","Max")
   mytable[,-2]=ReformatScientificNotation(mytable[,-2])
   ifelse(dir.exists(paste0("../Exports/",filepaths[i])), "", dir.create(paste0("../Exports/",filepaths[i])))
   SaveExcelWithSuperscripts(cbind(rownames(mytable),mytable), paste0("../Exports/",filepaths[i],"/Table1_chemical_compound.xlsx"))
@@ -135,8 +130,8 @@ mysd=formatC(sd(covars$Weight, na.rm=TRUE), format="f", digits=2)
 out=paste0(mymean, " (", mysd, ")")
 for (k in c("LUX","FRA","GS")){
   if (k == "LUX"){
-    mymean=formatC(mean(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
-    mysd=formatC(sd(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
+    mymean=formatC(mean(covars$Weight[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
+    mysd=formatC(sd(covars$Weight[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
     out=c(out, paste0(mymean, " (", mysd, ")"))
   } else {out = c(out, "-")}
 }
@@ -159,8 +154,8 @@ mysd=formatC(sd(covars$Length, na.rm=TRUE), format="f", digits=2)
 out=paste0(mymean, " (", mysd, ")")
 for (k in c("LUX","FRA","GS")){
   if (k == "LUX"){
-    mymean=formatC(mean(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
-    mysd=formatC(sd(covars$Age[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
+    mymean=formatC(mean(covars$Length[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
+    mysd=formatC(sd(covars$Length[covars$Batch==k], na.rm=TRUE), format="f", digits=2)
     out=c(out, paste0(mymean, " (", mysd, ")"))
   } else {out = c(out, "-")}
 }
