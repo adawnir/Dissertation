@@ -146,19 +146,28 @@ saveRDS(expo_fra,  paste0("../Processed/",filepaths[2],"/Exposure_matrix_raw.rds
 saveRDS(expo_gs,  paste0("../Processed/",filepaths[3],"/Exposure_matrix_raw.rds"))
 
 ### Inclusion/exclusion criteria (Chemical compound) ----
+# Detection rate
+chem_lux$detect_rate = 1-(chem_lux$nd_prop + chem_lux$NA_prop)
+chem_fra$detect_rate = 1-(chem_fra$nd_prop + chem_fra$NA_prop)
+chem_gs$detect_rate = 1-(chem_gs$nd_prop + chem_gs$NA_prop)
+
 # Number of chemical compounds with 90% or more nd or NA
-sum(chem_lux$nd_prop + chem_lux$NA_prop>=0.9)
-sum(chem_fra$nd_prop + chem_fra$NA_prop>=0.9)
-sum(chem_gs$nd_prop + chem_gs$NA_prop>=0.9)
+sum(chem_lux$detect_rate>0.1)
+sum(chem_fra$detect_rate>0.1)
+sum(chem_gs$detect_rate>0.1)
+
+sum(chem_lux$detect_rate<=0.1)
+sum(chem_fra$detect_rate<=0.1)
+sum(chem_gs$detect_rate<=0.1)
 
 # Filter out >=90% nd or NA
-expo_lux = expo_lux[,which(chem_lux$nd_prop + chem_lux$NA_prop<0.9)]
-expo_fra = expo_fra[,which(chem_fra$nd_prop + chem_fra$NA_prop<0.9)]
-expo_gs = expo_gs[,which(chem_gs$nd_prop + chem_gs$NA_prop<0.9)]
+expo_lux = expo_lux[,which(chem_lux$detect_rate>0.1)]
+expo_fra = expo_fra[,which(chem_fra$detect_rate>0.1)]
+expo_gs = expo_gs[,which(chem_gs$detect_rate>0.1)]
 
-chem_lux = chem_lux[which(chem_lux$nd_prop + chem_lux$NA_prop<0.9),]
-chem_fra = chem_fra[which(chem_fra$nd_prop + chem_fra$NA_prop<0.9),]
-chem_gs = chem_gs[which(chem_gs$nd_prop + chem_gs$NA_prop<0.9),]
+chem_lux = chem_lux[which(chem_lux$detect_rate>0.1),]
+chem_fra = chem_fra[which(chem_fra$detect_rate>0.1),]
+chem_gs = chem_gs[which(chem_gs$detect_rate>0.1),]
 
 ncol(expo_lux)
 ncol(expo_fra)
