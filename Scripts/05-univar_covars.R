@@ -244,7 +244,7 @@ for (i in 1:length(batches)){
     if (i==4){X = covars %>% select(Batch, Region, Department)}
     if (i==5){X = covars %>% select(Batch)}
     ncol(expo) * ncol(X) # number of tests
-    betas = pvals = NULL
+    pvals = NULL
     f1='expo[,k] ~ X[,j]'
     f0='expo[,k] ~ 1'
     t0=Sys.time()
