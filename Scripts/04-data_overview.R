@@ -134,10 +134,20 @@ tmp2 = chem_fra$nd_prop + chem_fra$NA_prop
 names(tmp2) = chem_fra$Compound
 tmp3 = chem_gs$nd_prop + chem_gs$NA_prop
 names(tmp3) = chem_gs$Compound
+
+nd = unique(c(chem_lux$Compound[which(chem_lux$detect_rate==0)],
+              chem_fra$Compound[which(chem_fra$detect_rate==0)],
+              chem_gs$Compound[which(chem_gs$detect_rate==0)],
+              setdiff(rownames(chem_lux),rownames(chem_fra))))
 tmp4 = chem_pooled3$nd_prop + chem_pooled3$NA_prop
 names(tmp4) = chem_pooled3$Compound
+tmp4 = tmp4[-which(names(tmp4) %in% nd)]
+
+nd = unique(c(chem_lux$Compound[which(chem_lux$detect_rate==0)],
+              chem_gs$Compound[which(chem_gs$detect_rate==0)]))
 tmp5 = chem_pooled2$nd_prop + chem_pooled2$NA_prop
 names(tmp5) = chem_pooled2$Compound
+tmp5 = tmp5[-which(names(tmp5) %in% nd)]
 
 prop = list(tmp1, tmp2, tmp3, tmp4, tmp5)
 prop = lapply(prop, function(x) 1-x)
@@ -167,13 +177,29 @@ for (i in 1:length(sorted_prop)){
 }
 
 # Proportion detected
-prop = 1-t(bind_rows(tmp1, tmp2, tmp3, tmp4))
+tmp1 = chem_lux$detect_rate
+names(tmp1) = chem_lux$Compound
+tmp2 = chem_fra$detect_rate
+names(tmp2) = chem_fra$Compound
+tmp3 = chem_gs$detect_rate
+names(tmp3) = chem_gs$Compound
+tmp4 = chem_pooled3$detect_rate
+names(tmp4) = chem_gs$Compound
+tmp5 = chem_pooled2$detect_rate
+names(tmp5) = chem_pooled2$Compound
+
+prop = t(bind_rows(tmp1, tmp2, tmp3, tmp4))
 prop[which(is.na(prop))] = 0 # Replace NA with 0
 prop = prop[order(annot,-prop[,4]),]
 prop = cbind(prop,rep(NA,nrow(prop)),rep(NA,nrow(prop)))
 mylabels = rownames(prop)
 prop = as.vector(t(prop))
 prop=prop[c(length(prop),1:length(prop)-1)]
+
+nd = unique(c(chem_lux$Compound[which(chem_lux$detect_rate==0)],
+              chem_fra$Compound[which(chem_fra$detect_rate==0)],
+              chem_gs$Compound[which(chem_gs$detect_rate==0)],
+              setdiff(rownames(chem_lux),rownames(chem_fra))))
 
 background = TRUE
 myspacing = 6
@@ -249,9 +275,11 @@ annot_sub = annot[mylabels]
        type="h", lwd=1, ylim = c(0,1))
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.6,
-         col.axis = ifelse(1-tmp4[mylabels[i]] > 0.1,
+         col.axis = ifelse(tmp4[mylabels[i]] > 0.1 & !(mylabels[i] %in% nd),
                            darken(annot.colours[(annot_sub)[i]], amount=0.5),
-                           "black"))
+                           ifelse(!(tmp4[mylabels[i]] > 0.1 & mylabels[i] %in% nd),
+                                  "black",
+                                  alpha(darken(annot.colours[(annot_sub)[i]], amount=0.5),0.5))))
   }
   xseqblack=c(xseq[!duplicated(annot_sub)]-myspacing/2, max(xseq)+myspacing/2)
   abline(v=xseqblack,lty=3,col="black")
@@ -268,13 +296,16 @@ annot_sub = annot[mylabels]
 }
 
 # Proportion detected
-prop = 1-t(bind_rows(tmp1, tmp3, tmp5))
+prop = t(bind_rows(tmp1, tmp3, tmp5))
 prop[which(is.na(prop))] = 0 # Replace NA with 0
 prop = prop[order(annot,-prop[,3]),]
 prop = cbind(prop,rep(NA,nrow(prop)),rep(NA,nrow(prop)))
 mylabels = rownames(prop)
 prop = as.vector(t(prop))
 prop=prop[c(length(prop),1:length(prop)-1)]
+
+nd = unique(c(chem_lux$Compound[which(chem_lux$detect_rate==0)],
+              chem_gs$Compound[which(chem_gs$detect_rate==0)]))
 
 background = TRUE
 myspacing = 5
@@ -350,9 +381,11 @@ annot_sub = annot[mylabels]
        type="h", lwd=1, ylim = c(0,1))
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.6,
-         col.axis = ifelse(1-tmp5[mylabels[i]] > 0.1,
+         col.axis = ifelse(tmp5[mylabels[i]] > 0.1 & !(mylabels[i] %in% nd),
                            darken(annot.colours[(annot_sub)[i]], amount=0.5),
-                           "black"))
+                           ifelse(!(tmp5[mylabels[i]] > 0.1 & mylabels[i] %in% nd),
+                                  "black",
+                                  alpha(darken(annot.colours[(annot_sub)[i]], amount=0.5),0.5))))
   }
   xseqblack=c(xseq[!duplicated(annot_sub)]-myspacing/2, max(xseq)+myspacing/2)
   abline(v=xseqblack,lty=3,col="black")

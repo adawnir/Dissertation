@@ -59,17 +59,24 @@ chem = full_join(chem_lux, chem_fra, by = "Compound", suffix = c(".lux", ".fra")
   select(Compound, Family, starts_with("LOD"), starts_with("LOQ"),starts_with("Extraction"))
 colnames(chem) = ifelse(grepl("\\.", colnames(chem))|colnames(chem)%in%c("Compound", "Family"),
                         colnames(chem), paste0(colnames(chem),".gs"))
+rownames(chem) = chem$Compound
 
 # Proportion of NAs per chemical compounds
 all(colnames(expo)==chem$Compound)
 chem$NA_prop = apply(expo, 2, function(x) sum(is.na(x))/nrow(expo))
 
-# Proportion of detected per chemical compounds
+# Proportion of non-detects per chemical compounds
 all(colnames(expo)==chem$Compound)
 chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
 
-# Number of chemical compounds with 90% or more nd or NA
-sum(chem$nd_prop + chem$NA_prop>=0.9)
+# Detection rate
+chem$detect_rate = 1-(chem$nd_prop + chem$NA_prop)
+
+# Number of chemical compounds with more than 10% detected
+sum(chem$detect_rate>0.1)
+
+# Number of chemical compounds with 10% or less detected
+sum(chem$detect_rate<=0.1)
 
 # Save data sets
 ifelse(dir.exists(paste0("../Processed/",filepaths[4])),"",dir.create(paste0("../Processed/",filepaths[4])))
@@ -77,12 +84,22 @@ saveRDS(covars, paste0("../Processed/",filepaths[4],"/Participant_covariate_info
 saveRDS(chem, paste0("../Processed/",filepaths[4],"/Chemical_compound_info.rds"))
 saveRDS(expo, paste0("../Processed/",filepaths[4],"/Exposure_matrix_raw.rds"))
 
-# Filter out >=90% nd or NA
-expo = expo[,which(chem$nd_prop + chem$NA_prop<0.9)]
-chem = chem[which(chem$nd_prop + chem$NA_prop<0.9),]
+# Filter out compounds with 10% or less detected
+expo = expo[,which(chem$detect_rate>0.1)]
+chem = chem[which(chem$detect_rate>0.1),]
 ncol(expo)
 
-max(rowSums(is.na(expo))/nrow(expo))
+# Number of chemical compounds not detected in one data set
+nd = unique(c(chem_lux$Compound[which(chem_lux$detect_rate==0)],
+              chem_fra$Compound[which(chem_fra$detect_rate==0)],
+              chem_gs$Compound[which(chem_gs$detect_rate==0)],
+              setdiff(rownames(chem_lux),rownames(chem_fra))))
+
+sum(chem$Compound %in% nd)
+
+expo = expo[,-which(chem$Compound %in% nd)]
+chem = chem[-which(chem$Compound %in% nd),]
+ncol(expo)
 
 # Save data sets
 saveRDS(chem, paste0("../Processed/",filepaths[4],"/Chemical_compound_info_thresh.rds"))
@@ -90,37 +107,34 @@ saveRDS(expo, paste0("../Processed/",filepaths[4],"/Exposure_matrix_raw_thresh.r
 
 ## Recoding nd
 # Replace nd with random values from 0 to minimum detection (Gaussian)
-min.lod = apply(chem[,grepl("LOD",colnames(chem))], 1, function(x) min(x, na.rm = T))
-
 # Set LOD for each data set
-# If LOD is 0 or missing set it as minimum of three data sets
-tmp = expo[covars_lux$Indiv.ID,]
-lod = ifelse(is.na(chem$LOD.lux), min.lod, chem$LOD.lux)
-names(lod) = chem$Compound
+tmp1 = expo[covars_lux$Indiv.ID,]
+lod1 = chem$LOD.lux
+names(lod1) = chem$Compound
 
 tmp2 = expo[covars_fra$Indiv.ID,]
-lod2 = ifelse(is.na(chem$LOD.fra), min.lod, chem$LOD.fra)
+lod2 = chem$LOD.fra
 names(lod2) = chem$Compound
 
 tmp3 = expo[covars_gs$Indiv.ID,]
-lod3 = ifelse(is.na(chem$LOD.gs), min.lod, chem$LOD.gs)
+lod3 = chem$LOD.gs
 names(lod3) = chem$Compound
 
 for(k in 1:ncol(expo)){
   set.seed(150621)
-  tmp[tmp[,k]=="nd"&!is.na(tmp[,k]),k] = rtruncnorm(sum(tmp[,k]=="nd"&!is.na(tmp[,k])),
-                                                    min=0,
-                                                    max=lod[colnames(expo)[k]]) 
+  tmp1[tmp1[,k]=="nd"&!is.na(tmp1[,k]),k] = rtruncnorm(sum(tmp1[,k]=="nd"&!is.na(tmp1[,k])),
+                                                      min=0,
+                                                      max=lod1[colnames(expo)[k]]) 
   tmp2[tmp2[,k]=="nd"&!is.na(tmp2[,k]),k] = rtruncnorm(sum(tmp2[,k]=="nd"&!is.na(tmp2[,k])),
-                                                    min=0,
-                                                    max=lod2[colnames(expo)[k]]) 
+                                                       min=0,
+                                                       max=lod2[colnames(expo)[k]]) 
   tmp3[tmp3[,k]=="nd"&!is.na(tmp3[,k]),k] = rtruncnorm(sum(tmp3[,k]=="nd"&!is.na(tmp3[,k])),
-                                                    min=0,
-                                                    max=lod3[colnames(expo)[k]]) 
+                                                       min=0,
+                                                       max=lod3[colnames(expo)[k]]) 
 }
 
 # Merge
-expo = rbind(tmp, tmp2, tmp3)
+expo = rbind(tmp1, tmp2, tmp3)
 
 # Convert to numeric (Replace any characters with NaN and add rownames)
 expo = apply(expo, 2, as.numeric)
@@ -145,12 +159,12 @@ source("graph_param.R")
 annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 
 covars_lux = readRDS(paste0("../Processed/",filepaths[1],"/Participant_covariate_info_thresh.rds"))
-chem_lux = readRDS(paste0("../Data/",filepaths[1],"/Chemical_compound_info.rds"))
-expo_lux = readRDS(paste0("../Data/",filepaths[1],"/Exposure_matrix_raw.rds"))
+chem_lux = readRDS(paste0("../Processed/",filepaths[1],"/Chemical_compound_info.rds"))
+expo_lux = readRDS(paste0("../Processed/",filepaths[1],"/Exposure_matrix_raw.rds"))
 
 covars_gs = readRDS(paste0("../Processed/",filepaths[3],"/Participant_covariate_info_thresh.rds"))
-chem_gs = readRDS(paste0("../Data/",filepaths[3],"/Chemical_compound_info.rds"))
-expo_gs = readRDS(paste0("../Data/",filepaths[3],"/Exposure_matrix_raw.rds"))
+chem_gs = readRDS(paste0("../Processed/",filepaths[3],"/Chemical_compound_info.rds"))
+expo_gs = readRDS(paste0("../Processed/",filepaths[3],"/Exposure_matrix_raw.rds"))
 
 # Merge covariate information
 covars = bind_rows(covars_lux, covars_gs) %>%
@@ -183,8 +197,14 @@ chem$NA_prop = apply(expo, 2, function(x) sum(is.na(x))/nrow(expo))
 all(colnames(expo)==chem$Compound)
 chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
 
-# Number of chemical compounds with 90% or more nd or NA
-sum(chem$nd_prop + chem$NA_prop>=0.9)
+# Detection rate
+chem$detect_rate = 1-(chem$nd_prop + chem$NA_prop)
+
+# Number of chemical compounds with more than 10% detected
+sum(chem$detect_rate>0.1)
+
+# Number of chemical compounds with 10% or less detected
+sum(chem$detect_rate<=0.1)
 
 # Save data sets
 ifelse(dir.exists(paste0("../Processed/",filepaths[5])),"",dir.create(paste0("../Processed/",filepaths[5])))
@@ -192,12 +212,20 @@ saveRDS(covars, paste0("../Processed/",filepaths[5],"/Participant_covariate_info
 saveRDS(chem, paste0("../Processed/",filepaths[5],"/Chemical_compound_info.rds"))
 saveRDS(expo, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw.rds"))
 
-# Filter out >=90% nd or NA
-expo = expo[,which(chem$nd_prop + chem$NA_prop<0.9)]
-chem = chem[which(chem$nd_prop + chem$NA_prop<0.9),]
+# Filter out compounds with 10% or less detected
+expo = expo[,which(chem$detect_rate>0.1)]
+chem = chem[which(chem$detect_rate>0.1),]
 ncol(expo)
 
-max(rowSums(is.na(expo))/nrow(expo))
+# Number of chemical compounds not detected in one data set
+nd = unique(c(chem_lux$Compound[which(chem_lux$detect_rate==0)],
+              chem_gs$Compound[which(chem_gs$detect_rate==0)]))
+
+sum(chem$Compound %in% nd)
+
+expo = expo[,-which(chem$Compound %in% nd)]
+chem = chem[-which(chem$Compound %in% nd),]
+ncol(expo)
 
 # Save data sets
 saveRDS(chem, paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
@@ -205,30 +233,27 @@ saveRDS(expo, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw_thresh.r
 
 ## Recoding nd
 # Replace nd with random values from 0 to minimum detection (Gaussian)
-min.lod = apply(chem[,grepl("LOD",colnames(chem))], 1, function(x) min(x, na.rm = T))
-
 # Set LOD for each data set
-# If LOD is missing set it as minimum of three data sets
-tmp = expo[covars_lux$Indiv.ID,]
-lod = ifelse(is.na(chem$LOD.lux), min.lod, chem$LOD.lux)
-names(lod) = chem$Compound
+tmp1 = expo[covars_lux$Indiv.ID,]
+lod1 = chem$LOD.lux
+names(lod1) = chem$Compound
 
 tmp3 = expo[covars_gs$Indiv.ID,]
-lod3 = ifelse(is.na(chem$LOD.gs), min.lod, chem$LOD.gs)
+lod3 = chem$LOD.gs
 names(lod3) = chem$Compound
 
 for(k in 1:ncol(expo)){
   set.seed(150621)
-  tmp[tmp[,k]=="nd"&!is.na(tmp[,k]),k] = rtruncnorm(sum(tmp[,k]=="nd"&!is.na(tmp[,k])),
-                                                    min=0,
-                                                    max=lod[colnames(expo)[k]])
+  tmp1[tmp1[,k]=="nd"&!is.na(tmp1[,k]),k] = rtruncnorm(sum(tmp1[,k]=="nd"&!is.na(tmp1[,k])),
+                                                       min=0,
+                                                       max=lod1[colnames(expo)[k]]) 
   tmp3[tmp3[,k]=="nd"&!is.na(tmp3[,k]),k] = rtruncnorm(sum(tmp3[,k]=="nd"&!is.na(tmp3[,k])),
                                                        min=0,
                                                        max=lod3[colnames(expo)[k]]) 
 }
 
 # Merge
-expo = rbind(tmp, tmp3)
+expo = rbind(tmp1, tmp3)
 
 # Convert to numeric (Replace any characters with NaN and add rownames)
 expo = apply(expo, 2, as.numeric)
