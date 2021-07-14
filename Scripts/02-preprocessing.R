@@ -151,16 +151,17 @@ chem_lux$detect_rate = 1-(chem_lux$nd_prop + chem_lux$NA_prop)
 chem_fra$detect_rate = 1-(chem_fra$nd_prop + chem_fra$NA_prop)
 chem_gs$detect_rate = 1-(chem_gs$nd_prop + chem_gs$NA_prop)
 
-# Number of chemical compounds with 90% or more nd or NA
+# Number of chemical compounds with more than 10% detected
 sum(chem_lux$detect_rate>0.1)
 sum(chem_fra$detect_rate>0.1)
 sum(chem_gs$detect_rate>0.1)
 
+# Number of chemical compounds with 10% or less detected
 sum(chem_lux$detect_rate<=0.1)
 sum(chem_fra$detect_rate<=0.1)
 sum(chem_gs$detect_rate<=0.1)
 
-# Filter out >=90% nd or NA
+# Filter out compounds with 10% or less detected
 expo_lux = expo_lux[,which(chem_lux$detect_rate>0.1)]
 expo_fra = expo_fra[,which(chem_fra$detect_rate>0.1)]
 expo_gs = expo_gs[,which(chem_gs$detect_rate>0.1)]
