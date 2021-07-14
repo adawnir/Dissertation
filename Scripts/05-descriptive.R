@@ -34,6 +34,12 @@ for (i in 1:length(batches)){
   
   cor = cor(expo, method = "spearman")
   
+  tmp = cor
+  tmp[lower.tri(tmp, diag = T)] = NA
+  high_corr = cbind(rownames(tmp)[which(abs(tmp) > 0.8, arr.ind = TRUE)[,1]],
+                    colnames(tmp)[which(abs(tmp) > 0.8, arr.ind = TRUE)[,2]])
+  write.csv(high_corr, file = paste0("../Exports/",filepaths[i],"/High_correlation_compound_pairs.csv"))
+  
   ifelse(dir.exists(paste0("../Figures/",filepaths[i])),"",dir.create(paste0("../Figures/",filepaths[i])))
   {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix.pdf"), width = 14, height = 12)
     pheatmap(cor,
@@ -115,3 +121,48 @@ for (i in 1:length(batches)){
   }
 }
 
+# Inspect highly correlated compounds
+expo = readRDS(paste0("../Processed/",filepaths[1],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
+chem = readRDS(paste0("../Processed/",filepaths[1],"/Chemical_compound_info_thresh.rds"))
+high_corr = read.csv(paste0("../Exports/",filepaths[1],"/High_correlation_compound_pairs.csv"),
+                     row.names = 1)
+high_corr[1,]
+high_corr[2,]
+high_corr[3,]
+chem["PCB-101",]
+chem["Dimethachlor",]
+cor(expo[,rownames(chem)[chem$nd_prop>0.89]], method = "spearman")
+
+expo = readRDS(paste0("../Processed/",filepaths[2],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
+chem = readRDS(paste0("../Processed/",filepaths[2],"/Chemical_compound_info_thresh.rds"))
+high_corr = read.csv(paste0("../Exports/",filepaths[2],"/High_correlation_compound_pairs.csv"),
+                     row.names = 1)
+high_corr[1,]
+high_corr[2,]
+high_corr[3,]
+chem["Propiconazole",]
+chem["Trifloxystrobin",]
+cor(expo[,rownames(chem)[chem$nd_prop+chem$NA_prop>0.84]], method = "spearman")
+chem["Propiconazole","nd_prop"]+chem["Propiconazole","NA_prop"]
+chem["Trifloxystrobin","nd_prop"]+chem["Trifloxystrobin","NA_prop"]
+
+expo = readRDS(paste0("../Processed/",filepaths[3],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
+chem = readRDS(paste0("../Processed/",filepaths[3],"/Chemical_compound_info_thresh.rds"))
+high_corr = read.csv(paste0("../Exports/",filepaths[3],"/High_correlation_compound_pairs.csv"),
+                     row.names = 1)
+high_corr[1,]
+chem["Pendimethalin",]
+chem["Prosulfocarb",]
+
+expo = readRDS(paste0("../Processed/",filepaths[4],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
+chem = readRDS(paste0("../Processed/",filepaths[4],"/Chemical_compound_info_thresh.rds"))
+high_corr = read.csv(paste0("../Exports/",filepaths[4],"/High_correlation_compound_pairs.csv"),
+                     row.names = 1)
+high_corr[1,]
+high_corr[2,]
+high_corr[3,]
+
+expo = readRDS(paste0("../Processed/",filepaths[5],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
+chem = readRDS(paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
+high_corr[1,]
+high_corr[2,]
