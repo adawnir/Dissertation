@@ -33,8 +33,8 @@ for (i in 1:length(batches)){
   if (i==1){
     X = covars %>% select(Age, Gender, Length, Weight)
   } else {X = covars %>% select(Age, Gender)}
-  pdf(paste0("../Figures/",filepaths[i],"/Detection_count_covariate.pdf"), width=10, height=5*ncol(X)/2)
-  par(mar=c(5,5,1,1), mfrow = c(ncol(X)/2,2))
+  pdf(paste0("../Figures/",filepaths[i],"/Detection_count_covariate.pdf"), width=10, height=5*ceiling(ncol(X)/2))
+  par(mar=c(5,5,1,1), mfrow = c(ceiling(ncol(X)/2),2))
   for (n in 1:ncol(X)){
     model = glm(nd_count ~ X[,n], poisson, covars)
     if (is.factor(X[,n])){
@@ -48,4 +48,36 @@ for (i in 1:length(batches)){
            legend=paste0("p=",formatC(summary(model)$coefficients[2,4], format="e", digits=2)))
   }
   dev.off()
+  
+  if (i %in% 4:5){
+    if (i==4){X = covars %>% select(Batch, Region, Department)}
+    if (i==5){X = covars %>% select(Batch)}
+    pdf(paste0("../Figures/",filepaths[i],"/Detection_count_geo.pdf"), width=5*(ceiling(ncol(X)/ceiling(ncol(X)/3))), height=5*ceiling(ncol(X)/3))
+    if (i==4){par(mar=c(5,13,1,1), mfrow = c(ceiling(ncol(X)/3),ceiling(ncol(X)/ceiling(ncol(X)/3))))}
+    if (i==5){par(mar=c(5,5,1,1), mfrow = c(ceiling(ncol(X)/3),ceiling(ncol(X)/ceiling(ncol(X)/3))))}
+    for (n in 1:ncol(X)){
+      model1=glm(nd_count ~ X[,n], poisson, covars)
+      model0=glm(nd_count ~ 1, poisson, covars)
+      pval = anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2]
+      pval = ifelse(pval==0,
+                    paste0("<",formatC(.Machine$double.xmin, format="e", digits=2)),
+                    formatC(pval, format="e", digits=2))
+      if (colnames(X)[n]=="Batch") {mycolours = batch.colours
+      } else {mycolours=brewer.pal(n=12,name='Paired')
+      mycolours=colorRampPalette(mycolours)(length(levels(X[,n])))
+      names(mycolours)=levels(X[,n])
+      }
+      if (colnames(X)[n]=="Batch"){
+        boxplot(nd_count ~ X[,n], data = covars, col = mycolours, las = 1,
+                xlab = "Number of non-detects", ylab = colnames(X)[n], main = NULL,
+                horizontal = TRUE) 
+      } else{
+        boxplot(nd_count ~ X[,n], data = covars, col = mycolours, las = 1,
+                xlab = "Number of non-detects", ylab = "", main = NULL,
+                cex.axis = 0.7, horizontal = TRUE) 
+      }
+      legend("right", bty="n", cex=1.5,legend=paste0("p=", pval))
+    }
+    dev.off()
+    }
 }
