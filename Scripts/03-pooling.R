@@ -36,18 +36,6 @@ covars = bind_rows(covars_lux, covars_fra, covars_gs) %>%
 rownames(covars) = covars$Indiv.ID
 str(covars)
 
-# Check extraction consistency
-extract_diff = full_join(chem_lux, chem_fra, by = "Compound", suffix = c(".lux", ".fra")) %>%
-  full_join(chem_gs, by = "Compound") %>%
-  mutate(Family = coalesce(Family.lux,Family)) %>%
-  select(Compound, Family, starts_with("Extraction")) %>%
-  .[!is.equal(list(.$Extraction.lux, .$Extraction.fra, .$Extraction)),]
-dim(extract_diff)
-
-ifelse(dir.exists("../Results/"),"",dir.create("../Results/"))
-ifelse(dir.exists(paste0("../Results/",filepaths[4])),"",dir.create(paste0("../Results/",filepaths[4])))
-saveRDS(extract_diff, paste0("../Results/",filepaths[4],"/Chemical_compound_info_extract_diff.rds"))
-
 # Merge chemical compound information
 expo = bind_rows(expo_lux, expo_fra, expo_gs)
 expo = expo[rownames(covars),]
@@ -104,6 +92,16 @@ ncol(expo)
 # Save data sets
 saveRDS(chem, paste0("../Processed/",filepaths[4],"/Chemical_compound_info_thresh.rds"))
 saveRDS(expo, paste0("../Processed/",filepaths[4],"/Exposure_matrix_raw_thresh.rds"))
+
+# Check extraction consistency
+extract_diff = chem %>%
+  select(Compound, Family, starts_with("Extraction")) %>%
+  .[!is.equal(list(.$Extraction.lux, .$Extraction.fra, .$Extraction.gs)),]
+dim(extract_diff)
+
+ifelse(dir.exists("../Results/"),"",dir.create("../Results/"))
+ifelse(dir.exists(paste0("../Results/",filepaths[4])),"",dir.create(paste0("../Results/",filepaths[4])))
+saveRDS(extract_diff, paste0("../Results/",filepaths[4],"/Chemical_compound_info_extract_diff.rds"))
 
 ## Recoding nd
 # Replace nd with random values from 0 to minimum detection (Gaussian)
