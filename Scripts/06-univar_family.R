@@ -572,7 +572,7 @@ for (i in 1:length(batches)){
     pvals = c(pvals, summary(model)$coefficients[2,4])
   }
   for (k in 1:ncol(family_diff)){
-    model1 = lm(family_diff[,k] ~ gender_diff)
+    model1 = lm(family_diff[,k] ~ as.factor(gender_diff))
     model0 = lm(family_diff[,k] ~ 1)
     pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
   }
@@ -596,19 +596,19 @@ for (i in 1:length(batches)){
   }
   if (i %in% 4:5){
     for (k in 1:ncol(family_diff)){
-      model1 = lm(family_diff[,k] ~ Batch)
+      model1 = lm(family_diff[,k] ~ as.factor(Batch))
       model0 = lm(family_diff[,k] ~ 1)
       pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
     }
   }
   if (i==4){
     for (k in 1:ncol(family_diff)){
-      model1 = lm(family_diff[,k] ~ Region)
+      model1 = lm(family_diff[,k] ~ as.factor(Region))
       model0 = lm(family_diff[,k] ~ 1)
       pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
     }
     for (k in 1:ncol(family_diff)){
-      model1 = lm(family_diff[,k] ~ Department)
+      model1 = lm(family_diff[,k] ~ as.factor(Department))
       model0 = lm(family_diff[,k] ~ 1)
       pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
     }
