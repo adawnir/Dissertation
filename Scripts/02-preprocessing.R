@@ -128,6 +128,8 @@ all(rownames(covars_lux)==rownames(rownames(expo_lux)))
 all(rownames(covars_fra)==rownames(rownames(expo_fra)))
 all(rownames(covars_gs)==rownames(rownames(expo_gs)))
 
+sum(is.na(chem_lux$nd_prop))
+sum(is.na(chem_lux$NA_prop))
 # Detection rate
 chem_lux$detect_rate = 1-(chem_lux$nd_prop + chem_lux$NA_prop)
 chem_fra$detect_rate = 1-(chem_fra$nd_prop + chem_fra$NA_prop)
@@ -173,6 +175,11 @@ chem_gs = chem_gs[which(chem_gs$detect_rate>0.1),]
 ncol(expo_lux)
 ncol(expo_fra)
 ncol(expo_gs)
+
+
+saveRDS(chem_lux, paste0("../Processed/",filepaths[1],"/Chemical_compound_info_thresh.rds"))
+saveRDS(chem_fra,  paste0("../Processed/",filepaths[2],"/Chemical_compound_info_thresh.rds"))
+saveRDS(chem_gs,  paste0("../Processed/",filepaths[3],"/Chemical_compound_info_thresh.rds"))
 
 saveRDS(expo_lux, paste0("../Processed/",filepaths[1],"/Exposure_matrix_raw_thresh.rds"))
 saveRDS(expo_fra,  paste0("../Processed/",filepaths[2],"/Exposure_matrix_raw_thresh.rds"))
