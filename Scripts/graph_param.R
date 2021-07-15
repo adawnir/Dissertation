@@ -5,7 +5,7 @@ chem_family = c("Organochlorines", "Organophosphate metabolites", "Pyrethroids",
                 "Neonicotinoids", "Oxadiazines", "Phenylpyrazoles", "Strobilurins",
                 "Triazines/Triazinones/Diazines", "Subtituted ureas", "Dinitroanilines",
                 "Other")
-annot.colours = lighten(colorRampPalette(RColorBrewer::brewer.pal(n=12,name='Paired'))(length(chem_family)), amount=0.2)
+annot.colours = colorspace::lighten(colorRampPalette(RColorBrewer::brewer.pal(n=12,name='Paired'))(length(chem_family)), amount=0.2)
 names(annot.colours) = chem_family
 
 filepaths = c("Luxembourg", "France", "GrandeSynthe", "Pooled3", "Pooled2")
