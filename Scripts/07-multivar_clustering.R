@@ -1,4 +1,4 @@
-## Univariate clustering analysis
+## Multivariate clustering analysis
 ## Rin Wada 12 July
 
 # Load packages
