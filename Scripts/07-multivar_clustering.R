@@ -40,7 +40,7 @@ for (i in 1:length(batches)){
   {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_expo_all.pdf"),width=14)
     par(mar=c(0,0,0,0))
     plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
-         tip.color=mycolours[covars$Family.ID])
+         tip.color=mycolours[as.character(covars$Family.ID)])
     dev.off()
   }
   
@@ -292,6 +292,77 @@ for (i in 1:length(batches)){
              legend=levels(covars$Department), cex = 0.6, ncol = 2)
       legend("topright", bty="n", cex=1.5,
              legend=paste0("p=",formatC(anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2], format="e", digits=2)))
+      dev.off()
+    }
+  }
+}
+### Geographical ----
+for (i in 4:5){
+  # Load data
+  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
+  covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh_no_isolated.rds"))
+  print(all(rownames(expo)==rownames(covars)))
+  
+  families=unique(covars$Batch)
+  
+  # mycolours=brewer.pal(n=12,name='Paired')
+  # mycolours=colorRampPalette(mycolours)(length(families))
+  # names(mycolours)=families
+
+  expo = scale(expo)
+  d=dist(expo)
+  h=hclust(d, method = "complete")
+  print(all(covars$Indiv.ID==h$labels))
+  h$labels=paste0(covars$Family.ID, "-",h$labels)
+  myphylo=as.phylo(h)
+  
+  {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_expo_all_batch.pdf"),width=14)
+    par(mar=c(0,0,0,0))
+    plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
+         tip.color=batch.colours[as.character(covars$Batch)])
+    dev.off()
+  }
+  {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_graph_expo_all_region.pdf"))
+    g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = batch.colours[as.character(covars$Batch)])
+    dev.off()
+  }
+  
+  if (i ==4){
+    families=unique(covars$Region)
+    mycolours=brewer.pal(n=12,name='Paired')
+    mycolours=colorRampPalette(mycolours)(length(families))
+    names(mycolours)=families
+    
+    {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_expo_all_region.pdf"),width=14)
+      par(mar=c(0,0,0,0))
+      plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
+           tip.color=mycolours[as.character(covars$Region)])
+      dev.off()
+    }
+    
+    {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_graph_expo_all_region.pdf"))
+      g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = mycolours[as.character(covars$Region)])
+      legend("bottomright", pch=19, col=mycolours[as.character(families)],
+             legend=families, cex = 0.4, ncol = 1)
+      dev.off()
+    }
+    
+    families=unique(covars$Department)
+    mycolours=brewer.pal(n=12,name='Paired')
+    mycolours=colorRampPalette(mycolours)(length(families))
+    names(mycolours)=families
+    
+    {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_expo_all_depart.pdf"),width=14)
+      par(mar=c(0,0,0,0))
+      plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
+           tip.color=mycolours[as.character(covars$Department)])
+      dev.off()
+    }
+    
+    {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_graph_expo_all_depart.pdf"))
+      g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = mycolours[as.character(covars$Department)])
+      legend("bottomright", pch=19, col=mycolours[as.character(families)],
+             legend=families, cex = 0.4, ncol = 1)
       dev.off()
     }
   }

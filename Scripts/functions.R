@@ -110,7 +110,7 @@ CreateScorePlot2=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=
 
 
 # Create clustering dendrogram graph
-ClusteringToGraph=function(covars,myphylo){
+ClusteringToGraph=function(covars,myphylo,mycol = mycolours[covars$Family.ID]){
   myphylo=as.phylo(h)
   graph_edges = myphylo$edge
   graph_net=graph.edgelist(graph_edges, directed=FALSE)
@@ -130,9 +130,9 @@ ClusteringToGraph=function(covars,myphylo){
     col = "darkgrey", lwd = 1)
   # add labels
   points(graph_layout[1:nobs,1], graph_layout[1:nobs,2], pch=19,
-         col=mycolours[covars$Family.ID])
+         col=mycol)
   text(graph_layout[1:nobs,1], graph_layout[1:nobs,2],
-       col=mycolours[covars$Family.ID],
+       col=mycol,
        myphylo$tip.label, cex = 0.5, xpd = TRUE, font = 1)
   
   return(graph_net)
