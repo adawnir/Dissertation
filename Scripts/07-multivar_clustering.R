@@ -201,7 +201,7 @@ for (i in 1:length(batches)){
   }
   names(gender_diff)=families
   
-  model1 = lm(fsp ~ gender_diff)
+  model1 = lm(fsp ~ as.factor(gender_diff))
   model0 = lm(fsp ~ 1)
   {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_by_gender.pdf"))
     par(mar=c(5,5,1,1))
@@ -225,7 +225,7 @@ for (i in 1:length(batches)){
     }
     names(Batch)=families
     
-    model1 = lm(fsp ~ Batch)
+    model1 = lm(fsp ~ as.factor(Batch))
     model0 = lm(fsp ~ 1)
     {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_by_Batch.pdf"))
       par(mar=c(5,5,1,1))
@@ -264,7 +264,7 @@ for (i in 1:length(batches)){
     depart.colours=colorRampPalette(depart.colours)(length(levels(covars$Department)))
     names(depart.colours)=levels(covars$Department)
     
-    model1 = lm(fsp ~ Region)
+    model1 = lm(fsp ~ as.factor(Region))
     model0 = lm(fsp ~ 1)
     {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_by_Region.pdf"))
       par(mar=c(5,5,1,1))
@@ -279,7 +279,7 @@ for (i in 1:length(batches)){
       dev.off()
     }
     
-    model1 = lm(fsp ~ Department)
+    model1 = lm(fsp ~ as.factor(Department))
     model0 = lm(fsp ~ 1)
     {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_by_Department.pdf"))
       par(mar=c(5,5,1,1))
