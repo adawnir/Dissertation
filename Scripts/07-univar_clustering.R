@@ -45,7 +45,7 @@ for (i in 1:length(batches)){
     {pdf(paste0("../Figures/",filepaths[i],"/Univar_clustering/Hierarchical_cont_expo_",p,".pdf"),width=14)
       par(mar=c(0,0,3,0))
       plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
-           tip.color=mycolours[covars$Family.ID], main=colnames(expo)[p])
+           tip.color=mycolours[as.character(covars$Family.ID)], main=colnames(expo)[p])
       dev.off()}
     
     {pdf(paste0("../Figures/",filepaths[i],"/Univar_clustering/Hierarchical_cont_graph_expo_",p,".pdf"))
