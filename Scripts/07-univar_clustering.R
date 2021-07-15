@@ -5,7 +5,6 @@
 library(ape)
 library(igraph)
 
-###  ----
 # Initialise
 rm(list=ls())
 path=dirname(rstudioapi::getActiveDocumentContext()$path)
