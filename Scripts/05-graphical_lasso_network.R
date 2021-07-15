@@ -32,7 +32,7 @@ for (i in 1:length(batches)){
   
   pdf(paste0("../Figures/",filepaths[i],"/Graphical_lasso_output.pdf"))
   CalibrationPlot(out)
-  dev.off
+  dev.off()
   
   # Adjacency matrix of the calibrated network
   A=CalibratedAdjacency(out)
