@@ -102,6 +102,8 @@ for (i in c(1,3)){
     plot(age_mu, fsp, pch=19, cex=1, cex.lab=1.5, las=1, 
          col=c("springgreen", "red")[age_group_diff],
          xlab="Within-family age mean", ylab="Shortest path length between siblings")
+    abline(h=axTicks(2), col="grey", lty=3)
+    abline(v=axTicks(1), col="grey", lty=3)
     text(age_mu, fsp, labels=names(age_group_diff), pos=3, col=darken(mycolours[names(age_group_diff)], amount=0.5))
     legend("topleft", pch=19, col=c("springgreen", "red"), ncol=1,
            legend=c("Same age group", "Different age group"))
