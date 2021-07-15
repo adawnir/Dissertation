@@ -23,13 +23,15 @@ for (i in 1:length(batches)){
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
   print(all(rownames(expo)==rownames(covars)))
-  # Running stability selection
-  t0=Sys.time()
-  out=CalibrateNetwork(data=expo, K=100, tau=0.5, PFER_thr=20, refine_calib_grid=FALSE, verbose=FALSE)
-  t1=Sys.time()
-  print(t1-t0)
-  saveRDS(out, paste0("../Results/",filepaths[i],"/Graphical_lasso_output.rds"))
   
+  # # Running stability selection
+  # t0=Sys.time()
+  # out=CalibrateNetwork(data=expo, K=100, tau=0.5, PFER_thr=20, refine_calib_grid=FALSE, verbose=FALSE)
+  # t1=Sys.time()
+  # print(t1-t0)
+  # saveRDS(out, paste0("../Results/",filepaths[i],"/Graphical_lasso_output.rds"))
+  
+  out = readRDS(paste0("../Results/",filepaths[i],"/Graphical_lasso_output.rds"))
   pdf(paste0("../Figures/",filepaths[i],"/Graphical_lasso_output.pdf"))
   CalibrationPlot(out)
   dev.off()
