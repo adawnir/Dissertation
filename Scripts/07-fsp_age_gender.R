@@ -1,6 +1,10 @@
 ## Multivariate clustering analysis
 ## Rin Wada 12 July
 
+# Load packages
+library(ape)
+library(igraph)
+
 # Initialise
 rm(list=ls())
 path=dirname(rstudioapi::getActiveDocumentContext()$path)
