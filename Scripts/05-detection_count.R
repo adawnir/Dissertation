@@ -24,8 +24,6 @@ for (i in 1:length(batches)){
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_raw_thresh.rds"))
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
   print(all(rownames(expo)==rownames(covars)))
-  # Relevel gender
-  covars$Gender = relevel(covars$Gender, "Female")
   # Count non-detects for each participant
   covars$nd_count = apply(expo, 1, function(x) sum(x=="nd", na.rm = T))
   # Association with gender
