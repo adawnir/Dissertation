@@ -1,13 +1,14 @@
-# Chemical family colours
-chem_family = c("Organochlorines", "Organophosphate metabolites", "Pyrethroids",
-                "Pyrethroid metabolites", "PCBs", "PBDEs", "Acidic herbicides",
-                "Anilinopyrimidines", "Azoles", "Benzamides", "Carbamates", "Carboxamides",
-                "Neonicotinoids", "Oxadiazines", "Phenylpyrazoles", "Strobilurins",
-                "Triazines/Triazinones/Diazines", "Subtituted ureas", "Dinitroanilines",
-                "Other")
-annot.colours = colorspace::lighten(colorRampPalette(RColorBrewer::brewer.pal(n=12,name='Paired'))(length(chem_family)), amount=0.2)
-names(annot.colours) = chem_family
+# Chemical family
+tmp = c("Organochlorines", "Organophosphate metabolites", "Pyrethroids",
+        "Pyrethroid metabolites", "PCBs", "PBDEs", "Acidic herbicides",
+        "Anilinopyrimidines", "Azoles", "Benzamides", "Carbamates", "Carboxamides",
+        "Neonicotinoids", "Oxadiazines", "Phenylpyrazoles", "Strobilurins",
+        "Triazines/Triazinones/Diazines", "Subtituted ureas", "Dinitroanilines",
+        "Other")
+annot.colours = colorspace::lighten(colorRampPalette(RColorBrewer::brewer.pal(n=12,name='Paired'))(length(tmp)), amount=0.2)
+names(annot.colours) = tmp
 
+# Batches
 filepaths = c("Luxembourg", "France", "GrandeSynthe", "Pooled3", "Pooled2")
 batches = c("Luxembourg", "France", "Grande-Synthe", "Pooled (LUX/FRA/GS)", "Pooled (LUX/GS)")
 batch.colours = c("tomato", "royalblue", "forestgreen", "mediumpurple", "darkgoldenrod")
