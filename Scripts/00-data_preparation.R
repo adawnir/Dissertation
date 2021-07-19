@@ -55,8 +55,9 @@ chem = chem %>% fill(Family)
 # Translate chemical family names from French to English
 table(chem$Family, useNA = "ifany")
 chem$Family[which(chem$Family=="PHENYLPYRAZOLES LC")] = "PHENYLPYRAZOLES"
+chem_family = names(annot.colours)
 names(chem_family) = unique(chem$Family)
-chem$Family = factor(chem_family[chem$Family], levels = chem_family)
+chem$Family = factor.order(chem_family[chem$Family])
 table(chem$Family, useNA = "ifany")
 
 # Translate extraction method from French to English
@@ -165,7 +166,7 @@ chem = data.frame(Compound = colnames(expo),
 
 # Translate chemical family names from French to English
 table(chem$Family, useNA = "ifany")
-chem$Family = factor(chem_family[chem$Family], levels = chem_family)
+chem$Family = droplevels(chem$Family)
 table(chem$Family, useNA = "ifany")
 
 # Translate extraction method from French to English
@@ -264,8 +265,9 @@ chem = chem %>% fill(Family)
 # Translate chemical family names from French to English
 table(chem$Family, useNA = "ifany")
 chem$Family[which(chem$Family=="PHENYLPYRAZOLES LC")] = "PHENYLPYRAZOLES"
+chem_family = names(annot.colours)
 names(chem_family) = unique(chem$Family)
-chem$Family = factor(chem_family[chem$Family], levels = chem_family)
+chem$Family = factor.order(chem_family[chem$Family])
 table(chem$Family, useNA = "ifany")
 
 # Translate extraction method from French to English
