@@ -23,8 +23,6 @@ for (i in 1:length(batches)){
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
   print(all(rownames(expo)==rownames(covars)))
   
-  covars$Region = droplevels(covars$Region)
-  covars$Department = droplevels(covars$Department)
   ### Correlation matrix ----
   annot_sub = annot[colnames(expo)]
   mat_col = data.frame(Family = annot_sub)
@@ -70,34 +68,31 @@ for (i in 1:length(batches)){
     dev.off()
   }
   ev=mypca$eig[,2]
-  families=unique(as.character(covars$Family.ID))
-  mycolours=brewer.pal(n=12,name='Paired')
-  mycolours=c(colorRampPalette(mycolours)(length(families[families!="Isolated"])),"grey")
-  names(mycolours)=c(families[families!="Isolated"],"Isolated")
-  CreateScorePlot(mypca=mypca, type=as.character(covars$Family.ID), mycolours=mycolours,
+  CreateScorePlot(mypca=mypca, type=as.character(covars$Family.ID),
+                  mycolours=family.colours[levels(covars$Family.ID)],
                   filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot.pdf"))
   if (i %in% 4:5){
-    CreateScorePlot2(mypca=mypca, type=as.character(covars$Batch),
-                     mycolours=batch.colours[levels(covars$Batch)],
-                     filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_batch.pdf"))
+    CreateScorePlot(mypca=mypca, type=as.character(covars$Batch),
+                    mycolours=batch.colours[levels(covars$Batch)],
+                    filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_batch.pdf"),
+                    segments = FALSE)
   }
   if (i==4){
-    mycolours=brewer.pal(n=12,name='Paired')
-    mycolours=colorRampPalette(mycolours)(length(levels(covars$Region)))
-    names(mycolours) = levels(covars$Region)
-    CreateScorePlot2(mypca=mypca, type=as.character(covars$Region), mycolours=mycolours,
-                    filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_region.pdf"))
-    mycolours=brewer.pal(n=12,name='Paired')
-    mycolours=colorRampPalette(mycolours)(length(levels(covars$Department)))
-    names(mycolours) = levels(covars$Department)
-    CreateScorePlot2(mypca=mypca, type=as.character(covars$Department), mycolours=mycolours,
-                     filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_depart.pdf"))
+    CreateScorePlot(mypca=mypca, type=as.character(covars$Region),
+                    mycolours=region.colours[levels(covars$Region)],
+                    filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_region.pdf"),
+                    segments = FALSE)
+    CreateScorePlot(mypca=mypca, type=as.character(covars$Department),
+                    mycolours=depart.colours[levels(covars$Department)],
+                    filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_depart.pdf"),
+                    segments = FALSE)
   }
   
   mycor=cor(expo, mypca$ind$coord)
 
-  {pdf(paste0("../Figures/",filepaths[i],"/PCA_correlation_circle.pdf"), width=14, height=5)
-    par(mar=c(5,5,1,1), mfrow=c(1,3))
+  {pdf(paste0("../Figures/",filepaths[i],"/PCA_correlation_circle.pdf"), width=17.5, height=5)
+    par(mar = c(5,5,1,1))
+    layout(matrix(c(1,2,3,4), 1, 4, byrow = TRUE), widths=c(2,2,2,1))
     comp=matrix(c(1,2,1,3,2,3), byrow=TRUE, ncol=2)
     for (k in 1:nrow(comp)){
       xcomp=comp[k,1]
@@ -117,6 +112,12 @@ for (i in 1:length(batches)){
            labels=colnames(expo), cex=0.75, 
            col=darken(annot.colours[annot_sub]),0.5)
     }
+    par(mar = c(1,1,1,1))
+    plot(0, 0, type = 'l', bty = 'n', xaxt = 'n', yaxt = 'n', xlab = "", ylab = "")
+    legend("left", col=annot.colours[unique(annot_sub)],
+           legend=names(annot.colours[unique(annot_sub)]),
+           ncol = ceiling(length(annot.colours[unique(annot_sub)])/25),
+           lty = 1, pt.cex=1.2, bty = "n", cex = 1.2)
     dev.off()
   }
 }
