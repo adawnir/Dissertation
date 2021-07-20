@@ -39,20 +39,30 @@ for (i in 1:length(batches)){
   write.csv(high_corr, file = paste0("../Exports/",filepaths[i],"/High_correlation_compound_pairs.csv"))
   
   ifelse(dir.exists(paste0("../Figures/",filepaths[i])),"",dir.create(paste0("../Figures/",filepaths[i])))
-  {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix.pdf"), width = 14, height = 12)
+  if (nrow(cor)>50){
+    width = 14
+    height = 12
+  }
+  if (nrow(cor)<50){
+    width = 8.5
+    height = 7
+  }
+  {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix.pdf"), width = width, height = height)
     pheatmap(cor,
-             show_rownames = FALSE, show_colnames = FALSE, border_color = NA,
+             cellwidth = 8, cellheight = 8,
+             border_color = NA,
              cluster_rows = FALSE, cluster_cols = FALSE,
              annotation_names_row = FALSE, annotation_names_col = FALSE, 
              annotation_row = mat_col,annotation_col = mat_col, annotation_colors = mat_colors)
     dev.off()
     }
-  {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix_clustered.pdf"), width = 14, height = 12)
+  {pdf(paste0("../Figures/",filepaths[i],"/Spearman_correlation_matrix_clustered.pdf"), width = width, height = height)
     pheatmap(cor,
-           show_rownames = FALSE, show_colnames = FALSE, border_color = NA,
-           treeheight_row = 0, treeheight_col = 0,
-           annotation_names_row = FALSE, annotation_names_col = FALSE, 
-           annotation_row = mat_col,annotation_col = mat_col, annotation_colors = mat_colors)
+             cellwidth = 8, cellheight = 8,
+             border_color = NA,
+             treeheight_row = 0, treeheight_col = 0,
+             annotation_names_row = FALSE, annotation_names_col = FALSE, 
+             annotation_row = mat_col,annotation_col = mat_col, annotation_colors = mat_colors)
     dev.off()
     }
   ### PCA for visualisation ----
