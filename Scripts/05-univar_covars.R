@@ -4,6 +4,7 @@
 # Load packages
 library(tidyverse)
 library(RColorBrewer)
+library(colorspace)
 
 ### Exposure ~ Covariate ----
 # Initialisation
@@ -53,10 +54,10 @@ for (i in 1:length(batches)){
   for (n in 1:ncol(betas)){
     plot(betas[,n], -log10(pvals[,n]), pch=19,
          col=ifelse(pvals[,n] < 0.05/length(betas[,n]), annot.colours[annot_sub], "grey"),
-         cex.lab=1, cex = 0.7,
+         cex.lab=1.5, cex = 0.7,
          ylim = c(0, max(-log10(pvals[,n]))+0.25),
          xlim = c(-max(abs(betas[,n]))-0.4, max(abs(betas[,n]))+0.4),
-         ylab=expression(-log[10](p-value)), 
+         ylab=expression(-log[10](italic(p))), 
          xlab=substitute(paste(beta,"(",tmp,")"), list(tmp = colnames(betas)[n])))
     text(betas[,n]+sign(betas[,n])*0.1, -log10(pvals[,n])+0.25,
          labels = ifelse(pvals[,n] < 0.05/length(betas[,n]), rownames(betas), ""),
@@ -227,7 +228,7 @@ for (i in 1:length(batches)){
          cex.lab=1, cex = 0.7,
          ylim = c(0, max(-log10(pvals[,n])+0.25)),
          xlim = c(-max(abs(betas[,n])), max(abs(betas[,n]))),
-         ylab=expression(-log[10](p-value)), 
+         ylab=expression(-log[10](italic(p))), 
          xlab=substitute(paste(beta,"(",tmp,")"), list(tmp = colnames(betas)[n])))
     text(betas[,n]+sign(betas[,n])*0.1, -log10(pvals[,n])+0.25,
          labels = ifelse(pvals[,n] < 0.05/length(betas[,n]), rownames(betas), ""),
@@ -257,7 +258,7 @@ for (i in 1:length(batches)){
     }
     t1=Sys.time()
     print(t1-t0)
-    pvals = ifelse(pvals ==0, .Machine$double.xmin, pvals)
+    pvals = ifelse(pvals == 0, .Machine$double.xmin, pvals)
     pvals = matrix(pvals, nrow = ncol(expo), ncol = ncol(X))
     rownames(pvals)=colnames(expo)
     colnames(pvals)=colnames(X)
