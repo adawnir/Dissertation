@@ -89,6 +89,10 @@ expo = expo[,-which(chem$Compound %in% nd)]
 chem = chem[-which(chem$Compound %in% nd),]
 ncol(expo)
 
+table(chem$Family)
+chem$Family = droplevels(chem$Family)
+table(chem$Family)
+
 # Save data sets
 saveRDS(chem, paste0("../Processed/",filepaths[4],"/Chemical_compound_info_thresh.rds"))
 saveRDS(expo, paste0("../Processed/",filepaths[4],"/Exposure_matrix_raw_thresh.rds"))
@@ -224,6 +228,10 @@ sum(chem$Compound %in% nd)
 expo = expo[,-which(chem$Compound %in% nd)]
 chem = chem[-which(chem$Compound %in% nd),]
 ncol(expo)
+
+table(chem$Family)
+chem$Family = droplevels(chem$Family)
+table(chem$Family)
 
 # Save data sets
 saveRDS(chem, paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
