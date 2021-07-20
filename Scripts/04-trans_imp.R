@@ -13,9 +13,8 @@ setwd(path)
 # Load custom parameters
 source("graph_param.R")
 
-# Load data
-annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 for (i in 1:length(batches)){
+  # Load data
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh.rds"))
   # Transformation
