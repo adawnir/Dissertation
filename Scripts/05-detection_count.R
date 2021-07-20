@@ -39,10 +39,12 @@ for (i in 1:length(batches)){
     model = glm(nd_count ~ X[,n], poisson, covars)
     if (is.factor(X[,n])){
       boxplot(nd_count ~ X[,n], data = covars, col = batch.colours[i],
-              xlab = colnames(X)[n], ylab = "Number of non-detects", main = NULL) 
+              xlab = colnames(X)[n], ylab = "Number of non-detects", main = NULL,
+              cex.lab = 1.5) 
     } else {
       plot(nd_count ~ X[,n], data = covars, pch = 19, col = batch.colours[i],
-           xlab = colnames(X)[n], ylab = "Number of non-detects", main = NULL)
+           xlab = colnames(X)[n], ylab = "Number of non-detects", main = NULL,
+           cex.lab = 1.5)
     }
     legend("topright", bty="n", cex=1.5,
            legend=paste0("p=",formatC(summary(model)$coefficients[2,4], format="e", digits=2)))
