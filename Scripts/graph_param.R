@@ -24,10 +24,11 @@ region.colours = colorRampPalette(RColorBrewer::brewer.pal(n=9,name='Set1'))(len
 names(region.colours) = c(unique(area$Region),"Luxembourg")
 
 # Department
-depart.colours = colorRampPalette(RColorBrewer::brewer.pal(n=12,name='Set3'))(length(unique(area$Department))+1)
+depart.colours = colorRampPalette(RColorBrewer::brewer.pal(n=9,name='Set1'))(length(unique(area$Department))+1)
 names(depart.colours) = c(unique(area$Department),"Luxembourg")
 
-# Check colours
-# image(1:length(region.colours), 1, as.matrix(1:length(region.colours)),
-#       col=region.colours,
+# # Check colours
+# image(1:length(depart.colours), 1, as.matrix(1:length(depart.colours)),
+#       col=depart.colours,
 #       xlab="", ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+
