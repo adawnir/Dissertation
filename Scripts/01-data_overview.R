@@ -83,6 +83,6 @@ setdiff(colnames(expo_fra),colnames(expo_lux))
 setdiff(colnames(expo_gs),colnames(expo_lux))
 
 # Check chemical family consistency
-all(chem_lux$Family[which(chem_lux$Compound%in%chem_gs$Compound)]==chem_gs$Family)
-all(chem_lux$Family[which(chem_lux$Compound%in%chem_fra$Compound)]==chem_fra$Family)
+all(chem_lux$Family[which(chem_lux$Compound%in%chem_gs$Compound)]==as.character(chem_gs$Family))
+all(chem_lux$Family[which(chem_lux$Compound%in%chem_fra$Compound)]==as.character(chem_fra$Family))
 
