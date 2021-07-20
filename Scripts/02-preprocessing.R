@@ -113,6 +113,8 @@ covars_gs = covars_gs = covars_gs %>%
          Area, Department, Region, Country, Batch) %>%
   mutate_if(is.character, factor.order)
 str(covars_gs)
+# Relevel gender
+covars_gs$Gender = relevel(covars_gs$Gender, "Female")
 
 # Add rownames
 rownames(covars_lux) = covars_lux$Indiv.ID
@@ -175,6 +177,11 @@ chem_gs = chem_gs[which(chem_gs$detect_rate>0.1),]
 ncol(expo_lux)
 ncol(expo_fra)
 ncol(expo_gs)
+
+table(chem_lux$Family)
+table(chem_fra$Family)
+table(chem_gs$Family)
+chem_gs$Family = droplevels(chem_gs$Family)
 
 
 saveRDS(chem_lux, paste0("../Processed/",filepaths[1],"/Chemical_compound_info_thresh.rds"))
