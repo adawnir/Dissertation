@@ -64,11 +64,9 @@ for (i in 1:length(batches)){
       pval = ifelse(pval==0,
                     paste0("<",formatC(.Machine$double.xmin, format="e", digits=2)),
                     formatC(pval, format="e", digits=2))
-      if (colnames(X)[n]=="Batch") {mycolours = batch.colours
-      } else {mycolours=brewer.pal(n=12,name='Paired')
-      mycolours=colorRampPalette(mycolours)(length(levels(X[,n])))
-      names(mycolours)=levels(X[,n])
-      }
+      if (colnames(X)[n]=="Batch") {mycolours = batch.colours}
+      if (colnames(X)[n]=="Region") {mycolours = region.colours}
+      if (colnames(X)[n]=="Department") {mycolours = depart.colours}
       if (colnames(X)[n]=="Batch"){
         boxplot(nd_count ~ X[,n], data = covars, col = mycolours, las = 1,
                 xlab = "Number of non-detects", ylab = colnames(X)[n], main = NULL,
