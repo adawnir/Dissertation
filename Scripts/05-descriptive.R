@@ -36,6 +36,7 @@ for (i in 1:length(batches)){
   tmp[lower.tri(tmp, diag = T)] = NA
   high_corr = cbind(rownames(tmp)[which(abs(tmp) > 0.8, arr.ind = TRUE)[,1]],
                     colnames(tmp)[which(abs(tmp) > 0.8, arr.ind = TRUE)[,2]])
+  ifelse(dir.exists(paste0("../Exports/",filepaths[i])),"",dir.create(paste0("../Exports/",filepaths[i])))
   write.csv(high_corr, file = paste0("../Exports/",filepaths[i],"/High_correlation_compound_pairs.csv"))
   
   ifelse(dir.exists(paste0("../Figures/",filepaths[i])),"",dir.create(paste0("../Figures/",filepaths[i])))
