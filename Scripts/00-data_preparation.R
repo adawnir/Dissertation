@@ -103,7 +103,7 @@ summary(chem$nd_prop[is.infinite(chem$LOD)]) # never-detected compounds have inf
 chem$LOD[which(is.infinite(chem$LOD))] = NA
 
 ## Save chemical family annotation as named list
-annot = chem$Family
+annot = as.character(chem$Family)
 names(annot) = chem$Compound
 ifelse(dir.exists("../Data"),"",dir.create("../Data"))
 saveRDS(annot, "../Data/Chemical_compound_family_annotation.rds")
