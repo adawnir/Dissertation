@@ -34,7 +34,7 @@ for (i in 1:3){
     tmp=c(lod,detect_rate,q)
     if(!duplicated(annot_sub)[k]){
       mytable=rbind(mytable, rep(NA,length(tmp)))
-      rownames(mytable)[nrow(mytable)]=as.character(annot_sub[k])
+      rownames(mytable)[nrow(mytable)]=annot_sub[k]
     }
     mytable=rbind(mytable, tmp)
     rownames(mytable)[nrow(mytable)]=colnames(expo)[k]
