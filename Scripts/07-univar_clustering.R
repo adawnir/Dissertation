@@ -26,10 +26,6 @@ for (i in 1:length(batches)){
   
   families=unique(covars$Family.ID)
   
-  mycolours=brewer.pal(n=12,name='Paired')
-  mycolours=colorRampPalette(mycolours)(length(families))
-  names(mycolours)=families
-  
   withinf_sp=matrix(NA,nrow=length(families),ncol=ncol(expo))
   null_sp=matrix(NA,nrow=(nrow(expo)*(nrow(expo)-1))/2,ncol=ncol(expo))
   
@@ -45,11 +41,11 @@ for (i in 1:length(batches)){
     {pdf(paste0("../Figures/",filepaths[i],"/Univar_clustering/Hierarchical_cont_expo_",p,".pdf"),width=14)
       par(mar=c(0,0,3,0))
       plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
-           tip.color=mycolours[as.character(covars$Family.ID)], main=colnames(expo)[p])
+           tip.color=family.colours[as.character(covars$Family.ID)], main=colnames(expo)[p])
       dev.off()}
     
     {pdf(paste0("../Figures/",filepaths[i],"/Univar_clustering/Hierarchical_cont_graph_expo_",p,".pdf"))
-      g=ClusteringToGraph(covars=covars, myphylo=myphylo)
+      g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = family.colours[levels(covars$Family.ID)])
       dev.off()}
     
     nobs=nrow(expo)
@@ -71,7 +67,7 @@ for (i in 1:length(batches)){
   for (p in 1:ncol(withinf_sp)){
     {pdf(paste0("../Figures/",filepaths[i],"/Univar_clustering/Shortest_path_cont_",p,".pdf"),width=14)
       par(mar=c(5,5,1,1))
-      plot(withinf_sp[,p], pch=19, col=mycolours[rownames(withinf_sp)], xaxt="n", las=1,
+      plot(withinf_sp[,p], pch=19, col=family.colours[rownames(withinf_sp)], xaxt="n", las=1,
            panel.first=abline(v=1:ncol(withinf_sp), lty=3, col="grey"), 
            xlab="Family ID", cex=2,
            ylab="Shortest path length between siblings", cex.lab=1.5)
@@ -129,8 +125,8 @@ for (i in 1:length(batches)){
   
   {pdf(paste0("../Figures/",filepaths[i],"/Boxplot_univariate_cont_shortest_path_by_family.pdf"), width=14)
     par(mar=c(5,5,1,1))
-    boxplot(y~z,pch=19, cex=0.5, col=c("grey80", mycolours[colnames(withinf_sp)]), 
-            border=c("grey80", mycolours[colnames(withinf_sp)]), #outline=FALSE, 
+    boxplot(y~z,pch=19, cex=0.5, col=c("grey80", family.colours[colnames(withinf_sp)]), 
+            border=c("grey80", family.colours[colnames(withinf_sp)]), #outline=FALSE, 
             las=1, xaxt="n", outline=FALSE,
             medcol='white', whiskcol='black', staplecol='black', outcol='black',
             xlab="Family ID", ylab="Shortest path", cex.lab=1.5)
@@ -139,6 +135,7 @@ for (i in 1:length(batches)){
     for (k in 1:ncol(withinf_sp)){
       axis(side=1, at=k+1, labels=colnames(withinf_sp)[k], cex.axis=0.8)
     }
-    dev.off()}
+    dev.off()
+    }
   }
 
