@@ -141,7 +141,7 @@ CreateScorePlot3=function(mypca, filename=NULL, type1, type2, mycolours, comp=NU
 
 
 # Create clustering dendrogram graph
-ClusteringToGraph=function(covars,myphylo,mycol = mycolours[covars$Family.ID]){
+ClusteringToGraph=function(covars,myphylo,mycol=NULL,verbose = TRUE){
   myphylo=as.phylo(h)
   graph_edges = myphylo$edge
   graph_net=graph.edgelist(graph_edges, directed=FALSE)
@@ -149,22 +149,23 @@ ClusteringToGraph=function(covars,myphylo,mycol = mycolours[covars$Family.ID]){
   graph_layout = layout_with_kk(graph_net)
   nobs = nrow(expo)
   
-  par(mar=c(0,1,0,1))
-  plot(graph_layout[,1], graph_layout[,2], type = "n", axes = FALSE,
-       xlab = "", ylab = "")
-  # draw tree branches
-  segments(
-    x0 = graph_layout[graph_edges[,1],1], 
-    y0 = graph_layout[graph_edges[,1],2],
-    x1 = graph_layout[graph_edges[,2],1],
-    y1 = graph_layout[graph_edges[,2],2],
-    col = "darkgrey", lwd = 1)
-  # add labels
-  points(graph_layout[1:nobs,1], graph_layout[1:nobs,2], pch=19,
-         col=mycol)
-  text(graph_layout[1:nobs,1], graph_layout[1:nobs,2],
-       col=mycol,
-       myphylo$tip.label, cex = 0.5, xpd = TRUE, font = 1)
-  
+  if (isTRUE(verbose)){
+    par(mar=c(0,1,0,1))
+    plot(graph_layout[,1], graph_layout[,2], type = "n", axes = FALSE,
+         xlab = "", ylab = "")
+    # draw tree branches
+    segments(
+      x0 = graph_layout[graph_edges[,1],1], 
+      y0 = graph_layout[graph_edges[,1],2],
+      x1 = graph_layout[graph_edges[,2],1],
+      y1 = graph_layout[graph_edges[,2],2],
+      col = "darkgrey", lwd = 1)
+    # add labels
+    points(graph_layout[1:nobs,1], graph_layout[1:nobs,2], pch=19,
+           col=mycol)
+    text(graph_layout[1:nobs,1], graph_layout[1:nobs,2],
+         col=mycol,
+         myphylo$tip.label, cex = 0.5, xpd = TRUE, font = 1)
+  }
   return(graph_net)
 }
