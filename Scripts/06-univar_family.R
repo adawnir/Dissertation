@@ -26,7 +26,9 @@ for (i in 1:length(batches)){
   print(all(rownames(expo)==rownames(covars)))
   
   ## Remove isolated children (no siblings)
-  covars = covars[which(covars$Family.ID != "Isolated"),]
+  covars = covars %>%
+    filter(Family.ID != "Isolated") %>%
+    mutate_if(is.factor, droplevels)
   expo = expo[rownames(covars),]
   saveRDS(covars, paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh_no_isolated.rds"))
   saveRDS(expo, paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
@@ -45,7 +47,7 @@ for (i in 1:length(batches)){
   t1=Sys.time()
   print(t1-t0)
   names(pvals) = colnames(expo)
-  # If p-value = 0 replace with smallest double in R
+  # If p-value = 0 replace wtihin smallest double in R
   pvals = ifelse(pvals ==0, .Machine$double.xmin, pvals)
   saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_exposure_family_pvals.rds"))
   assign(paste0("pvals_",suffix[i]),pvals)
@@ -69,7 +71,7 @@ options(scipen=999)
   plot(values[,1],
        col=batch.colours[1],
        xaxt="n", xlab="", ylab = expression(-log[10](italic(p))), cex.lab=1.5,
-       type="n", ylim = c(min(values, na.rm = TRUE), max(values, na.rm = TRUE)),
+       type="n", ylim = c(min(values, na.rm = TRUE), 500),
        log = "y")
   abline(h = -log10(0.05), lty = 2, col = "grey")
   abline(v = xseq, lty = 3, col = "grey", lwd = 0.7)
@@ -83,7 +85,7 @@ options(scipen=999)
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = rownames(values)[i], las=2, cex.axis = 0.8,
          col.axis = ifelse(isTRUE(values[i,4] > bonf[4]),
-                           darken(annot.colours[(annot_sub)[i]], amount=0.5),"black"))
+                           darken(annot.colours[annot_sub[i]], amount=0.5),"black"))
     }
   xgroup=c(which(!duplicated(annot_sub))-0.5, length(rownames(values))+0.5)
   axis(side=1, line=8, at=xgroup, labels=NA)
@@ -106,7 +108,7 @@ options(scipen=999)
   plot(values[,1],
        col=batch.colours[1],
        xaxt="n", xlab="", ylab = expression(-log[10](italic(p))), cex.lab=1.5,
-       type="n", ylim = c(min(values, na.rm = TRUE), max(values, na.rm = TRUE)),
+       type="n", ylim = c(min(values, na.rm = TRUE), 500),
        log = "y")
   abline(h = -log10(0.05), lty = 2, col = "grey")
   abline(v = xseq, lty = 3, col = "grey", lwd = 0.7)
@@ -120,7 +122,7 @@ options(scipen=999)
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = rownames(values)[i], las=2, cex.axis = 0.8,
          col.axis = ifelse(isTRUE(values[i,5] > bonf[5]),
-                           darken(annot.colours[(annot_sub)[i]], amount=0.5),"black"))
+                           darken(annot.colours[annot_sub[i]], amount=0.5),"black"))
   }
   xgroup=c(which(!duplicated(annot_sub))-0.5, length(rownames(values))+0.5)
   axis(side=1, line=8, at=xgroup, labels=NA)
@@ -134,7 +136,7 @@ options(scipen=999)
          legend = c(batches[c(1,3,5)],
                     paste0("Bonferroni threshold (",c("LUX","GS","Pooled"),")"),
                     "Nominal threshold"),
-         bg="white", cex = 0.8, ncol = 5)
+         bg="white", cex = 0.8, ncol = 4)
   dev.off()
 }
 options(scipen=0)
@@ -156,12 +158,11 @@ suffix = c("lux","fra","gs","pooled3","pooled2")
 for (i in 1:length(batches)){
   # Load data
   nd = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_nd.rds"))
-  covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
+  covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh_no_isolated.rds"))
+  ## Remove isolated children (no siblings)
+  nd = nd[rownames(covars),]
   print(all(rownames(nd)==rownames(covars)))
   
-  ## Remove isolated children (no siblings)
-  covars = covars[which(covars$Family.ID != "Isolated"),]
-  nd = nd[rownames(covars),]
   saveRDS(nd, paste0("../Processed/",filepaths[i],"/Exposure_matrix_nd_no_isolated.rds"))
   saveRDS(covars, paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh_no_isolated.rds"))
 
@@ -201,7 +202,7 @@ xseq = seq(1, nrow(values))
   plot(values[,1],
        col=batch.colours[1],
        xaxt="n", xlab="", ylab = expression(-log[10](italic(p))), cex.lab=1.5,
-       type="n", ylim = c(min(values, na.rm = TRUE), max(values, na.rm = TRUE)))
+       type="n", ylim = c(min(values, na.rm = TRUE), 13))
   abline(h = -log10(0.05), lty = 2, col = "grey")
   abline(v = xseq, lty = 3, col = "grey", lwd = 0.7)
   for (i in 1:4){
@@ -214,7 +215,7 @@ xseq = seq(1, nrow(values))
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = rownames(values)[i], las=2, cex.axis = 0.8,
          col.axis = ifelse(isTRUE(values[i,4] > bonf[4]),
-                           darken(annot.colours[(annot_sub)[i]], amount=0.5),"black"))
+                           darken(annot.colours[annot_sub[i]], amount=0.5),"black"))
   }
   xgroup=c(which(!duplicated(annot_sub))-0.5, length(rownames(values))+0.5)
   axis(side=1, line=8, at=xgroup, labels=NA)
@@ -237,7 +238,7 @@ xseq = seq(1, nrow(values))
   plot(values[,1],
        col=batch.colours[1],
        xaxt="n", xlab="", ylab = expression(-log[10](italic(p))), cex.lab=1.5,
-       type="n", ylim = c(min(values, na.rm = TRUE), max(values, na.rm = TRUE)))
+       type="n", ylim = c(min(values, na.rm = TRUE), 8))
   abline(h = -log10(0.05), lty = 2, col = "grey")
   abline(v = xseq, lty = 3, col = "grey", lwd = 0.7)
   for (i in c(1,3,5)){
@@ -250,7 +251,7 @@ xseq = seq(1, nrow(values))
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = rownames(values)[i], las=2, cex.axis = 0.8,
          col.axis = ifelse(isTRUE(values[i,5] > bonf[5]),
-                           darken(annot.colours[(annot_sub)[i]], amount=0.5),"black"))
+                           darken(annot.colours[annot_sub[i]], amount=0.5),"black"))
   }
   xgroup=c(which(!duplicated(annot_sub))-0.5, length(rownames(values))+0.5)
   axis(side=1, line=8, at=xgroup, labels=NA)
@@ -264,7 +265,7 @@ xseq = seq(1, nrow(values))
          legend = c(batches[c(1,3,5)],
                     paste0("Bonferroni threshold (",c("LUX","GS","Pooled"),")"),
                     "Nominal threshold"),
-         bg="white", cex = 0.8, ncol = 5)
+         bg="white", cex = 0.8, ncol = 4)
   dev.off()
 }
 
@@ -288,7 +289,7 @@ for (i in 1:length(batches)){
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh_no_isolated.rds"))
   print(all(rownames(expo)==rownames(covars)))
   
-  families=unique(covars$Family.ID)
+  families=levels(covars$Family.ID)
   family_sd=matrix(NA, nrow=length(families), ncol=ncol(expo))
   for (p in 1:ncol(expo)){
     for (f in 1:length(families)){
@@ -299,25 +300,31 @@ for (i in 1:length(batches)){
   rownames(family_sd)=families
   
   overall_sd=apply(expo,2,sd)
-  
-  mycolours=brewer.pal(n=12,name='Paired')
-  mycolours=colorRampPalette(mycolours)(length(families))
-  names(mycolours)=families
-  
-  x=as.vector(row(family_sd))
+
+  x=as.vector(rownames(family_sd))
   y=as.vector(family_sd)
   z=as.vector(col(family_sd))
   
   annot_sub=annot[colnames(family_sd)]
+  
+  # One-way ANOVA
+  pvals = NULL
+  for (k in 1:ncol(expo)){
+    pvals = c(pvals, summary(aov(expo[,k] ~ covars$Family.ID))[[1]]$`Pr(>F)`[1])
+  }
+  
+  # bonf = 0.05/ncol(expo)
+  
   {pdf(paste0("../Figures/",filepaths[i],"/Univariate_sd_family_overall_cont.pdf"), width=14, height=8)
       par(mar=c(20,5,1,1))
-      plot(z,y, pch=19, cex=0.5, col=mycolours[x], las=1, xaxt="n",
+      plot(z,y, pch=19, cex=0.5, col=family.colours[x], las=1, xaxt="n",
            xlab="", ylab="Standard deviation", cex.lab=1.5,
-           panel.first=abline(v=unique(z),lty=3,col="grey"),
+           panel.first=abline(v=levels(z),lty=3,col="grey"),
            ylim=range(c(family_sd,overall_sd)))
       points(overall_sd, pch=15)
       for (k in 1:ncol(family_sd)){
-        axis(side=1, at=k, labels=colnames(family_sd)[k], cex.axis=0.8, las=2)
+        axis(side=1, at=k, labels=colnames(family_sd)[k], cex.axis=0.8, las=2,
+             col.axis = ifelse(pvals[k] < 0.05, darken(annot.colours[annot_sub[k]],0.5), "black"))
       }
       xgroup=c(which(!duplicated(annot_sub))-0.5, length(colnames(family_sd))+0.5)
       axis(side=1, line=8, at=xgroup, labels=NA)
@@ -326,7 +333,7 @@ for (i in 1:length(batches)){
         axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2,
              col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
       }
-      # legend("top", col=c(mycolours, "black"),
+      # legend("top", col=c(family.colours[families], "black"),
       #        pch=c(rep(19,length(families)),15),
       #        pt.cex=c(rep(0.5,length(families)),1),
       #        legend=c(as.character(families), "Overall"), ncol=10, bg="white")
@@ -342,18 +349,26 @@ for (i in 1:length(batches)){
     colnames(batch_sd)=colnames(expo)
     rownames(batch_sd)=levels(covars$Batch)
     
-    x=as.vector(row(batch_sd))
+    x=as.vector(rownames(batch_sd))
     y=as.vector(batch_sd)
     z=as.vector(col(batch_sd))
+    
+    # One-way ANOVA
+    pvals = NULL
+    for (k in 1:ncol(expo)){
+      pvals = c(pvals, summary(aov(expo[,k] ~ covars$Batch))[[1]]$`Pr(>F)`[1])
+    }
+    
     {pdf(paste0("../Figures/",filepaths[i],"/Univariate_sd_batch_overall_cont.pdf"), width=14, height=8)
       par(mar=c(20,5,1,1))
-      plot(z,y, pch=19, cex=0.5, col=batch.colours[levels(covars$Batch)[x]], las=1, xaxt="n",
+      plot(z,y, pch=19, cex=0.5, col=batch.colours[x], las=1, xaxt="n",
            xlab="", ylab="Standard deviation", cex.lab=1.5,
            panel.first=abline(v=unique(z),lty=3,col="grey"),
            ylim=range(c(batch_sd,overall_sd)))
       points(overall_sd, pch=15)
       for (k in 1:ncol(batch_sd)){
-        axis(side=1, at=k, labels=colnames(batch_sd)[k], cex.axis=0.8, las=2)
+        axis(side=1, at=k, labels=colnames(batch_sd)[k], cex.axis=0.8, las=2,
+             col.axis = ifelse(pvals[k] < 0.05, darken(annot.colours[annot_sub[k]], amount=0.5), "black"))
       }
       xgroup=c(which(!duplicated(annot_sub))-0.5, length(colnames(batch_sd))+0.5)
       axis(side=1, line=8, at=xgroup, labels=NA)
@@ -362,17 +377,15 @@ for (i in 1:length(batches)){
         axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2,
              col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
       }
-      legend("top", col=c(batch.colours[levels(covars$Batch)], "black"),
-             pch=c(rep(19,length(levels(covars$Batch))),15),
-             pt.cex=c(rep(0.5,length(levels(covars$Batch))),1),
-             legend=c(levels(covars$Batch), "Overall"),
-             ncol=length(levels(covars$Batch))+1, bg="white", cex = 0.8)
+      legend("top", col=c(batch.colours[x], "black"),
+             pch=c(rep(19,length(x)),15),
+             pt.cex=c(rep(0.5,length(x)),1),
+             legend=c(batches[1:3], "Overall"),
+             ncol=length(x)+1, bg="white", cex = 0.8)
       dev.off()
     }
   }
   if (i == 4){
-    covars$Region = droplevels(covars$Region)
-    covars$Department = droplevels(covars$Department)
     region_sd=matrix(NA, nrow=length(levels(covars$Region)), ncol=ncol(expo))
     for (p in 1:ncol(expo)){
       for (r in 1:length(levels(covars$Region))){
@@ -390,23 +403,26 @@ for (i in 1:length(batches)){
     colnames(depart_sd)=colnames(expo)
     rownames(depart_sd)=levels(covars$Department)
     
-    x=as.vector(row(region_sd))
+    x=as.vector(rownames(region_sd))
     y=as.vector(region_sd)
     z=as.vector(col(region_sd))
     
-    mycolours=brewer.pal(n=12,name='Paired')
-    mycolours=colorRampPalette(mycolours)(length(levels(covars$Region)))
-    names(mycolours)=levels(covars$Region)
+    # One-way ANOVA
+    pvals = NULL
+    for (k in 1:ncol(expo)){
+      pvals = c(pvals, summary(aov(expo[,k] ~ covars$Region))[[1]]$`Pr(>F)`[1])
+    }
     
     {pdf(paste0("../Figures/",filepaths[i],"/Univariate_sd_region_overall_cont.pdf"), width=14, height=8)
       par(mar=c(20,5,1,1))
-      plot(z,y, pch=19, cex=0.5, col=mycolours[x], las=1, xaxt="n",
+      plot(z,y, pch=19, cex=0.5, col=region.colours[x], las=1, xaxt="n",
            xlab="", ylab="Standard deviation", cex.lab=1.5,
            panel.first=abline(v=unique(z),lty=3,col="grey"),
            ylim=range(c(region_sd,overall_sd)))
       points(overall_sd, pch=15)
       for (k in 1:ncol(region_sd)){
-        axis(side=1, at=k, labels=colnames(region_sd)[k], cex.axis=0.8, las=2)
+        axis(side=1, at=k, labels=colnames(region_sd)[k], cex.axis=0.8, las=2,
+             col.axis = ifelse(pvals[k] < 0.05, darken(annot.colours[annot_sub[k]], amount=0.5), "black"))
       }
       xgroup=c(which(!duplicated(annot_sub))-0.5, length(colnames(region_sd))+0.5)
       axis(side=1, line=8, at=xgroup, labels=NA)
@@ -415,31 +431,34 @@ for (i in 1:length(batches)){
         axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2,
              col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
       }
-      legend("top", col=c(mycolours, "black"),
-             pch=c(rep(19,length(levels(covars$Region))),15),
-             pt.cex=c(rep(0.5,length(levels(covars$Region))),1),
-             legend=c(levels(covars$Region), "Overall"), cex = 0.8,
+      legend("top", col=c(region.colours[x], "black"),
+             pch=c(rep(19,length(x)),15),
+             pt.cex=c(rep(0.5,length(x)),1),
+             legend=c(x, "Overall"), cex = 0.8,
              ncol=5, bg="white")
       dev.off()
     }
     
-    x=as.vector(row(depart_sd))
+    x=as.vector(rownames(depart_sd))
     y=as.vector(depart_sd)
     z=as.vector(col(depart_sd))
     
-    mycolours=brewer.pal(n=12,name='Paired')
-    mycolours=colorRampPalette(mycolours)(length(levels(covars$Department)))
-    names(mycolours)=levels(covars$Department)
+    # One-way ANOVA
+    pvals = NULL
+    for (k in 1:ncol(expo)){
+      pvals = c(pvals, summary(aov(expo[,k] ~ covars$Department))[[1]]$`Pr(>F)`[1])
+    }
     
     {pdf(paste0("../Figures/",filepaths[i],"/Univariate_sd_depart_overall_cont.pdf"), width=14, height=8)
       par(mar=c(20,5,1,1))
-      plot(z,y, pch=19, cex=0.5, col=mycolours[x], las=1, xaxt="n",
+      plot(z,y, pch=19, cex=0.5, col=depart.colours[x], las=1, xaxt="n",
            xlab="", ylab="Standard deviation", cex.lab=1.5,
            panel.first=abline(v=unique(z),lty=3,col="grey"),
            ylim=range(c(depart_sd,overall_sd)))
       points(overall_sd, pch=15)
       for (k in 1:ncol(depart_sd)){
-        axis(side=1, at=k, labels=colnames(depart_sd)[k], cex.axis=0.8, las=2)
+        axis(side=1, at=k, labels=colnames(depart_sd)[k], cex.axis=0.8, las=2,
+             col.axis = ifelse(pvals[k] < 0.05, darken(annot.colours[annot_sub[k]], amount=0.5), "black"))
       }
       xgroup=c(which(!duplicated(annot_sub))-0.5, length(colnames(depart_sd))+0.5)
       axis(side=1, line=8, at=xgroup, labels=NA)
@@ -448,10 +467,10 @@ for (i in 1:length(batches)){
         axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2,
              col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
       }
-      legend("top", col=c(mycolours, "black"),
-             pch=c(rep(19,length(levels(covars$Department))),15),
-             pt.cex=c(rep(0.5,length(levels(covars$Department))),1),
-             legend=c(levels(covars$Department), "Overall"), cex = 0.8,
+      legend("top", col=c(depart.colours[x], "black"),
+             pch=c(rep(19,length(x)),15),
+             pt.cex=c(rep(0.5,length(x)),1),
+             legend=c(x, "Overall"), cex = 0.8,
              ncol=5, bg="white")
       dev.off()
     }
@@ -488,7 +507,7 @@ for (i in 1:length(batches)){
   colnames(family_diff)=colnames(expo)
   rownames(family_diff)=families
   
-  # Relationship with age
+  # Relationship wtihin age
   age_mu=rep(NA, length(families))
   for (f in 1:length(families)){
     age_mu[f]=mean(covars$Age[covars$Family.ID==families[f]])
@@ -509,9 +528,11 @@ for (i in 1:length(batches)){
       if (unique(tmp)=="Female"){
         gender_diff[f]=2
       }
+    } else if (sum(is.na(tmp))>0) {
+      gender_diff[f] = NA
     } else {
       gender_diff[f]=3
-    } 
+    }
   }
   names(gender_diff)=families
   if (i==1){
@@ -572,8 +593,9 @@ for (i in 1:length(batches)){
     pvals = c(pvals, summary(model)$coefficients[2,4])
   }
   for (k in 1:ncol(family_diff)){
-    model1 = lm(family_diff[,k] ~ as.factor(gender_diff))
-    model0 = lm(family_diff[,k] ~ 1)
+    tmp = family_diff[!is.na(gender_diff),]
+    model1 = lm(tmp[,k] ~ as.factor(gender_diff[!is.na(gender_diff)]))
+    model0 = lm(tmp[,k] ~ 1)
     pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
   }
   if (i==1){
@@ -617,8 +639,8 @@ for (i in 1:length(batches)){
   if (i==1){X = c(X, "weight_mu","weight_diff","length_mu","length_diff")}
   if (i %in% 4:5){X = c(X, "Batch")}
   if (i==4){X = c(X, "Region","Department")}
-  # If p-value = 0 replace with smallest double in R
-  pvals = ifelse(pvals ==0, .Machine$double.xmin, pvals)
+  # If p-value = 0 replace wtihin smallest double in R
+  pvals = ifelse(pvals == 0, .Machine$double.xmin, pvals)
   pvals = matrix(pvals, nrow = ncol(family_diff), ncol = length(X))
   rownames(pvals)=colnames(family_diff)
   colnames(pvals)= X
@@ -627,7 +649,7 @@ for (i in 1:length(batches)){
   # Manhattan plot
   xseq = seq(1, nrow(pvals))
   for (j in colnames(pvals)){
-    {pdf(paste0("../Figures/",filepaths[i],"/Univariate__family_diff_",j,".pdf"), width=14, height=8)
+    {pdf(paste0("../Figures/",filepaths[i],"/Univariate_family_diff_",j,".pdf"), width=14, height=8)
       par(mar=c(20,5,1,1))
       plot(-log10(pvals[,j]),
            pch = ifelse(i %in% 4:5, 17, 19), col=annot.colours[annot_sub],
@@ -683,14 +705,28 @@ for (i in 1:length(batches)){
   
   ### Univariate linear mixed models
   icc_family=NULL
-  for (p in 1:ncol(expo)){
-    x=expo[,p]
-    model=lmer(x~(1|covars$Family.ID))
-    vcov = as.data.frame(VarCorr(model))$vcov
-    icc_family=c(icc_family,vcov[1]/sum(vcov))
+  
+  
+  
+  if (i %in% c(2,4,5)){
+    for (p in 1:ncol(expo)){
+      x=expo[,p]
+      model=lmer(x~(1|covars$Family.ID) + (1|covars$Department) + (1|covars$Region))
+      vcov = as.data.frame(VarCorr(model))$vcov
+      icc_family=c(icc_family,vcov[1]/sum(vcov))
+    }
+    names(icc_family) = colnames(expo)
+    assign(paste0("icc_family_",suffix[i]),icc_family)
+  } else {
+    for (p in 1:ncol(expo)){
+      x=expo[,p]
+      model=lmer(x~(1|covars$Family.ID))
+      vcov = as.data.frame(VarCorr(model))$vcov
+      icc_family=c(icc_family,vcov[1]/sum(vcov))
+    }
+    names(icc_family) = colnames(expo)
+    assign(paste0("icc_family_",suffix[i]),icc_family)
   }
-  names(icc_family) = colnames(expo)
-  assign(paste0("icc_family_",suffix[i]),icc_family)
   
   if (i %in% 4:5){
     icc_batch=NULL
@@ -796,7 +832,7 @@ annot_sub=annot[names(icc_batch_pooled2)]
 {pdf("../Figures/Pooled2/Intra_class_correlation_batch_univariate_expo_cont.pdf", width=14, height=8)
   par(mar=c(20,5,1,1))
   plot(icc_batch_pooled2, pch=19, cex=1, las=1, xaxt="n",
-       xlab="", ylab="Intra-Class Correlation with batch", cex.lab=1.2,
+       xlab="", ylab="Intra-Class Correlation wtihin batch", cex.lab=1.2,
        panel.first=abline(v=1:length(icc_batch_pooled2),lty=3,col="grey"),
        col=annot.colours[annot_sub])
   for (k in 1:length(icc_batch_pooled2)){
@@ -817,7 +853,7 @@ annot_sub=annot[names(icc_batch_pooled3)]
 {pdf("../Figures/Pooled3/Intra_class_correlation_batch_univariate_expo_cont.pdf", width=14, height=8)
   par(mar=c(20,5,1,1))
   plot(icc_batch_pooled3, pch=19, cex=1, las=1, xaxt="n",
-       xlab="", ylab="Intra-Class Correlation with batch", cex.lab=1.2,
+       xlab="", ylab="Intra-Class Correlation wtihin batch", cex.lab=1.2,
        panel.first=abline(v=1:length(icc_batch_pooled3),lty=3,col="grey"),
        col=annot.colours[annot_sub])
   for (k in 1:length(icc_batch_pooled3)){
@@ -838,7 +874,7 @@ annot_sub=annot[names(icc_region)]
 {pdf("../Figures/Pooled3/Intra_class_correlation_region_univariate_expo_cont.pdf", width=14, height=8)
   par(mar=c(20,5,1,1))
   plot(icc_region, pch=19, cex=1, las=1, xaxt="n",
-       xlab="", ylab="Intra-Class Correlation with region", cex.lab=1.2,
+       xlab="", ylab="Intra-Class Correlation wtihin region", cex.lab=1.2,
        panel.first=abline(v=1:length(icc_region),lty=3,col="grey"),
        col=annot.colours[annot_sub])
   for (k in 1:length(icc_region)){
@@ -859,7 +895,7 @@ annot_sub=annot[names(icc_depart)]
 {pdf("../Figures/Pooled3/Intra_class_correlation_depart_univariate_expo_cont.pdf", width=14, height=8)
   par(mar=c(20,5,1,1))
   plot(icc_depart, pch=19, cex=1, las=1, xaxt="n",
-       xlab="", ylab="Intra-Class Correlation with department", cex.lab=1.2,
+       xlab="", ylab="Intra-Class Correlation wtihin department", cex.lab=1.2,
        panel.first=abline(v=1:length(icc_depart),lty=3,col="grey"),
        col=annot.colours[annot_sub])
   for (k in 1:length(icc_depart)){
