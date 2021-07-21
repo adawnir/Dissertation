@@ -76,7 +76,7 @@ names(tmp5) = chem_pooled2$Compound
 
 prop = t(bind_rows(tmp1, tmp2, tmp3, tmp4, tmp5))
 prop[which(is.na(prop))] = 1 # Replace NA with 1
-prop = prop[order(annot,-prop[,4],-prop[,5]),]
+prop = prop[order(match(rownames(prop), names(annot))),]
 prop = cbind(prop,rep(NA,nrow(prop)),rep(NA,nrow(prop)))
 mylabels = rownames(prop)
 prop = as.vector(t(prop))
@@ -91,7 +91,7 @@ annot_sub = annot[mylabels]
   plot(prop,
        col=c(NA, batch.colours, NA),
        xaxt="n", ylab="", xlab = "",
-       type="n", lwd=2, ylim = c(0,1))
+       type="n", lwd=2, ylim = c(0,1.1))
   xseqgreysep=c(min(xseq)-myspacing/2,apply(rbind(xseq[-1],xseq[-length(xseq)]),2,mean),max(xseq)+myspacing/2)
   if (background){
     for (k in seq(1,length(xseqgreysep),by=2)){
@@ -109,7 +109,7 @@ annot_sub = annot[mylabels]
   plot(prop,
        col=c(NA, batch.colours, NA),
        xaxt="n", ylab="Proportion missing", xlab = "", cex.lab=1.5,
-       type="h", lwd=1, ylim = c(0,1))
+       type="h", lwd=1, ylim = c(0,1.1))
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.6)
   }
@@ -121,8 +121,8 @@ annot_sub = annot[mylabels]
     axis(side=1, line=7, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
-  legend("right", lty=1, lwd=2, col=batch.colours, cex = 0.7,
-         legend = batches, bg="white")
+  legend("top", lty=1, lwd=2, col=batch.colours, cex = 0.7,
+         legend = batches, bg="white", horiz = TRUE)
   dev.off()
 }
 
@@ -171,8 +171,8 @@ for (i in 1:length(sorted_prop)){
     points(thrseq, N[[k]], type="b", pch=pch[k], lty = lty[k], col=batch.colours[k])
   }
   abline(v = 0.1, lty = 2)
-  legend("topright", lty=lty, pch = pch, lwd=2, col=batch.colours,0.7,
-         legend = batches, cex=0.8, bg="white")
+  legend("top", lty=lty, pch = pch, lwd=2, col=batch.colours,0.7,
+         legend = batches, cex=0.7, bg="white", horiz = TRUE)
   dev.off()
 }
 
@@ -190,7 +190,7 @@ names(tmp5) = chem_pooled2$Compound
 
 prop = t(bind_rows(tmp1, tmp2, tmp3, tmp4))
 prop[which(is.na(prop))] = 0 # Replace NA with 0
-prop = prop[order(annot,-prop[,4]),]
+prop = prop[order(match(rownames(prop),names(annot))),]
 prop = cbind(prop,rep(NA,nrow(prop)),rep(NA,nrow(prop)))
 mylabels = rownames(prop)
 prop = as.vector(t(prop))
@@ -210,7 +210,7 @@ annot_sub = annot[mylabels]
   plot(prop,
        col=c(NA, batch.colours[1:4], NA),
        xaxt="n", ylab="", xlab = "",
-       type="n", lwd=1, ylim = c(0,1))
+       type="n", lwd=1, ylim = c(0,1.1))
   xseqgreysep=c(min(xseq)-myspacing/2,apply(rbind(xseq[-1],xseq[-length(xseq)]),2,mean),max(xseq)+myspacing/2)
   if (background){
     for (k in seq(1,length(xseqgreysep),by=2)){
@@ -228,7 +228,7 @@ annot_sub = annot[mylabels]
   plot(prop,
        col=c(NA, batch.colours[1:4], NA),
        xaxt="n", ylab="Proportion detected", xlab = "", cex.lab=1.5,
-       type="h", lwd=1, ylim = c(0,1))
+       type="h", lwd=1, ylim = c(0,1.1))
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.6)
   }
@@ -240,8 +240,8 @@ annot_sub = annot[mylabels]
     axis(side=1, line=7, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
-  legend("topright", lty=1, lwd=2, col=batch.colours[1:4], cex = 0.7,
-         legend = batches[1:4], bg="white")
+  legend("top", lty=1, lwd=2, col=batch.colours[1:4], cex = 0.7,
+         legend = batches[1:4], bg="white", horiz = TRUE)
   dev.off()
 }
 
@@ -252,7 +252,7 @@ annot_sub = annot[mylabels]
                   c(NA, batch.colours[1:4], NA),
                   alpha(c(NA, batch.colours[1:4], NA), 0.5)),
        xaxt="n", ylab="", xlab = "",
-       type="n", lwd=1, ylim = c(0,1))
+       type="n", lwd=1, ylim = c(0,1.1))
   xseqgreysep=c(min(xseq)-myspacing/2,apply(rbind(xseq[-1],xseq[-length(xseq)]),2,mean),max(xseq)+myspacing/2)
   if (background){
     for (k in seq(1,length(xseqgreysep),by=2)){
@@ -272,7 +272,7 @@ annot_sub = annot[mylabels]
                   c(NA, batch.colours[1:4], NA),
                   alpha(c(NA, batch.colours[1:4], NA), 0.5)),
        xaxt="n", ylab="Proportion detected", xlab = "", cex.lab=1.5,
-       type="h", lwd=1, ylim = c(0,1))
+       type="h", lwd=1, ylim = c(0,1.1))
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.6,
          col.axis = ifelse(tmp4[mylabels[i]] > 0.1 & !(mylabels[i] %in% nd),
@@ -290,15 +290,15 @@ annot_sub = annot[mylabels]
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
   abline(h = 0.1, lty = 2)
-  legend("right", lty=1, lwd=2, col=batch.colours[1:4], cex = 0.7,
-         legend = batches[1:4], bg="white")
+  legend("top", lty=1, lwd=2, col=batch.colours[1:4], cex = 0.7,
+         legend = batches[1:4], bg="white", horiz = TRUE)
   dev.off()
 }
 
 # Proportion detected
 prop = t(bind_rows(tmp1, tmp3, tmp5))
 prop[which(is.na(prop))] = 0 # Replace NA with 0
-prop = prop[order(annot,-prop[,3]),]
+prop = prop[order(match(rownames(prop),names(annot))),]
 prop = cbind(prop,rep(NA,nrow(prop)),rep(NA,nrow(prop)))
 mylabels = rownames(prop)
 prop = as.vector(t(prop))
@@ -316,7 +316,7 @@ annot_sub = annot[mylabels]
   plot(prop,
        col=c(NA, batch.colours[c(1,3,4)], NA),
        xaxt="n", ylab="", xlab = "",
-       type="n", lwd=1, ylim = c(0,1))
+       type="n", lwd=1, ylim = c(0,1.1))
   xseqgreysep=c(min(xseq)-myspacing/2,apply(rbind(xseq[-1],xseq[-length(xseq)]),2,mean),max(xseq)+myspacing/2)
   if (background){
     for (k in seq(1,length(xseqgreysep),by=2)){
@@ -334,7 +334,7 @@ annot_sub = annot[mylabels]
   plot(prop,
        col=c(NA, batch.colours[c(1,3,5)], NA),
        xaxt="n", ylab="Proportion detected", xlab = "", cex.lab=1.5,
-       type="h", lwd=1, ylim = c(0,1))
+       type="h", lwd=1, ylim = c(0,1.1))
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.6)
   }
@@ -346,8 +346,8 @@ annot_sub = annot[mylabels]
     axis(side=1, line=7, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
-  legend("topright", lty=1, lwd=2, col=batch.colours[c(1,3,5)], cex = 0.7,
-         legend = batches[c(1,3,5)], bg="white")
+  legend("top", lty=1, lwd=2, col=batch.colours[c(1,3,5)], cex = 0.7,
+         legend = batches[c(1,3,5)], bg="white", horiz = TRUE)
   dev.off()
 }
 
@@ -358,7 +358,7 @@ annot_sub = annot[mylabels]
                   c(NA, batch.colours[1:4], NA),
                   alpha(c(NA, batch.colours[c(1,3,5)], NA), 0.5)),
        xaxt="n", ylab="", xlab = "",
-       type="n", lwd=1, ylim = c(0,1))
+       type="n", lwd=1, ylim = c(0,1.1))
   xseqgreysep=c(min(xseq)-myspacing/2,apply(rbind(xseq[-1],xseq[-length(xseq)]),2,mean),max(xseq)+myspacing/2)
   if (background){
     for (k in seq(1,length(xseqgreysep),by=2)){
@@ -378,7 +378,7 @@ annot_sub = annot[mylabels]
                   c(NA, batch.colours[c(1,3,5)], NA),
                   alpha(c(NA, batch.colours[c(1,3,5)], NA), 0.5)),
        xaxt="n", ylab="Proportion detected", xlab = "", cex.lab=1.5,
-       type="h", lwd=1, ylim = c(0,1))
+       type="h", lwd=1, ylim = c(0,1.1))
   for(i in 1:length(xseq)){
     axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.6,
          col.axis = ifelse(tmp5[mylabels[i]] > 0.1 & !(mylabels[i] %in% nd),
@@ -396,7 +396,7 @@ annot_sub = annot[mylabels]
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
   abline(h = 0.1, lty = 2)
-  legend("right", lty=1, lwd=2, col=batch.colours[c(1,3,5)], cex = 0.7,
-         legend = batches[c(1,3,5)], bg="white")
+  legend("top", lty=1, lwd=2, col=batch.colours[c(1,3,5)], cex = 0.7,
+         legend = batches[c(1,3,5)], bg="white", horiz = TRUE)
   dev.off()
 }
