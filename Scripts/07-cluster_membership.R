@@ -215,6 +215,3 @@ for (i in 1:length(batches)){
   
   }
 
-### Characterising clusters ----
-## Univariate
-
