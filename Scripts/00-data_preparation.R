@@ -160,7 +160,7 @@ colnames(expo) = readLines(paste0("../Dictionaries/Chemical_names_",filepath,".t
 ## Chemical compound information
 annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 chem = data.frame(Compound = colnames(expo),
-                  Family = annot[colnames(expo)],
+                  Family = factor.order(annot[colnames(expo)]),
                   LOQ = as.numeric(gsub("\\*","",mydata[143,6:ncol(mydata)])),
                   Extraction = unlist(mydata[144,6:ncol(mydata)]))
 
