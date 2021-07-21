@@ -8,8 +8,8 @@ ContinuousTest3=function(x, y){
   }
   
   # one-way ANOVA
-  mytest=aov(x ~ y, test = 'Chisq')
-  mypval=formatC(mytest$`Pr(>Chi)`[2], format="e", digits=2)
+  mytest=aov(x ~ y)
+  mypval=formatC(mytest[[i]]$`Pr(>F)`[1], format="e", digits=2)
   out=c(out, mypval)
   
   return(out)
