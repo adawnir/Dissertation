@@ -7,12 +7,8 @@ ContinuousTest3=function(x, y){
     out=c(out, paste0(mymean, " (", mysd, ")"))
   }
   
-  # T-test
-  f1='x ~ y'
-  f0='x ~ 1'
-  model1=lm(as.formula(f1))
-  model0=lm(as.formula(f0))
-  mytest=anova(model0, model1, test = 'Chisq')
+  # one-way ANOVA
+  mytest=aov(x ~ y, test = 'Chisq')
   mypval=formatC(mytest$`Pr(>Chi)`[2], format="e", digits=2)
   out=c(out, mypval)
   
@@ -45,9 +41,9 @@ ReformatScientificNotation=function(x){
 }
 
 SaveExcelWithSuperscripts=function(dt, filename){
-  wb <- createWorkbook() # create workbook
-  addWorksheet(wb, sheetName = "data") # add sheet
-  writeData(wb, sheet=1, x=dt, xy=c(1, 1)) # write data on workbook
+  wb <- openxlsx::createWorkbook() # create workbook
+  openxlsx::addWorksheet(wb, sheetName = "data") # add sheet
+  openxlsx::writeData(wb, sheet=1, x=dt, xy=c(1, 1)) # write data on workbook
   
   for(i in grep("\\_\\[([A-z0-9\\s\\-]*)\\]", wb$sharedStrings)){
     # if empty string in superscript notation, then just remove the superscript notation
@@ -62,5 +58,5 @@ SaveExcelWithSuperscripts=function(dt, filename){
     # find the "_[...]" pattern, remove brackets and udnerline and enclose the text with superscript format
     wb$sharedStrings[[i]] <- gsub("\\_\\[([A-z0-9\\s\\-]*)\\]", "</t></r><r><rPr><vertAlign val=\"superscript\"/></rPr><t xml:space=\"preserve\">\\1</t></r><r><t xml:space=\"preserve\">", wb$sharedStrings[[i]])
   }
-  saveWorkbook(wb, file=filename, overwrite = TRUE)
+  openxlsx::saveWorkbook(wb, file=filename, overwrite = TRUE)
 }
