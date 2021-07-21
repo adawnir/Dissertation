@@ -15,7 +15,17 @@ group_sample = function(x,group,n, exclude = NULL){
   return(as.logical(tmp))
 }
 
+# Make factor in the order of original data
 factor.order = function(x) {factor(x, levels = unique(x))}
+
+# Reorder last level
+last.level = function(f, last) {
+  if (!is.factor(f)) stop("f must be a factor")
+  orig.levels = levels(f)
+  if (! last %in% orig.levels) stop("last must be a level of f")
+  new.levels = c(setdiff(orig.levels, last), last)
+  factor(f, levels = new.levels)
+}
 
 # Compare multiple vectors and ignore NA
 is.equal = function(mylist) {
