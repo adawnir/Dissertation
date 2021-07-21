@@ -26,10 +26,6 @@ for (i in 1:length(batches)){
   
   families=unique(covars$Family.ID)
   
-  mycolours=brewer.pal(n=12,name='Paired')
-  mycolours=colorRampPalette(mycolours)(length(families))
-  names(mycolours)=families
-  
   expo = scale(expo)
   d=dist(expo)
   h=hclust(d, method = "complete")
@@ -37,7 +33,7 @@ for (i in 1:length(batches)){
   h$labels=paste0(covars$Family.ID, "-",h$labels)
   myphylo=as.phylo(h)
   
-  g=ClusteringToGraph(covars=covars, myphylo=myphylo)
+  g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = family.colours[levels(covars$Family.ID)], verbose = FALSE)
   
   nobs=nrow(expo)
   sp=shortest.paths(g)[1:nobs,1:nobs]
@@ -63,13 +59,12 @@ for (i in 1:length(batches)){
   }
   names(age_diff)=families
   
-  # model=lm(fsp~age_mu*age_diff)
-  # print(summary(model))
-  
   gender_diff=rep(NA, length(families))
   for (f in 1:length(families)){
     tmp=covars$Gender[covars$Family.ID==families[f]]
-    if (length(unique(tmp))==1){
+    if (sum(is.na(tmp))>0) {
+      gender_diff[f] = NA
+    } else if (length(unique(tmp))==1){
       if (unique(tmp)=="Male"){
         gender_diff[f]=1
       }
@@ -78,18 +73,18 @@ for (i in 1:length(batches)){
       }
     } else {
       gender_diff[f]=3
-    } 
+    }
   }
   names(gender_diff)=families
   
-  model0=lm(fsp~age_mu+as.factor(gender_diff))
-  model1=lm(fsp~age_mu*as.factor(gender_diff))
+  model0 = lm(fsp ~ age_mu + as.factor(gender_diff))
+  model1 = lm(fsp ~ age_mu * as.factor(gender_diff))
   {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_vs_age_mean_gender_diff.pdf"))
     par(mar=c(5,5,1,1))
     plot(age_mu, fsp, pch=19, cex=1, cex.lab=1.5, las=1,
          col=c("skyblue", "pink", "tan")[gender_diff],
          xlab="Within-family age mean", ylab="Shortest path length between siblings")
-    text(age_mu, fsp, labels=names(age_mu), pos=3, col=darken(mycolours[names(age_mu)], amount=0.5))
+    text(age_mu, fsp, labels=names(age_mu), pos=3, col=darken(family.colours[names(age_mu)], amount=0.5))
     abline(h=axTicks(2), col="grey", lty=3)
     abline(v=axTicks(1), col="grey", lty=3)
     legend("topleft", pch=19, col=c("skyblue", "pink", "tan"), ncol=1,
@@ -99,20 +94,60 @@ for (i in 1:length(batches)){
     dev.off()
   }
   
-  model0=lm(fsp~age_diff+as.factor(gender_diff))
-  model1=lm(fsp~age_diff*as.factor(gender_diff))
+  model1=lm(fsp[which(gender_diff=="1")]~age_mu[which(gender_diff=="1")])
+  model2=lm(fsp[which(gender_diff=="2")]~age_mu[which(gender_diff=="2")])
+  model3=lm(fsp[which(gender_diff=="3")]~age_mu[which(gender_diff=="3")])
+
+  {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_vs_age_mean_by_gender_diff.pdf"), width = 15, height = 5)
+    par(mar=c(5,5,2,2), mfrow = c(1,3))
+    for (k in 1:3){
+      plot(age_mu[which(gender_diff==k)], fsp[which(gender_diff==k)], pch=19, cex=1, cex.lab=1.5, las=1,
+           col=c("skyblue", "pink", "tan")[k],
+           xlab="Within-family age mean", ylab="Shortest path length between siblings",
+           main = c("All male", "All female", "Different gender")[k])
+      text(age_mu[which(gender_diff==k)], fsp[which(gender_diff==k)], labels=ifelse(!is.na(age_mu[which(gender_diff==k)]), names(age_mu[which(gender_diff==k)]), ""), pos=3, col=darken(family.colours[names(age_mu[which(gender_diff==k)])], amount=0.5))
+      abline(h=axTicks(2), col="grey", lty=3)
+      abline(v=axTicks(1), col="grey", lty=3)
+      legend("topright", bty="n", cex=1.5,
+             legend=paste0("p=",formatC(summary(eval(parse(text = paste0("model",k))))$coefficients[2,4], format="e", digits=2))) 
+    }
+    dev.off()
+    }
+  
+  model0=lm(fsp~age_diff + as.factor(gender_diff))
+  model1=lm(fsp~age_diff * as.factor(gender_diff))
   {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_vs_age_diff_gender_diff.pdf"))
     par(mar=c(5,5,1,1))
     plot(age_diff, fsp, pch=19, cex=1, cex.lab=1.5, las=1,
          col=c("skyblue", "pink", "tan")[gender_diff],
          xlab="Within-family age absolute difference", ylab="Shortest path length between siblings")
-    text(age_diff, fsp, labels=names(age_diff), pos=3, col=darken(mycolours[names(age_diff)], amount=0.5))
+    text(age_diff, fsp, labels=names(age_diff), pos=3, col=darken(family.colours[names(age_diff)], amount=0.5))
     abline(h=axTicks(2), col="grey", lty=3)
     abline(v=axTicks(1), col="grey", lty=3)
     legend("topleft", pch=19, col=c("skyblue", "pink", "tan"), ncol=1,
            legend=c("All Male", "All Female", "Different genders"))
     legend("topright", bty="n", cex=1.5,
            legend=paste0("p=",formatC(anova(model0,model1, test = 'Chisq')$`Pr(>Chi)`[2], format="e", digits=2)))
+    dev.off()
+  }
+  
+  model1=lm(fsp[which(gender_diff=="1")]~age_diff[which(gender_diff=="1")])
+  model2=lm(fsp[which(gender_diff=="2")]~age_diff[which(gender_diff=="2")])
+  model3=lm(fsp[which(gender_diff=="3")]~age_diff[which(gender_diff=="3")])
+  
+  {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_vs_age_diff_by_gender_diff.pdf"), width = 15, height = 5)
+    par(mar=c(5,5,2,2), mfrow = c(1,3))
+    for (k in 1:3){
+      plot(age_diff[which(gender_diff==k)], fsp[which(gender_diff==k)], pch=19, cex=1, cex.lab=1.5, las=1,
+           col=c("skyblue", "pink", "tan")[k],
+           xlab="Within-family age absolute difference", ylab="Shortest path length between siblings",
+           main = c("All male", "All female", "Different gender")[k])
+      text(age_diff[which(gender_diff==k)], fsp[which(gender_diff==k)], labels=ifelse(!is.na(age_diff[which(gender_diff==k)]), names(age_diff[which(gender_diff==k)]), ""), pos=3, col=darken(family.colours[names(age_diff[which(gender_diff==k)])], amount=0.5))
+      abline(h=axTicks(2), col="grey", lty=3)
+      abline(v=axTicks(1), col="grey", lty=3)
+      legend("topright", bty="n", cex=1.5,
+             legend=paste0("p=",formatC(summary(eval(parse(text = paste0("model",k))))$coefficients[2,4], format="e", digits=2))) 
+    }
     dev.off()
   }
 }
