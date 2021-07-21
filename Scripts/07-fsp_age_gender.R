@@ -4,6 +4,7 @@
 # Load packages
 library(ape)
 library(igraph)
+library(colorspace)
 
 # Initialise
 rm(list=ls())
