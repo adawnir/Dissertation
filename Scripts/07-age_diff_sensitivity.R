@@ -19,7 +19,7 @@ source("graph_param.R")
 annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 
 suffix = c("lux","fra","gs","pooled3","pooled2")
-for (i in 1:5){
+for (i in 1:length(batches)){
   # Load data
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh_no_isolated.rds"))
