@@ -225,7 +225,7 @@ for (i in 1:length(batches)){
   for (n in 1:ncol(betas)){
     plot(betas[,n], -log10(pvals[,n]), pch=19,
          col=ifelse(pvals[,n] < 0.05/length(betas[,n]), annot.colours[annot_sub], "grey"),
-         cex.lab=1, cex = 0.7,
+         cex.lab=1.5, cex = 0.7,
          ylim = c(0, max(-log10(pvals[,n])+0.25)),
          xlim = c(-max(abs(betas[,n])), max(abs(betas[,n]))),
          ylab=expression(-log[10](italic(p))), 
