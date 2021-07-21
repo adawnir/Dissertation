@@ -93,8 +93,9 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=1
   }
 }
 
-CreateScorePlot3=function(mypca, filename=NULL, type1, type2, mycolours, comp=NULL, cex = 1, pch=19,
-                          legend = TRUE, legend_text = NULL){
+# Creat PLS-DA score plot
+CreateScorePlot.plsda=function(myplsda, filename=NULL, type1, type2, mycolours, comp=NULL, cex = 1.5, pch=19,
+                               legend = TRUE, legend_text = NULL){
   if (is.null(comp)){
     comp=matrix(c(1,2,1,3,2,3), byrow=TRUE, ncol=2)
   }
@@ -110,35 +111,51 @@ CreateScorePlot3=function(mypca, filename=NULL, type1, type2, mycolours, comp=NU
   start2 = which(compare2, arr.ind=TRUE)[,1]
   end2 = which(compare2, arr.ind=TRUE)[,2]
   if (!is.null(filename)){
-    pdf(paste0(filename), width=19, height=5) 
+    pdf(paste0(filename), width=17.5, height=5) 
   }
-  par(mfrow=c(1,4))
+  par(mar = c(5,5,1,1))
+  layout(matrix(c(1,2,3,4), 1, 4, byrow = TRUE), widths=c(2,2,2,1))
   for (k in 1:nrow(comp)){
     xcomp=comp[k,1]
     ycomp=comp[k,2]
-    S = mypca$ind$coord[,c(xcomp,ycomp)]
+    ev = myplsda$explained_variance$X*100
+    S = myplsda$variates$X[,c(xcomp, ycomp)]
     plot(S, pch=pch, cex=cex, las=1, type = "n",
          col=mycolours[type1],
          xlab=paste0("Comp ",xcomp," (", round(ev[xcomp], digits=2), "% e.v.)"),
-         ylab=paste0("Comp ",ycomp," (", round(ev[ycomp], digits=2), "% e.v.)"))
-    segments(S[start,1],S[start,2],S[end,1],S[end,2],
-             col = ifelse(paste(start,end) %in% paste(start2,end2),mycolours[type1[start]],alpha("grey",0.5)))
+         ylab=paste0("Comp ",ycomp," (", round(ev[ycomp], digits=2), "% e.v.)"),
+         cex.lab = 1.5)
+    segments(S[start,1],S[start,2],S[end,1],S[end,2], lwd = 2,
+             col = ifelse(paste(start,end) %in% paste(start2,end2),mycolours[type1[start]],alpha("grey80",0.3)))
     points(S, pch=pch, cex=cex,col=mycolours[type1])
+    families=unique(type1)
+    for (f in 1:length(families)){
+      tmpmat=S[type1==families[f],]
+      if (!is.null(nrow(tmpmat))){
+        if (nrow(tmpmat)>2){
+          lines(ellipse(cov(tmpmat), centre = c(mean(tmpmat[,1]),mean(tmpmat[,2])), level = 0.9),
+                lty = 3, col = mycolours[f])
+        }
+      }
+      # else {
+      #   draw.ellipse(tmpmat[1], tmpmat[2], 0.5, 0.5,lty = 3, border = mycolours[f])
+      # }
+    }
     abline(v=axTicks(1), lty=3, col="grey")
     abline(h=axTicks(2), lty=3, col="grey")
   }
   if (isTRUE(legend)){
+    par(mar = c(1,1,1,1))
     plot(0, 0, type = 'l', bty = 'n', xaxt = 'n', yaxt = 'n', xlab = "", ylab = "")
-    legend("left", col=mycolours, ncol = ceiling(length(mycolours)/15),
+    legend("left", col=mycolours, ncol = ceiling(length(mycolours)/25),
            pch=pch, pt.cex=cex, legend=names(mycolours), bty = "n", cex = 1.2)
-    legend("top", legend=legend_text, bty = "n", cex = 1.2)
+    legend("topleft", legend=legend_text, bty = "n", cex = 1.2)
   }
   if (!is.null(filename)){
     print("Saved to filename")
     dev.off()
   }
 }
-
 
 # Create clustering dendrogram graph
 ClusteringToGraph=function(covars,myphylo,mycol=NULL,verbose = TRUE){
