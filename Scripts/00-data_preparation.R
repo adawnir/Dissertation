@@ -159,6 +159,9 @@ colnames(expo) = readLines(paste0("../Dictionaries/Chemical_names_",filepath,".t
 
 ## Chemical compound information
 annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
+# Reorder expo to be consistent with Luxembourg data set
+expo = expo[,order(match(colnames(expo),names(annot)))]
+
 chem = data.frame(Compound = colnames(expo),
                   Family = factor.order(annot[colnames(expo)]),
                   LOQ = as.numeric(gsub("\\*","",mydata[143,6:ncol(mydata)])),
@@ -256,6 +259,9 @@ colnames(expo) = readLines(paste0("../Dictionaries/Chemical_names_",filepath,".t
 
 ## Chemical compound information
 annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
+# Reorder expo to be consistent with Luxembourg data set
+expo = expo[,order(match(colnames(expo),names(annot)))]
+
 chem = data.frame(Compound = colnames(expo),
                   Family = unlist(mydata[47,5:ncol(mydata)]),
                   LOQ = as.numeric(gsub("\\*","",mydata[45,5:ncol(mydata)])),
