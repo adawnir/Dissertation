@@ -34,6 +34,8 @@ covars = bind_rows(covars_lux, covars_fra, covars_gs) %>%
   select(Batch, Indiv.ID, Age, Gender, Weight, Length, Family.ID,
         Area, Department, Region, Country)
 rownames(covars) = covars$Indiv.ID
+covars$Family.ID = last.level(covars$Family.ID, "Isolated")
+levels(covars$Family.ID)
 str(covars)
 
 # Merge chemical compound information
@@ -173,6 +175,8 @@ covars = bind_rows(covars_lux, covars_gs) %>%
   select(Batch, Indiv.ID, Age, Gender, Weight, Length, Family.ID,
          Area, Department, Region, Country)
 rownames(covars) = covars$Indiv.ID
+covars$Family.ID = last.level(covars$Family.ID, "Isolated")
+levels(covars$Family.ID)
 str(covars)
 
 # Check extraction consistency
