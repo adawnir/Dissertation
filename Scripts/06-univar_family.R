@@ -521,15 +521,15 @@ for (i in 1:length(batches)){
   gender_diff=rep(NA, length(families))
   for (f in 1:length(families)){
     tmp=covars$Gender[covars$Family.ID==families[f]]
-    if (length(unique(tmp))==1){
+    if (sum(is.na(tmp))>0) {
+      gender_diff[f] = NA
+    } else if (length(unique(tmp))==1){
       if (unique(tmp)=="Male"){
         gender_diff[f]=1
       }
       if (unique(tmp)=="Female"){
         gender_diff[f]=2
       }
-    } else if (sum(is.na(tmp))>0) {
-      gender_diff[f] = NA
     } else {
       gender_diff[f]=3
     }
