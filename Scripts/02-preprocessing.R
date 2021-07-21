@@ -91,6 +91,8 @@ covars_fra = covars_fra = covars_fra %>%
   select(Indiv.ID, Age, Gender, Family.ID, Sibling.ID,
          Area, Department, Region, Country, Batch) %>%
   mutate_if(is.character, factor.order)
+covars_fra$Family.ID = last.level(covars_fra$Family.ID, "Isolated")
+levels(covars_fra$Family.ID)
 str(covars_fra)
 
 # Recoding Family Sibling ID
@@ -113,6 +115,8 @@ covars_gs = covars_gs = covars_gs %>%
          Area, Department, Region, Country, Batch) %>%
   mutate_if(is.character, factor.order)
 str(covars_gs)
+covars_gs$Family.ID = last.level(covars_gs$Family.ID, "Isolated")
+levels(covars_gs$Family.ID)
 # Relevel gender
 covars_gs$Gender = relevel(covars_gs$Gender, "Female")
 
