@@ -60,11 +60,20 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=1
     start = which(compare, arr.ind=TRUE)[,1]
     end = which(compare, arr.ind=TRUE)[,2]
   }
-  if (!is.null(filename)){
-    pdf(paste0(filename), width=17.5, height=5) 
+  if (isTRUE(legend)){
+    extra = 2.5
+  } else {
+    extra = 0
   }
-  par(mar = c(5,5,1,1))
-  layout(matrix(c(1,2,3,4), 1, 4, byrow = TRUE), widths=c(2,2,2,1))
+  if (!is.null(filename)){
+    pdf(paste0(filename), width=15+extra, height=5) 
+  }
+  if (isTRUE(legend)){
+    par(mar = c(5,5,1,1))
+    layout(matrix(c(1,2,3,4), 1, 4, byrow = TRUE), widths=c(2,2,2,1))
+  } else {
+    par(mar = c(5,5,1,1), mfrow = c(1,3))
+  }
   for (k in 1:nrow(comp)){
     xcomp=comp[k,1]
     ycomp=comp[k,2]
@@ -109,11 +118,20 @@ CreateScorePlot.plsda=function(myplsda, filename=NULL, type1, type2, mycolours, 
   compare2[lower.tri(compare2, diag = TRUE)] = NA
   start2 = which(compare2, arr.ind=TRUE)[,1]
   end2 = which(compare2, arr.ind=TRUE)[,2]
-  if (!is.null(filename)){
-    pdf(paste0(filename), width=17.5, height=5) 
+  if (isTRUE(legend)){
+    extra = 2.5
+  } else {
+    extra = 0
   }
-  par(mar = c(5,5,1,1))
-  layout(matrix(c(1,2,3,4), 1, 4, byrow = TRUE), widths=c(2,2,2,1))
+  if (!is.null(filename)){
+    pdf(paste0(filename), width=15+extra, height=5) 
+  }
+  if (isTRUE(legend)){
+    par(mar = c(5,5,1,1))
+    layout(matrix(c(1,2,3,4), 1, 4, byrow = TRUE), widths=c(2,2,2,1))
+  } else {
+    par(mar = c(5,5,1,1), mfrow = c(1,3))
+  }
   for (k in 1:nrow(comp)){
     xcomp=comp[k,1]
     ycomp=comp[k,2]
