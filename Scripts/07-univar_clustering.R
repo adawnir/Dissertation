@@ -131,7 +131,7 @@ for (i in 1:length(batches)){
             medcol='white', whiskcol='black', staplecol='black', outcol='black',
             xlab="Family ID", ylab="Shortest path", cex.lab=1.5)
     abline(h=median(ybis), lty=3)
-    axis(side=1, at=1, labels="Ref", cex.axis=0.8)
+    axis(side=1, at=1, labels="Ref", cex.axis=0.8, las = 2)
     for (k in 1:ncol(withinf_sp)){
       axis(side=1, at=k+1, labels=colnames(withinf_sp)[k], cex.axis=0.8)
     }
