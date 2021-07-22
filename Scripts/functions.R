@@ -104,7 +104,7 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=1
 
 # Creat PLS-DA score plot
 CreateScorePlot.plsda=function(myplsda, filename=NULL, type1, type2, mycolours, comp=NULL, cex = 1.5, pch=19,
-                               legend = TRUE, legend_text = NULL){
+                               legend = TRUE, legend_text = NULL, legend_type1 = TRUE){
   if (is.null(comp)){
     comp=matrix(c(1,2,1,3,2,3), byrow=TRUE, ncol=2)
   }
@@ -164,8 +164,10 @@ CreateScorePlot.plsda=function(myplsda, filename=NULL, type1, type2, mycolours, 
   if (isTRUE(legend)){
     par(mar = c(1,1,1,1))
     plot(0, 0, type = 'l', bty = 'n', xaxt = 'n', yaxt = 'n', xlab = "", ylab = "")
+    if (isTRUE(legend_type1)){
     legend("left", col=mycolours, ncol = ceiling(length(mycolours)/25),
            pch=pch, pt.cex=cex, legend=names(mycolours), bty = "n", cex = 1.2)
+      }
     legend("topleft", legend=legend_text, bty = "n", cex = 1.2)
   }
   if (!is.null(filename)){

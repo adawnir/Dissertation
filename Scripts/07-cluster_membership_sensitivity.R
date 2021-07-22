@@ -20,8 +20,8 @@ source("graph_param.R")
 suffix = c("lux","fra","gs","pooled3","pooled2")
 for (i in 1:length(batches)){
   # Load data
-  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
-  covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh_no_isolated.rds"))
+  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
+  covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
   print(all(rownames(expo)==rownames(covars)))
 
   # Standardisation
@@ -36,17 +36,17 @@ for (i in 1:length(batches)){
   h$labels=paste0(covars$Family.ID, "-",h$labels)
   
   ### Focus: Stability selection based HC
-  out = Clustering(expo, K = 100, tau = 0.5, seed = 290621)
+  # out = Clustering(expo, K = 100, tau = 0.5, seed = 290621)
+  # 
+  # # Save outputs
+  # saveRDS(out, paste0("../Results/",filepaths[i],"/Stability_clustering_output_sensitivity.rds"))
+  # 
+  # pdf(paste0("../Figures/",filepaths[i],"/Stability_clustering_output_sensitivity.pdf"))
+  # par(mar=c(7, 5, 7, 6))
+  # CalibrationPlot(out)
+  # dev.off()
 
-  # Save outputs
-  saveRDS(out, paste0("../Results/",filepaths[i],"/Stability_clustering_output.rds"))
-
-  pdf(paste0("../Figures/",filepaths[i],"/Stability_clustering_output.pdf"))
-  par(mar=c(7, 5, 7, 6))
-  CalibrationPlot(out)
-  dev.off()
-  
-  out = readRDS(paste0("../Results/",filepaths[i],"/Stability_clustering_output.rds"))
+  out = readRDS(paste0("../Results/",filepaths[i],"/Stability_clustering_output_sensitivity.rds"))
   covars$stab_cluster = Clusters(out)
   
   ### Summarise: HC with F-test based cluster score
@@ -56,7 +56,7 @@ for (i in 1:length(batches)){
     score = c(score,ClusteringScore(expo, member)$score)
   }
   
-  pdf(paste0("../Figures/",filepaths[i],"/F-test_clustering_score.pdf"))
+  pdf(paste0("../Figures/",filepaths[i],"/F-test_clustering_score_sensitivity.pdf"))
   plot(y = score, x = seq(2,nrow(expo)-1),
        pch = 19,
        col = "navy", type = "b",
@@ -73,8 +73,17 @@ for (i in 1:length(batches)){
   ### Fixed: k = # of families
   covars$fixed_cluster = cutree(h, k=length(unique(covars$Family.ID)))
   
+  if (i %in% 4:5){
+    covars$fixed_cluster_batch = cutree(h, k=length(unique(covars$Batch)))
+  }
+  if (i == 4){
+    covars$fixed_cluster_country = cutree(h, k=length(unique(covars$Country)))
+    covars$fixed_cluster_region = cutree(h, k=length(unique(covars$Region)))
+    covars$fixed_cluster_department = cutree(h, k=length(unique(covars$Department)))
+  }
+  
   # Save memberships
-  saveRDS(covars, paste0("../Results/",filepaths[i],"/Cluster_memberships.rds"))
+  saveRDS(covars, paste0("../Results/",filepaths[i],"/Cluster_memberships_sensitivity.rds"))
 }
 
 ### Cluster membership evaluation ----
@@ -99,12 +108,17 @@ rand_stab = rand_score = rand_fixed = NULL
 adjrand_stab = adjrand_score = adjrand_fixed = NULL
 for (i in 1:length(batches)){
   # Load data
-  covars = readRDS(paste0("../Results/",filepaths[i],"/Cluster_memberships.rds"))
+  covars = readRDS(paste0("../Results/",filepaths[i],"/Cluster_memberships_sensitivity.rds"))
   assign(paste0("covars_",suffix[i]), covars)
+  
   # Number of clusters
   k_stab = c(k_stab, length(unique(covars$stab_cluster)))
   k_score = c(k_score, length(unique(covars$score_cluster)))
   k_fixed = c(k_fixed, length(unique(covars$fixed_cluster)))
+  
+  covars = covars %>%
+    filter(Family.ID != "Isolated") %>%
+    mutate_if(is.factor, droplevels)
   
   # Rand index
   rand_stab = c(rand_stab, rand.index(as.numeric(covars$Family.ID),covars$stab_cluster))
@@ -157,8 +171,8 @@ library(plotrix)
 library(ellipse)
 for (i in 1:length(batches)){
   # Load data
-  covars = readRDS(paste0("../Results/",filepaths[i],"/Cluster_memberships.rds"))
-  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
+  covars = readRDS(paste0("../Results/",filepaths[i],"/Cluster_memberships_sensitivity.rds"))
+  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
   
   families=unique(covars$stab_cluster)[table(covars$stab_cluster)!=1]
   mycolours=brewer.pal(n=12,name='Paired')
@@ -171,11 +185,12 @@ for (i in 1:length(batches)){
   
   myplsda = plsda(expo, as.factor(covars$stab_cluster), ncomp = 3)
   CreateScorePlot.plsda(myplsda=myplsda, type1=covars$stab_cluster, type2=covars$Family.ID,
+                        legend_type1 = FALSE,
                         legend_text = c(paste0("k=",k_stab[i]),
                                         paste0("Adj. Rand index: ",adjrand_stab[i]),
                                         paste0("Rand index: ",rand_stab[i]),
                                         paste0(prop_stab[i],"% recovered")),
-                        mycolours=mycolours, filename=paste0("../Figures/",filepaths[i],"/PLSDA_score_plot_stab_cluster.pdf"))
+                        mycolours=mycolours, filename=paste0("../Figures/",filepaths[i],"/PLSDA_score_plot_stab_cluster_sensitivity.pdf"))
                    
   
   families=unique(covars$score_cluster)[table(covars$score_cluster)!=1]
@@ -189,11 +204,12 @@ for (i in 1:length(batches)){
   
   myplsda = plsda(expo, as.factor(covars$score_cluster), ncomp = 3)
   CreateScorePlot.plsda(myplsda=myplsda, type1=covars$score_cluster, type2=covars$Family.ID,
+                        legend_type1 = FALSE,
                         legend_text = c(paste0("k=",k_score[i]),
                                         paste0("Adj. Rand index: ",adjrand_score[i]),
                                         paste0("Rand index: ",rand_score[i]),
                                         paste0(prop_score[i],"% recovered")),
-                        mycolours=mycolours, filename=paste0("../Figures/",filepaths[i],"/PLSDA_score_plot_score_cluster.pdf"))
+                        mycolours=mycolours, filename=paste0("../Figures/",filepaths[i],"/PLSDA_score_plot_score_cluster_sensitivity.pdf"))
   
   families=unique(covars$fixed_cluster)[table(covars$fixed_cluster)!=1]
   mycolours=brewer.pal(n=12,name='Paired')
@@ -206,11 +222,12 @@ for (i in 1:length(batches)){
   
   myplsda = plsda(expo, as.factor(covars$fixed_cluster), ncomp = 3)
   CreateScorePlot.plsda(myplsda=myplsda, type1=covars$fixed_cluster, type2=covars$Family.ID,
+                        legend_type1 = FALSE,
                         legend_text = c(paste0("k=",k_fixed[i]),
                                         paste0("Adj. Rand index: ",adjrand_fixed[i]),
                                         paste0("Rand index: ",rand_fixed[i]),
                                         paste0(prop_fixed[i],"% recovered")),
-                        mycolours=mycolours, filename=paste0("../Figures/",filepaths[i],"/PLSDA_score_plot_fixed_cluster.pdf"))
+                        mycolours=mycolours, filename=paste0("../Figures/",filepaths[i],"/PLSDA_score_plot_fixed_cluster_sensitivity.pdf"))
   
   }
 
