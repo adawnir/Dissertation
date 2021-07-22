@@ -73,6 +73,15 @@ for (i in 1:length(batches)){
   ### Fixed: k = # of families
   covars$fixed_cluster = cutree(h, k=length(unique(covars$Family.ID)))
   
+  if (i %in% 4:5){
+    covars$fixed_cluster_batch = cutree(h, k=length(unique(covars$Batch)))
+  }
+  if (i == 4){
+    covars$fixed_cluster_country = cutree(h, k=length(unique(covars$Country)))
+    covars$fixed_cluster_region = cutree(h, k=length(unique(covars$Region)))
+    covars$fixed_cluster_department = cutree(h, k=length(unique(covars$Department)))
+  }
+  
   # Save memberships
   saveRDS(covars, paste0("../Results/",filepaths[i],"/Cluster_memberships.rds"))
 }
@@ -100,7 +109,6 @@ adjrand_stab = adjrand_score = adjrand_fixed = NULL
 for (i in 1:length(batches)){
   # Load data
   covars = readRDS(paste0("../Results/",filepaths[i],"/Cluster_memberships.rds"))
-  assign(paste0("covars_",suffix[i]), covars)
   # Number of clusters
   k_stab = c(k_stab, length(unique(covars$stab_cluster)))
   k_score = c(k_score, length(unique(covars$score_cluster)))
@@ -158,7 +166,9 @@ library(ellipse)
 for (i in 1:length(batches)){
   # Load data
   covars = readRDS(paste0("../Results/",filepaths[i],"/Cluster_memberships.rds"))
+  assign(paste0("covars_",suffix[i]), covars)
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
+  assign(paste0("expo_",suffix[i]), expo)
   
   families=unique(covars$stab_cluster)[table(covars$stab_cluster)!=1]
   mycolours=brewer.pal(n=12,name='Paired')
@@ -212,5 +222,160 @@ for (i in 1:length(batches)){
                                         paste0(prop_fixed[i],"% recovered")),
                         mycolours=mycolours, filename=paste0("../Figures/",filepaths[i],"/PLSDA_score_plot_fixed_cluster.pdf"))
   
-  }
+}
+
+### Pooled 2: Batch vs Stability----
+families=unique(covars_pooled2$stab_cluster)[table(covars_pooled2$stab_cluster)!=1]
+mycolours=brewer.pal(n=12,name='Paired')
+mycolours=colorRampPalette(mycolours)(length(families))
+names(mycolours)=families
+tmp = rep(alpha("grey80",0.3),length(setdiff(unique(covars_pooled2$stab_cluster), families)))
+names(tmp) = setdiff(unique(covars_pooled2$stab_cluster), families)
+mycolours = c(mycolours, tmp)
+mycolours = mycolours[as.character(unique(covars_pooled2$stab_cluster))]
+
+myplsda = plsda(expo_pooled2, as.factor(covars_pooled2$stab_cluster), ncomp = 3)
+CreateScorePlot.plsda(myplsda=myplsda, type1=covars_pooled2$stab_cluster, type2=covars_pooled2$Batch,
+                      legend_text = c(paste0("k=",k_stab[5]),
+                                      paste0("Adj. Rand index: ",round(adj.rand.index(as.numeric(covars_pooled2$Batch),covars_pooled2$stab_cluster),2)),
+                                      paste0("Rand index: ",round(rand.index(as.numeric(covars_pooled2$Batch),covars_pooled2$stab_cluster),2))),
+                      mycolours=mycolours, filename=paste0("../Figures/",filepaths[5],"/PLSDA_score_plot_stab_cluster_batch.pdf"))
+
+
+### Pooled 3: Batch vs Stability----
+families=unique(covars_pooled3$stab_cluster)[table(covars_pooled3$stab_cluster)!=1]
+mycolours=brewer.pal(n=12,name='Paired')
+mycolours=colorRampPalette(mycolours)(length(families))
+names(mycolours)=families
+tmp = rep(alpha("grey80",0.3),length(setdiff(unique(covars_pooled3$stab_cluster), families)))
+names(tmp) = setdiff(unique(covars_pooled3$stab_cluster), families)
+mycolours = c(mycolours, tmp)
+mycolours = mycolours[as.character(unique(covars_pooled3$stab_cluster))]
+
+myplsda = plsda(expo_pooled3, as.factor(covars_pooled3$stab_cluster), ncomp = 3)
+CreateScorePlot.plsda(myplsda=myplsda, type1=covars_pooled3$stab_cluster, type2=covars_pooled3$Batch,
+                      legend_text = c(paste0("k=",k_stab[4]),
+                                      paste0("Adj. Rand index: ",round(adj.rand.index(as.numeric(covars_pooled3$Batch),covars_pooled3$stab_cluster),2)),
+                                      paste0("Rand index: ",round(rand.index(as.numeric(covars_pooled3$Batch),covars_pooled3$stab_cluster),2))),
+                      mycolours=mycolours, filename=paste0("../Figures/",filepaths[4],"/PLSDA_score_plot_stab_cluster_batch.pdf"))
+
+### Pooled 3: Country vs Stability----
+families=unique(covars_pooled3$stab_cluster)[table(covars_pooled3$stab_cluster)!=1]
+mycolours=brewer.pal(n=12,name='Paired')
+mycolours=colorRampPalette(mycolours)(length(families))
+names(mycolours)=families
+tmp = rep(alpha("grey80",0.3),length(setdiff(unique(covars_pooled3$stab_cluster), families)))
+names(tmp) = setdiff(unique(covars_pooled3$stab_cluster), families)
+mycolours = c(mycolours, tmp)
+mycolours = mycolours[as.character(unique(covars_pooled3$stab_cluster))]
+
+myplsda = plsda(expo_pooled3, as.factor(covars_pooled3$stab_cluster), ncomp = 3)
+CreateScorePlot.plsda(myplsda=myplsda, type1=covars_pooled3$stab_cluster, type2=covars_pooled3$Country,
+                      legend_text = c(paste0("k=",k_stab[4]),
+                                      paste0("Adj. Rand index: ",round(adj.rand.index(as.numeric(covars_pooled3$Country),covars_pooled3$stab_cluster),2)),
+                                      paste0("Rand index: ",round(rand.index(as.numeric(covars_pooled3$Country),covars_pooled3$stab_cluster),2))),
+                      mycolours=mycolours, filename=paste0("../Figures/",filepaths[4],"/PLSDA_score_plot_stab_cluster_country.pdf"))
+
+### Pooled 3: Region vs Stability----
+families=unique(covars_pooled3$stab_cluster)[table(covars_pooled3$stab_cluster)!=1]
+mycolours=brewer.pal(n=12,name='Paired')
+mycolours=colorRampPalette(mycolours)(length(families))
+names(mycolours)=families
+tmp = rep(alpha("grey80",0.3),length(setdiff(unique(covars_pooled3$stab_cluster), families)))
+names(tmp) = setdiff(unique(covars_pooled3$stab_cluster), families)
+mycolours = c(mycolours, tmp)
+mycolours = mycolours[as.character(unique(covars_pooled3$stab_cluster))]
+
+myplsda = plsda(expo_pooled3, as.factor(covars_pooled3$stab_cluster), ncomp = 3)
+CreateScorePlot.plsda(myplsda=myplsda, type1=covars_pooled3$stab_cluster, type2=covars_pooled3$Region,
+                      legend_text = c(paste0("k=",k_stab[4]),
+                                      paste0("Adj. Rand index: ",round(adj.rand.index(as.numeric(covars_pooled3$Region),covars_pooled3$stab_cluster),2)),
+                                      paste0("Rand index: ",round(rand.index(as.numeric(covars_pooled3$Region),covars_pooled3$stab_cluster),2))),
+                      mycolours=mycolours, filename=paste0("../Figures/",filepaths[4],"/PLSDA_score_plot_stab_cluster_region.pdf"))
+
+### Pooled 3: Department vs Stability----
+families=unique(covars_pooled3$stab_cluster)[table(covars_pooled3$stab_cluster)!=1]
+mycolours=brewer.pal(n=12,name='Paired')
+mycolours=colorRampPalette(mycolours)(length(families))
+names(mycolours)=families
+tmp = rep(alpha("grey80",0.3),length(setdiff(unique(covars_pooled3$stab_cluster), families)))
+names(tmp) = setdiff(unique(covars_pooled3$stab_cluster), families)
+mycolours = c(mycolours, tmp)
+mycolours = mycolours[as.character(unique(covars_pooled3$stab_cluster))]
+
+myplsda = plsda(expo_pooled3, as.factor(covars_pooled3$stab_cluster), ncomp = 3)
+CreateScorePlot.plsda(myplsda=myplsda, type1=covars_pooled3$stab_cluster, type2=covars_pooled3$Department,
+                      legend_text = c(paste0("k=",k_stab[4]),
+                                      paste0("Adj. Rand index: ",round(adj.rand.index(as.numeric(covars_pooled3$Department),covars_pooled3$stab_cluster),2)),
+                                      paste0("Rand index: ",round(rand.index(as.numeric(covars_pooled3$Department),covars_pooled3$stab_cluster),2))),
+                      mycolours=mycolours, filename=paste0("../Figures/",filepaths[4],"/PLSDA_score_plot_stab_cluster_depart.pdf"))
+
+### Pooled 3: Batch vs Fixed----
+families=unique(covars_pooled3$fixed_cluster_batch)[table(covars_pooled3$fixed_cluster_batch)!=1]
+mycolours=brewer.pal(n=12,name='Paired')
+mycolours=colorRampPalette(mycolours)(length(families))
+names(mycolours)=families
+tmp = rep(alpha("grey80",0.3),length(setdiff(unique(covars_pooled3$fixed_cluster_batch), families)))
+names(tmp) = setdiff(unique(covars_pooled3$fixed_cluster_batch), families)
+mycolours = c(mycolours, tmp)
+mycolours = mycolours[as.character(unique(covars_pooled3$fixed_cluster_batch))]
+
+myplsda = plsda(expo_pooled3, as.factor(covars_pooled3$fixed_cluster_batch), ncomp = 3)
+CreateScorePlot.plsda(myplsda=myplsda, type1=covars_pooled3$fixed_cluster_batch, type2=covars_pooled3$Batch,
+                      legend_text = c(paste0("k=",length(unique(covars_pooled3$Batch))),
+                                      paste0("Adj. Rand index: ",round(adj.rand.index(as.numeric(covars_pooled3$Batch),covars_pooled3$fixed_cluster_batch),2)),
+                                      paste0("Rand index: ",round(rand.index(as.numeric(covars_pooled3$Batch),covars_pooled3$fixed_cluster_batch),2))),
+                      mycolours=mycolours, filename=paste0("../Figures/",filepaths[4],"/PLSDA_score_plot_fixed_cluster_batch.pdf"))
+
+### Pooled 3: Country vs Fixed----
+families=unique(covars_pooled3$fixed_cluster_country)[table(covars_pooled3$fixed_cluster_country)!=1]
+mycolours=brewer.pal(n=12,name='Paired')
+mycolours=colorRampPalette(mycolours)(length(families))
+names(mycolours)=families
+tmp = rep(alpha("grey80",0.3),length(setdiff(unique(covars_pooled3$fixed_cluster_country), families)))
+names(tmp) = setdiff(unique(covars_pooled3$fixed_cluster_country), families)
+mycolours = c(mycolours, tmp)
+mycolours = mycolours[as.character(unique(covars_pooled3$fixed_cluster_country))]
+
+myplsda = plsda(expo_pooled3, as.factor(covars_pooled3$fixed_cluster_country), ncomp = 3)
+CreateScorePlot.plsda(myplsda=myplsda, type1=covars_pooled3$fixed_cluster_country, type2=covars_pooled3$Country,
+                      legend_text = c(paste0("k=",length(unique(covars_pooled3$Country))),
+                                      paste0("Adj. Rand index: ",round(adj.rand.index(as.numeric(covars_pooled3$Country),covars_pooled3$fixed_cluster_country),2)),
+                                      paste0("Rand index: ",round(rand.index(as.numeric(covars_pooled3$Country),covars_pooled3$fixed_cluster_country),2))),
+                      mycolours=mycolours, filename=paste0("../Figures/",filepaths[4],"/PLSDA_score_plot_fixed_cluster_country.pdf"))
+
+### Pooled 3: Region vs Fixed----
+families=unique(covars_pooled3$fixed_cluster_region)[table(covars_pooled3$fixed_cluster_region)!=1]
+mycolours=brewer.pal(n=12,name='Paired')
+mycolours=colorRampPalette(mycolours)(length(families))
+names(mycolours)=families
+tmp = rep(alpha("grey80",0.3),length(setdiff(unique(covars_pooled3$fixed_cluster_region), families)))
+names(tmp) = setdiff(unique(covars_pooled3$fixed_cluster_region), families)
+mycolours = c(mycolours, tmp)
+mycolours = mycolours[as.character(unique(covars_pooled3$fixed_cluster_region))]
+
+myplsda = plsda(expo_pooled3, as.factor(covars_pooled3$fixed_cluster_region), ncomp = 3)
+CreateScorePlot.plsda(myplsda=myplsda, type1=covars_pooled3$fixed_cluster_region, type2=covars_pooled3$Region,
+                      legend_text = c(paste0("k=",length(unique(covars_pooled3$Region))),
+                                      paste0("Adj. Rand index: ",round(adj.rand.index(as.numeric(covars_pooled3$Region),covars_pooled3$fixed_cluster_region),2)),
+                                      paste0("Rand index: ",round(rand.index(as.numeric(covars_pooled3$Region),covars_pooled3$fixed_cluster_region),2))),
+                      mycolours=mycolours, filename=paste0("../Figures/",filepaths[4],"/PLSDA_score_plot_fixed_cluster_region.pdf"))
+
+### Pooled 3: Department vs Fixed----
+families=unique(covars_pooled3$fixed_cluster_depart)[table(covars_pooled3$fixed_cluster_depart)!=1]
+mycolours=brewer.pal(n=12,name='Paired')
+mycolours=colorRampPalette(mycolours)(length(families))
+names(mycolours)=families
+tmp = rep(alpha("grey80",0.3),length(setdiff(unique(covars_pooled3$fixed_cluster_depart), families)))
+names(tmp) = setdiff(unique(covars_pooled3$fixed_cluster_depart), families)
+mycolours = c(mycolours, tmp)
+mycolours = mycolours[as.character(unique(covars_pooled3$fixed_cluster_depart))]
+
+myplsda = plsda(expo_pooled3, as.factor(covars_pooled3$fixed_cluster_depart), ncomp = 3)
+CreateScorePlot.plsda(myplsda=myplsda, type1=covars_pooled3$fixed_cluster_depart, type2=covars_pooled3$Department,
+                      legend_text = c(paste0("k=",length(unique(covars_pooled3$Department))),
+                                      paste0("Adj. Rand index: ",round(adj.rand.index(as.numeric(covars_pooled3$Department),covars_pooled3$fixed_cluster_depart),2)),
+                                      paste0("Rand index: ",round(rand.index(as.numeric(covars_pooled3$Department),covars_pooled3$fixed_cluster_depart),2))),
+                      mycolours=mycolours, filename=paste0("../Figures/",filepaths[4],"/PLSDA_score_plot_fixed_cluster_depart.pdf"))
+
 
