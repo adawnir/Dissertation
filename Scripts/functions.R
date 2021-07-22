@@ -100,13 +100,12 @@ CreateScorePlot.plsda=function(myplsda, filename=NULL, type1, type2, mycolours, 
     comp=matrix(c(1,2,1,3,2,3), byrow=TRUE, ncol=2)
   }
   compare = sapply(type2, function(x) x==type2)
-  # compare[which(type=="Isolated"),which(type=="Isolated")] = FALSE
+  compare[which(type2=="Isolated"),which(type2=="Isolated")] = FALSE
   compare[lower.tri(compare, diag = TRUE)] = NA
   start = which(compare, arr.ind=TRUE)[,1]
   end = which(compare, arr.ind=TRUE)[,2]
   
   compare2 = sapply(type1, function(x) x==type1)
-  # compare[which(type=="Isolated"),which(type=="Isolated")] = FALSE
   compare2[lower.tri(compare2, diag = TRUE)] = NA
   start2 = which(compare2, arr.ind=TRUE)[,1]
   end2 = which(compare2, arr.ind=TRUE)[,2]
