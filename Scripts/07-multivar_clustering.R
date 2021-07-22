@@ -25,7 +25,7 @@ for (i in 1:length(batches)){
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh_no_isolated.rds"))
   print(all(rownames(expo)==rownames(covars)))
   
-  families=unique(covars$Family.ID)
+  families=levels(covars$Family.ID)
   
   expo = scale(expo)
   d=dist(expo)
@@ -42,7 +42,7 @@ for (i in 1:length(batches)){
   }
   
   {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_graph_expo_all.pdf"))
-    g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = family.colours[levels(covars$Family.ID)])
+    g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = family.colours[as.character(covars$Family.ID)])
     dev.off()
   }
   
@@ -315,7 +315,7 @@ for (i in 4:5){
          tip.color=batch.colours[as.character(covars$Batch)])
     dev.off()
   }
-  {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_graph_expo_all_region.pdf"))
+  {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_graph_expo_all_batch.pdf"))
     g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = batch.colours[as.character(covars$Batch)])
     dev.off()
   }
