@@ -36,10 +36,10 @@ for (i in 1:length(batches)){
   h$labels=paste0(covars$Family.ID, "-",h$labels)
   
   ### Focus: Stability selection based HC
-  out = Clustering(expo, K = 100, tau = 0.5, seed = 290621)
-
-  # Save outputs
-  saveRDS(out, paste0("../Results/",filepaths[i],"/Stability_clustering_output.rds"))
+  # out = Clustering(expo, K = 100, tau = 0.5, seed = 290621)
+  # 
+  # # Save outputs
+  # saveRDS(out, paste0("../Results/",filepaths[i],"/Stability_clustering_output.rds"))
 
   pdf(paste0("../Figures/",filepaths[i],"/Stability_clustering_output.pdf"))
   par(mar=c(7, 5, 7, 6))
