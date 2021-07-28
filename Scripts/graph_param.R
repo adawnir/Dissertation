@@ -10,7 +10,7 @@ names(annot.colours) = tmp
 
 # Batches
 filepaths = c("Luxembourg", "France", "GrandeSynthe", "Pooled3", "Pooled2")
-batches = c("Luxembourg", "France", "Grande-Synthe", "Pooled (LUX/FRA/GS)", "Pooled (LUX/GS)")
+batches = c("Luxembourg", "France", "Grande-Synthe", "Pooled", "LUX and GS")
 batch.colours = c("tomato", "royalblue", "forestgreen", "mediumpurple", "darkgoldenrod")
 names(batch.colours) = c("LUX","FRA","GS","Pooled3","Pooled2")
 
