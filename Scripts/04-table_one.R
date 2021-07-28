@@ -54,7 +54,7 @@ for (k in c("LUX","FRA","GS")){
   out=c(out, myn)
 }
 mytable=rbind(mytable, out)
-rownames(mytable)[nrow(mytable)]="Families with siblings, N"
+rownames(mytable)[nrow(mytable)]="Sibling pairs, N"
 
 myn = sum(covars$Family.ID=="Isolated")
 myp = formatC(myn/length(covars$Family.ID)*100, format = "f", digits = 1)
