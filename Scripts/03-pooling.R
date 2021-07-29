@@ -110,29 +110,23 @@ saveRDS(extract_diff, paste0("../Results/",filepaths[4],"/Chemical_compound_info
 ## Recoding nd
 # Replace nd with random values from 0 to minimum detection (Gaussian)
 # Set LOD for each data set
-tmp1 = expo[covars_lux$Indiv.ID,]
+tmp1 = expo[covars$Batch=="LUX",]
 lod1 = chem$LOD.lux
 names(lod1) = chem$Compound
 
-tmp2 = expo[covars_fra$Indiv.ID,]
+tmp2 = expo[covars$Batch=="FRA",]
 lod2 = chem$LOD.fra
 names(lod2) = chem$Compound
 
-tmp3 = expo[covars_gs$Indiv.ID,]
+tmp3 = expo[covars$Batch=="GS",]
 lod3 = chem$LOD.gs
 names(lod3) = chem$Compound
 
 for(k in 1:ncol(expo)){
   set.seed(150621)
-  tmp1[tmp1[,k]=="nd"&!is.na(tmp1[,k]),k] = rtruncnorm(sum(tmp1[,k]=="nd"&!is.na(tmp1[,k])),
-                                                      min=0,
-                                                      max=lod1[colnames(expo)[k]]) 
-  tmp2[tmp2[,k]=="nd"&!is.na(tmp2[,k]),k] = rtruncnorm(sum(tmp2[,k]=="nd"&!is.na(tmp2[,k])),
-                                                       min=0,
-                                                       max=lod2[colnames(expo)[k]]) 
-  tmp3[tmp3[,k]=="nd"&!is.na(tmp3[,k]),k] = rtruncnorm(sum(tmp3[,k]=="nd"&!is.na(tmp3[,k])),
-                                                       min=0,
-                                                       max=lod3[colnames(expo)[k]]) 
+  tmp1[which(tmp1[,k]=="nd"),k] = rtruncnorm(sum(tmp1[,k]=="nd", na.rm = T),min=0,max=lod1[colnames(expo)[k]]) 
+  tmp2[which(tmp2[,k]=="nd"),k] = rtruncnorm(sum(tmp2[,k]=="nd", na.rm = T),min=0,max=lod2[colnames(expo)[k]]) 
+  tmp3[which(tmp3[,k]=="nd"),k] = rtruncnorm(sum(tmp3[,k]=="nd", na.rm = T),min=0,max=lod3[colnames(expo)[k]]) 
 }
 
 # Merge
@@ -251,13 +245,10 @@ names(lod3) = chem$Compound
 
 for(k in 1:ncol(expo)){
   set.seed(150621)
-  tmp1[tmp1[,k]=="nd"&!is.na(tmp1[,k]),k] = rtruncnorm(sum(tmp1[,k]=="nd"&!is.na(tmp1[,k])),
-                                                       min=0,
-                                                       max=lod1[colnames(expo)[k]]) 
-  tmp3[tmp3[,k]=="nd"&!is.na(tmp3[,k]),k] = rtruncnorm(sum(tmp3[,k]=="nd"&!is.na(tmp3[,k])),
-                                                       min=0,
-                                                       max=lod3[colnames(expo)[k]]) 
+  tmp1[which(tmp1[,k]=="nd"),k] = rtruncnorm(sum(tmp1[,k]=="nd", na.rm = T),min=0,max=lod1[colnames(expo)[k]]) 
+  tmp3[which(tmp3[,k]=="nd"),k] = rtruncnorm(sum(tmp3[,k]=="nd", na.rm = T),min=0,max=lod3[colnames(expo)[k]]) 
 }
+
 
 # Merge
 expo = rbind(tmp1, tmp3)
