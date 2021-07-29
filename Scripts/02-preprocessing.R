@@ -134,12 +134,30 @@ all(rownames(covars_lux)==rownames(rownames(expo_lux)))
 all(rownames(covars_fra)==rownames(rownames(expo_fra)))
 all(rownames(covars_gs)==rownames(rownames(expo_gs)))
 
-sum(is.na(chem_lux$nd_prop))
-sum(is.na(chem_lux$NA_prop))
-# Detection rate
-chem_lux$detect_rate = 1-(chem_lux$nd_prop + chem_lux$NA_prop)
-chem_fra$detect_rate = 1-(chem_fra$nd_prop + chem_fra$NA_prop)
-chem_gs$detect_rate = 1-(chem_gs$nd_prop + chem_gs$NA_prop)
+
+suffix = c("lux","fra","gs")
+for(i in 1:3){
+  expo = eval(parse(text = paste0("expo_",suffix[i])))
+  chem = eval(parse(text = paste0("chem_",suffix[i])))
+  all(colnames(expo)==chem$Compound)
+  
+  # Proportion of NAs per chemical compounds
+  chem$NA_prop = apply(expo, 2, function(x) sum(is.na(x))/nrow(expo))
+  # Proportion of detected per chemical compounds
+  chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
+  # Minimum detection per chemical compound
+  chem$LOD = apply(expo, 2, function(x) min(as.numeric(unlist(x)), na.rm = T))
+  # Replace LOD of never-detected compounds with NA
+  chem$LOD[which(is.infinite(chem$LOD))] = NA
+  
+  # Detection rate
+  if(sum(is.na(chem$nd_prop))+sum(is.na(chem$NA_prop))==0){
+    chem$detect_rate = 1-(chem$nd_prop + chem$NA_prop)
+  } else {warning("NA in NA_prop or nd_prop")}
+  
+  assign(paste0("chem_",suffix[i]), chem)
+  assign(paste0("expo_",suffix[i]), expo)
+}
 
 ifelse(dir.exists("../Processed/"),"",dir.create("../Processed/"))
 ifelse(dir.exists(paste0("../Processed/",filepaths[1])),"",dir.create(paste0("../Processed/",filepaths[1])))

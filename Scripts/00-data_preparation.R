@@ -293,22 +293,6 @@ all(colnames(expo)==chem$Compound)
 # Number of chemical compounds measured
 nrow(chem)
 
-# Proportion of NAs per chemical compounds
-all(colnames(expo)==chem$Compound)
-chem$NA_prop = apply(expo, 2, function(x) sum(is.na(x))/nrow(expo))
-
-# Proportion of detected per chemical compounds
-all(colnames(expo)==chem$Compound)
-chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
-
-# Minimum detection per chemical compound
-all(colnames(expo)==chem$Compound)
-chem$LOD = apply(expo, 2, function(x) min(as.numeric(unlist(x)), na.rm = T))
-# Check for infinite values
-summary(chem$nd_prop[is.infinite(chem$LOD)]) # never-detected compounds have infinite values
-# Replace LOD of never-detected compounds with NA
-chem$LOD[which(is.infinite(chem$LOD))] = NA
-
 ifelse(dir.exists(paste0("../Data/",filepath)),"",dir.create(paste0("../Data/",filepath)))
 saveRDS(covars, paste0("../Data/",filepath,"/Participant_covariate_info.rds"))
 saveRDS(chem, paste0("../Data/",filepath,"/Chemical_compound_info.rds"))
