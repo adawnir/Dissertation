@@ -22,6 +22,7 @@ for (i in 1:length(batches)){
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
   print(all(rownames(expo)==rownames(covars)))
+  print(ncol(expo))
   
   ### Correlation matrix ----
   annot_sub = annot[colnames(expo)]
@@ -170,11 +171,8 @@ expo = readRDS(paste0("../Processed/",filepaths[4],"/Exposure_matrix_ndimp_thres
 chem = readRDS(paste0("../Processed/",filepaths[4],"/Chemical_compound_info_thresh.rds"))
 high_corr = read.csv(paste0("../Exports/",filepaths[4],"/High_correlation_compound_pairs.csv"),
                      row.names = 1)
-high_corr[1,]
-high_corr[2,]
-high_corr[3,]
+high_corr
 
 expo = readRDS(paste0("../Processed/",filepaths[5],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
 chem = readRDS(paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
-high_corr[1,]
-high_corr[2,]
+high_corr
