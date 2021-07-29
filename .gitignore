@@ -16,8 +16,8 @@
 /Meeting_logs
 /Literature
 /Brief
-/Script/Archive
-/Script/Example
+/Scripts/Archive
+/Scripts/Example
 *.pdf
 *.pptx
 *.docx
