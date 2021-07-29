@@ -86,17 +86,17 @@ for (i in 1:length(batches)){
     CreateScorePlot(mypca=mypca, type=as.character(covars$Batch),
                     mycolours=batch.colours[levels(covars$Batch)],
                     filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_batch.pdf"),
-                    segments = FALSE)
+                    segments = FALSE, ellipse = TRUE)
   }
-  if (i==4){
+  if (i%in%c(2,4)){
     CreateScorePlot(mypca=mypca, type=as.character(covars$Region),
                     mycolours=region.colours[levels(covars$Region)],
                     filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_region.pdf"),
-                    segments = FALSE)
+                    segments = FALSE, ellipse = TRUE)
     CreateScorePlot(mypca=mypca, type=as.character(covars$Department),
                     mycolours=depart.colours[levels(covars$Department)],
                     filename=paste0("../Figures/",filepaths[i],"/PCA_score_plot_depart.pdf"),
-                    segments = FALSE)
+                    segments = FALSE, ellipse = TRUE)
   }
   
   mycor=cor(expo, mypca$ind$coord)
