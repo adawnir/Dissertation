@@ -49,7 +49,10 @@ flex_format = function(f, digits = 2, thresh = 0.1){
 }
 
 # Create PCA score plot
-CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=19, segments = TRUE, legend = TRUE){
+CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=19,
+                         ellipse = FALSE,
+                         segments = TRUE,
+                         legend = TRUE){
   if (is.null(comp)){
     comp=matrix(c(1,2,1,3,2,3), byrow=TRUE, ncol=2)
   }
@@ -87,6 +90,21 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=1
       segments(S[start,1],S[start,2],S[end,1],S[end,2], col = alpha("grey",0.5))
     }
     points(S, pch=pch, cex=1.2, col=mycolours[type])
+    families = unique(type)
+    if (isTRUE(ellipse)){
+      for (f in 1:length(families)){
+        tmpmat=S[type==families[f],]
+        if (!is.null(nrow(tmpmat))){
+          if (nrow(tmpmat)>2){
+            lines(ellipse::ellipse(cov(tmpmat), centre = c(mean(tmpmat[,1]),mean(tmpmat[,2])), level = 0.95),
+                  lty = 3, col = mycolours[unique(type)[f]])
+          }
+        }
+        # else {
+        #   plotrix::draw.ellipse(tmpmat[1], tmpmat[2], 0.5, 0.5,lty = 3, border = mycolours[f])
+        # }
+      } 
+    }
     abline(v=axTicks(1), lty=3, col="grey")
     abline(h=axTicks(2), lty=3, col="grey")
   }
@@ -150,12 +168,12 @@ CreateScorePlot.plsda=function(myplsda, filename=NULL, type1, type2, mycolours, 
       tmpmat=S[type1==families[f],]
       if (!is.null(nrow(tmpmat))){
         if (nrow(tmpmat)>2){
-          lines(ellipse(cov(tmpmat), centre = c(mean(tmpmat[,1]),mean(tmpmat[,2])), level = 0.9),
+          lines(ellipse::ellipse(cov(tmpmat), centre = c(mean(tmpmat[,1]),mean(tmpmat[,2])), level = 0.95),
                 lty = 3, col = mycolours[f])
         }
       }
       # else {
-      #   draw.ellipse(tmpmat[1], tmpmat[2], 0.5, 0.5,lty = 3, border = mycolours[f])
+      #   plotrix::draw.ellipse(tmpmat[1], tmpmat[2], 0.5, 0.5,lty = 3, border = mycolours[f])
       # }
     }
     abline(v=axTicks(1), lty=3, col="grey")
