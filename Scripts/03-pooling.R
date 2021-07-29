@@ -80,15 +80,13 @@ chem = chem[which(chem$detect_rate>0.1),]
 ncol(expo)
 
 # Number of chemical compounds not detected in one data set
-nd = unique(c(chem_lux$Compound[which(chem_lux$detect_rate==0)],
-              chem_fra$Compound[which(chem_fra$detect_rate==0)],
-              chem_gs$Compound[which(chem_gs$detect_rate==0)],
-              setdiff(rownames(chem_lux),rownames(chem_fra))))
+grep = intersect(chem_lux$Compound[which(chem_lux$detect_rate!=0)],chem_fra$Compound[which(chem_fra$detect_rate!=0)]) %>%
+  intersect(chem_gs$Compound[which(chem_gs$detect_rate!=0)])
 
-sum(chem$Compound %in% nd)
+sum(chem$Compound %in% grep)
 
-expo = expo[,-which(chem$Compound %in% nd)]
-chem = chem[-which(chem$Compound %in% nd),]
+expo = expo[,which(chem$Compound %in% grep)]
+chem = chem[which(chem$Compound %in% grep),]
 ncol(expo)
 
 table(chem$Family)
@@ -224,13 +222,12 @@ chem = chem[which(chem$detect_rate>0.1),]
 ncol(expo)
 
 # Number of chemical compounds not detected in one data set
-nd = unique(c(chem_lux$Compound[which(chem_lux$detect_rate==0)],
-              chem_gs$Compound[which(chem_gs$detect_rate==0)]))
+grep = intersect(chem_lux$Compound[which(chem_lux$detect_rate!=0)], chem_gs$Compound[which(chem_gs$detect_rate!=0)])
 
-sum(chem$Compound %in% nd)
+sum(chem$Compound %in% grep)
 
-expo = expo[,-which(chem$Compound %in% nd)]
-chem = chem[-which(chem$Compound %in% nd),]
+expo = expo[,which(chem$Compound %in% grep)]
+chem = chem[which(chem$Compound %in% grep),]
 ncol(expo)
 
 table(chem$Family)
