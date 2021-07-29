@@ -218,15 +218,15 @@ saveRDS(expo_gs,  paste0("../Processed/",filepaths[3],"/Exposure_matrix_raw_thre
 # Replace nd with random values from 0 to minimum detection (Gaussian)
 for(k in 1:ncol(expo_lux)){
   set.seed(150621)
-  expo_lux[expo_lux[,k]=="nd"&!is.na(expo_lux[,k]),k] = rtruncnorm(sum(expo_lux[,k]=="nd"&!is.na(expo_lux[,k])), min=0, max=chem_lux$LOD[k]) 
+  expo_lux[which(expo_lux[,k]=="nd"),k] = rtruncnorm(sum(expo_lux[,k]=="nd", na.rm = T),min=0,max=chem_lux$LOD[k]) 
 }
 for(k in 1:ncol(expo_fra)){
   set.seed(150621)
-  expo_fra[expo_fra[,k]=="nd"&!is.na(expo_fra[,k]),k] = rtruncnorm(sum(expo_fra[,k]=="nd"&!is.na(expo_fra[,k])), min=0, max=chem_fra$LOD[k]) 
+  expo_fra[which(expo_fra[,k]=="nd"),k] = rtruncnorm(sum(expo_fra[,k]=="nd", na.rm = T),min=0,max=chem_fra$LOD[k]) 
 }
 for(k in 1:ncol(expo_gs)){
   set.seed(150621)
-  expo_gs[expo_gs[,k]=="nd"&!is.na(expo_gs[,k]),k] = rtruncnorm(sum(expo_gs[,k]=="nd"&!is.na(expo_gs[,k])), min=0, max=chem_gs$LOD[k]) 
+  expo_gs[which(expo_gs[,k]=="nd"),k] = rtruncnorm(sum(expo_gs[,k]=="nd", na.rm = T),min=0,max=chem_gs$LOD[k]) 
 }
 
 # Convert to numeric (Replace any characters with NaN and add rownames)
