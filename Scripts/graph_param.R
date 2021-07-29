@@ -20,11 +20,11 @@ names(family.colours) = c(paste0("F",1:35), paste0("G",1:13), paste0("L",1:18), 
 
 # Region
 area = read.csv("../Dictionaries/French_area_codes.csv")
-region.colours = colorRampPalette(RColorBrewer::brewer.pal(n=9,name='Set1'))(length(unique(area$Region))+1)
+region.colours = colorRampPalette(RColorBrewer::brewer.pal(n=12,name='Paired'))(length(unique(area$Region))+1)
 names(region.colours) = c(unique(area$Region),"Luxembourg")
 
 # Department
-depart.colours = colorRampPalette(RColorBrewer::brewer.pal(n=9,name='Set1'))(length(unique(area$Department))+1)
+depart.colours = colorRampPalette(RColorBrewer::brewer.pal(n=12,name='Paired'))(length(unique(area$Department))+1)
 names(depart.colours) = c(unique(area$Department),"Luxembourg")
 
 # # Check colours
