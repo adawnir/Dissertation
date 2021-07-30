@@ -4,6 +4,8 @@
 # Load packages
 library(ape)
 library(igraph)
+library(colorspace)
+library(RColorBrewer)
 
 ### Family ----
 # Initialise
@@ -216,40 +218,15 @@ for (i in 1:length(batches)){
            legend=paste0("p=",formatC(anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2], format="e", digits=2)))
     dev.off()
   }
-  if (i %in% 4:5){
-    Batch=rep(NA, length(families))
-    for (f in 1:length(families)){
-      tmp=covars$Batch[covars$Family.ID==families[f]]
-      if (length(unique(tmp))==1){
-        Batch[f] = unique(tmp)
-      }
-    }
-    names(Batch)=families
-    
-    model1 = lm(fsp ~ as.factor(Batch))
-    model0 = lm(fsp ~ 1)
-    {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_by_Batch.pdf"))
-      par(mar=c(5,5,1,1))
-      plot(fsp, pch=19, cex=1, cex.lab=1.5, las=1, 
-           col=batch.colours[Batch],
-           xlab="Family", ylab="Shortest path length between siblings")
-      text(fsp, labels=names(Batch), pos=3, col=darken(family.colours[names(Batch)], amount=0.5))
-      legend("topleft", pch=19, col=batch.colours[unique(Batch)],
-             legend=levels(covars$Batch))
-      legend("topright", bty="n", cex=1.5,
-             legend=paste0("p=",formatC(anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2], format="e", digits=2)))
-      dev.off()
-    }
-  }
   if (i == 4){
     Region=rep(NA, length(families))
     Department=rep(NA, length(families))
     for (f in 1:length(families)){
-      tmp=covars$Region[covars$Family.ID==families[f]]
+      tmp=as.character(covars$Region)[covars$Family.ID==families[f]]
       if (length(unique(tmp))==1){
         Region[f] = unique(tmp)
       }
-      tmp=covars$Department[covars$Family.ID==families[f]]
+      tmp=as.character(covars$Department)[covars$Family.ID==families[f]]
       if (length(unique(tmp))==1){
         Department[f] = unique(tmp)
       }
@@ -257,33 +234,34 @@ for (i in 1:length(batches)){
     names(Region)=families
     names(Department)=families
     
+    Department = ifelse(Department=="Paris",1,0)
+    Region = ifelse(Region=="Île-de-France",1,0)
+    
     model1 = lm(fsp ~ as.factor(Region))
-    model0 = lm(fsp ~ 1)
     {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_by_Region.pdf"))
       par(mar=c(5,5,1,1))
       plot(fsp, pch=19, cex=1, cex.lab=1.5, las=1, 
-           col=region.colours[Region],
+           col=ifelse(Region==1,region.colours["Île-de-France"],"grey"),
            xlab="Family", ylab="Shortest path length between siblings")
       text(fsp, labels=names(Region), pos=3, col=darken(family.colours[names(Region)], amount=0.5))
-      legend("topleft", pch=19, col=region.colours[unique(Region)],
-             legend=levels(covars$Region), cex = 0.6, ncol = 2)
+      legend("top", pch=19, col=c(region.colours["Île-de-France"],"grey"),
+             legend=c("Île-de-France","Other region"))
       legend("topright", bty="n", cex=1.5,
-             legend=paste0("p=",formatC(anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2], format="e", digits=2)))
+             legend=paste0("p=",formatC(summary(model)$coefficients[2,4], format="e", digits=2)))
       dev.off()
     }
     
     model1 = lm(fsp ~ as.factor(Department))
-    model0 = lm(fsp ~ 1)
     {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_by_Department.pdf"))
       par(mar=c(5,5,1,1))
       plot(fsp, pch=19, cex=1, cex.lab=1.5, las=1, 
-           col=depart.colours[Department],
+           col=ifelse(Department==1,depart.colours["Paris"],"grey"),
            xlab="Family", ylab="Shortest path length between siblings")
       text(fsp, labels=names(Department), pos=3, col=darken(family.colours[names(Department)], amount=0.5))
-      legend("topleft", pch=19, col=depart.colours[unique(Department)],
-             legend=levels(covars$Department), cex = 0.6, ncol = 2)
+      legend("top", pch=19, col=c(depart.colours["Paris"],"grey"),
+             legend=c("Paris","Other department"))
       legend("topright", bty="n", cex=1.5,
-             legend=paste0("p=",formatC(anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2], format="e", digits=2)))
+             legend=paste0("p=",formatC(summary(model)$coefficients[2,4], format="e", digits=2)))
       dev.off()
     }
   }
@@ -320,42 +298,36 @@ for (i in 4:5){
     dev.off()
   }
   
-  if (i ==4){
+  if (i == 4){
     families=unique(covars$Region)
-    mycolours=brewer.pal(n=12,name='Paired')
-    mycolours=colorRampPalette(mycolours)(length(families))
+    mycolours = region.colours
     names(mycolours)=families
     
     {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_expo_all_region.pdf"),width=14)
       par(mar=c(0,0,0,0))
       plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
-           tip.color=mycolours[as.character(covars$Region)])
+           tip.color=region.colours[as.character(covars$Region)])
       dev.off()
     }
     
     {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_graph_expo_all_region.pdf"))
-      g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = mycolours[as.character(covars$Region)])
-      legend("bottomright", pch=19, col=mycolours[as.character(families)],
-             legend=families, cex = 0.4, ncol = 1)
+      g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = region.colours[as.character(covars$Region)])
+      legend("bottomright", pch=19, col=region.colours[levels(covars$Region)],
+             legend=levels(covars$Region), cex = 0.4, ncol = 1)
       dev.off()
     }
-    
-    families=unique(covars$Department)
-    mycolours=brewer.pal(n=12,name='Paired')
-    mycolours=colorRampPalette(mycolours)(length(families))
-    names(mycolours)=families
     
     {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_expo_all_depart.pdf"),width=14)
       par(mar=c(0,0,0,0))
       plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
-           tip.color=mycolours[as.character(covars$Department)])
+           tip.color=depart.colours[as.character(covars$Department)])
       dev.off()
     }
     
     {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_graph_expo_all_depart.pdf"))
-      g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = mycolours[as.character(covars$Department)])
-      legend("bottomright", pch=19, col=mycolours[as.character(families)],
-             legend=families, cex = 0.4, ncol = 1)
+      g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = depart.colours[as.character(covars$Department)])
+      legend("bottomright", pch=19, col=depart.colours[levels(covars$Department)],
+             legend=leves(covars$Department), cex = 0.4, ncol = 1)
       dev.off()
     }
   }
