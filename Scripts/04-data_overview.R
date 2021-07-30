@@ -93,7 +93,6 @@ prop[which(is.na(prop))] = 0 # Replace NA with 0
 prop = prop[names(annot),]
 mylabels = rownames(prop)
 
-background = TRUE
 myspacing = 1
 xseq = 1:nrow(prop)
 annot_sub = annot[mylabels]
