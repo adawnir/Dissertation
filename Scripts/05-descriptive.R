@@ -175,4 +175,5 @@ high_corr
 
 expo = readRDS(paste0("../Processed/",filepaths[5],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
 chem = readRDS(paste0("../Processed/",filepaths[5],"/Chemical_compound_info_thresh.rds"))
+high_corr = read.csv(paste0("../Exports/",filepaths[5],"/High_correlation_compound_pairs.csv"))
 high_corr
