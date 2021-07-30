@@ -4,6 +4,7 @@
 # Load packages
 library(ape)
 library(igraph)
+library(colorspace)
 
 # Initialise
 rm(list=ls())
@@ -67,15 +68,13 @@ for (i in 1:length(batches)){
   for (p in 1:ncol(withinf_sp)){
     {pdf(paste0("../Figures/",filepaths[i],"/Univar_clustering/Shortest_path_cont_",p,".pdf"),width=14)
       par(mar=c(5,5,1,1))
-      plot(withinf_sp[,p], pch=19, col=family.colours[rownames(withinf_sp)], xaxt="n", las=1,
-           panel.first=abline(v=1:ncol(withinf_sp), lty=3, col="grey"), 
+      plot(withinf_sp[,p], pch=19, col=family.colours[rownames(withinf_sp)], xaxt="n", las=2,
+           panel.first=abline(v=1:nrow(withinf_sp), lty=3, col="grey"), 
            xlab="Family ID", cex=2,
            ylab="Shortest path length between siblings", cex.lab=1.5)
       axis(side=1, at=1:nrow(withinf_sp), labels=families, las = 2)
       dev.off()}
   }
-  
-  print(which(colnames(expo)=="Fipronil"))
   
   x=as.vector(row(withinf_sp))
   y=as.vector(withinf_sp)
@@ -133,9 +132,15 @@ for (i in 1:length(batches)){
     abline(h=median(ybis), lty=3)
     axis(side=1, at=1, labels="Ref", cex.axis=0.8, las = 2)
     for (k in 1:ncol(withinf_sp)){
-      axis(side=1, at=k+1, labels=colnames(withinf_sp)[k], cex.axis=0.8)
+      axis(side=1, at=k+1, labels=colnames(withinf_sp)[k], cex.axis=0.8, las = 2)
     }
     dev.off()
     }
-  }
+}
+
+for (i in 1:length(batches)){
+  # Load data
+  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
+  print(which(colnames(expo)=="Fipronil"))
+}
 
