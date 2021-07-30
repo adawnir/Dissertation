@@ -79,12 +79,12 @@ ifelse(dir.exists("../Figures"), "", dir.create("../Figures"))
        ylab="Number of kept variables", ylim = c(0,152))
   pch = c(rep(19,3),rep(17,2))
   lty = c(rep(1,3),rep(2,2))
-  for (k in 1:4){
+  for (k in 1:3){
     points(thrseq, N[[k]], type="b", pch=pch[k], lty = lty[k], col=batch.colours[k])
   }
   abline(v = 0.1, lty = 2)
-  legend("top", lty=lty, pch = pch, lwd=2, col=batch.colours[1:4],
-         legend = batches[1:4], bg="white", horiz = TRUE)
+  legend("top", lty=lty, pch = pch, lwd=2, col=batch.colours[1:3],
+         legend = batches[1:3], bg="white", horiz = TRUE)
   dev.off()
 }
 
@@ -97,9 +97,9 @@ myspacing = 1
 xseq = 1:nrow(prop)
 annot_sub = annot[mylabels]
 
-{pdf("../Figures/Detection_prop.pdf", width=14, height=14)
-  par(oma=c(21,0,0,0),mar=c(0,5,1,1), mfrow = c(4,1))
-  for (i in 1:4){
+{pdf("../Figures/Detection_prop.pdf", width=14, height=11)
+  par(oma=c(21,0,0,0),mar=c(0,5,1,1), mfrow = c(3,1))
+  for (i in 1:3){
     plot(prop[,i],
          col=annot.colours[annot_sub],
          xaxt="n", ylab=paste0("Proportion detected"," (", batches[i] ,")"), xlab = "", cex.lab=1.2,
@@ -118,9 +118,9 @@ annot_sub = annot[mylabels]
   dev.off()
 }
 
-{pdf("../Figures/Detection_prop_thresh.pdf", width=14, height=14)
-  par(oma=c(21,0,0,0),mar=c(0,5,1,1), mfrow = c(4,1))
-  for (i in 1:4){
+{pdf("../Figures/Detection_prop_thresh.pdf", width=14, height=11)
+  par(oma=c(21,0,0,0),mar=c(0,5,1,1), mfrow = c(3,1))
+  for (i in 1:3){
     plot(prop[,i],
          col=ifelse(prop>0.1,annot.colours[annot_sub],alpha(annot.colours[annot_sub], 0.3)),
          xaxt="n", ylab=paste0("Proportion detected"," (", batches[i] ,")"), xlab = "", cex.lab=1.2,
