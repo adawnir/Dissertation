@@ -284,25 +284,17 @@ for (i in 1:length(batches)){
     Region=rep(NA, length(families))
     Department=rep(NA, length(families))
     for (f in 1:length(families)){
-      tmp=covars$Region[covars$Family.ID==families[f]]
+      tmp=as.character(covars$Region)[covars$Family.ID==families[f]]
       if (length(unique(tmp))==1){
         Region[f] = unique(tmp)
       }
-      tmp=covars$Department[covars$Family.ID==families[f]]
+      tmp=as.character(covars$Department)[covars$Family.ID==families[f]]
       if (length(unique(tmp))==1){
         Department[f] = unique(tmp)
       }
     }
     names(Region)=families
     names(Department)=families
-    
-    region.colours=brewer.pal(n=12,name='Paired')
-    region.colours=colorRampPalette(region.colours)(length(levels(covars$Region)))
-    names(region.colours)=levels(covars$Region)
-    
-    depart.colours=brewer.pal(n=12,name='Paired')
-    depart.colours=colorRampPalette(depart.colours)(length(levels(covars$Department)))
-    names(depart.colours)=levels(covars$Department)
     
     model1 = glm(misclass ~ as.factor(Region), family = "binomial")
     model0 = glm(misclass ~ 1, family = "binomial")

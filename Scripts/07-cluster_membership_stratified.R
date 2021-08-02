@@ -48,7 +48,7 @@ for (i in 4:5){
     CalibrationPlot(out)
     dev.off()
 
-    # out = readRDS(paste0("../Results/",filepaths[i],"/Stability_clustering_output_",k,".rds"))
+    out = readRDS(paste0("../Results/",filepaths[i],"/Stability_clustering_output_",k,".rds"))
     # Save memberships
     saveRDS(Clusters(out), paste0("../Results/",filepaths[i],"/Cluster_memberships_",k,".rds"))
     
@@ -70,30 +70,49 @@ setwd(path)
 source("functions.R")
 source("graph_param.R")
 
-suffix = c("lux","fra","gs","pooled3","pooled2")
-k_stab = k_score = k_fixed = NULL
-prop_stab = prop_score = prop_fixed = NULL
-rand_stab = rand_score = rand_fixed = NULL
-adjrand_stab = adjrand_score = adjrand_fixed = NULL
-for (i in 1:length(batches)){
-  # Load data
-  covars = readRDS(paste0("../Results/",filepaths[i],"/Cluster_memberships.rds"))
-  # Number of clusters
-  k_stab = c(k_stab, length(unique(covars$stab_cluster)))
-  k_score = c(k_score, length(unique(covars$score_cluster)))
-  k_fixed = c(k_fixed, length(unique(covars$fixed_cluster)))
-  
-  # Rand index
-  rand_stab = c(rand_stab, rand.index(as.numeric(covars$Family.ID),covars$stab_cluster))
-  rand_score = c(rand_score, rand.index(as.numeric(covars$Family.ID),covars$score_cluster))
-  rand_fixed = c(rand_fixed, rand.index(as.numeric(covars$Family.ID),covars$fixed_cluster))
-  
-  # Adjusted Rand index
-  adjrand_stab = c(adjrand_stab, adj.rand.index(as.numeric(covars$Family.ID),covars$stab_cluster))
-  adjrand_score = c(adjrand_score, adj.rand.index(as.numeric(covars$Family.ID),covars$score_cluster))
-  adjrand_fixed = c(adjrand_fixed, adj.rand.index(as.numeric(covars$Family.ID),covars$fixed_cluster))
-  
-  # Families reconstructed
+covars_lux = readRDS(paste0("../Results/",filepaths[1],"/Cluster_memberships.rds"))
+covars_fra = readRDS(paste0("../Results/",filepaths[2],"/Cluster_memberships.rds"))
+covars_gs = readRDS(paste0("../Results/",filepaths[3],"/Cluster_memberships.rds"))
+
+cluster_lux = readRDS(paste0("../Results/",filepaths[4],"/Cluster_memberships_LUX.rds"))
+cluster_fra = readRDS(paste0("../Results/",filepaths[4],"/Cluster_memberships_FRA.rds"))
+cluster_gs = readRDS(paste0("../Results/",filepaths[4],"/Cluster_memberships_GS.rds"))
+
+# Number of clusters
+length(unique(covars_lux$stab_cluster))
+length(unique(cluster_lux))
+
+# Rand index
+rand.index(as.numeric(covars_lux$Family.ID),covars_lux$stab_cluster)
+rand.index(as.numeric(covars_lux$Family.ID),cluster_lux)
+rand.index(covars_lux$stab_cluster,cluster_lux)
+
+# Rand index
+adj.rand.index(as.numeric(covars_lux$Family.ID),covars_lux$stab_cluster)
+adj.rand.index(as.numeric(covars_lux$Family.ID),cluster_lux)
+adj.rand.index(covars_lux$stab_cluster,cluster_lux)
+
+
+# Number of clusters
+length(unique(covars_fra$stab_cluster))
+length(unique(cluster_fra))
+
+# Rand index
+adj.rand.index(as.numeric(covars_fra$Family.ID),covars_fra$stab_cluster)
+adj.rand.index(as.numeric(covars_fra$Family.ID),cluster_fra)
+adj.rand.index(covars_fra$stab_cluster,cluster_fra)
+
+
+# Number of clusters
+length(unique(covars_gs$stab_cluster))
+length(unique(cluster_gs))
+
+# Rand index
+adj.rand.index(as.numeric(covars_gs$Family.ID),covars_gs$stab_cluster)
+adj.rand.index(as.numeric(covars_gs$Family.ID),cluster_gs)
+adj.rand.index(covars_gs$stab_cluster,cluster_gs)
+
+# Families reconstructed
   tmp = covars %>%
     group_by(Family.ID) %>%
     summarise(count = length(unique(stab_cluster))) %>%
@@ -114,19 +133,6 @@ for (i in 1:length(batches)){
     filter(count==1) %>%
     nrow(.)/length(unique(covars$Family.ID))
   prop_fixed = c(prop_fixed, tmp)
-}
-
-rand_stab = round(rand_stab,2)
-adjrand_stab = round(adjrand_stab,2)
-prop_stab = round(prop_stab*100,1)
-
-rand_score = round(rand_score,2)
-adjrand_score = round(adjrand_score,2)
-prop_score = round(prop_score*100,1)
-
-rand_fixed = round(rand_fixed,2)
-adjrand_fixed = round(adjrand_fixed,2)
-prop_fixed = round(prop_fixed*100,1)
 
 ### PLS for visualisation ----
 library(sgPLS)

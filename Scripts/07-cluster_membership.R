@@ -40,11 +40,11 @@ for (i in 1:length(batches)){
   # 
   # # Save outputs
   # saveRDS(out, paste0("../Results/",filepaths[i],"/Stability_clustering_output.rds"))
-
-  pdf(paste0("../Figures/",filepaths[i],"/Stability_clustering_output.pdf"))
-  par(mar=c(7, 5, 7, 6))
-  CalibrationPlot(out)
-  dev.off()
+  # 
+  # pdf(paste0("../Figures/",filepaths[i],"/Stability_clustering_output.pdf"))
+  # par(mar=c(7, 5, 7, 6))
+  # CalibrationPlot(out)
+  # dev.off()
   
   out = readRDS(paste0("../Results/",filepaths[i],"/Stability_clustering_output.rds"))
   covars$stab_cluster = Clusters(out)
@@ -114,11 +114,6 @@ for (i in 1:length(batches)){
   k_score = c(k_score, length(unique(covars$score_cluster)))
   k_fixed = c(k_fixed, length(unique(covars$fixed_cluster)))
   
-  # Rand index
-  rand_stab = c(rand_stab, rand.index(as.numeric(covars$Family.ID),covars$stab_cluster))
-  rand_score = c(rand_score, rand.index(as.numeric(covars$Family.ID),covars$score_cluster))
-  rand_fixed = c(rand_fixed, rand.index(as.numeric(covars$Family.ID),covars$fixed_cluster))
-  
   # Adjusted Rand index
   adjrand_stab = c(adjrand_stab, adj.rand.index(as.numeric(covars$Family.ID),covars$stab_cluster))
   adjrand_score = c(adjrand_score, adj.rand.index(as.numeric(covars$Family.ID),covars$score_cluster))
@@ -147,15 +142,12 @@ for (i in 1:length(batches)){
   prop_fixed = c(prop_fixed, tmp)
 }
 
-rand_stab = round(rand_stab,2)
 adjrand_stab = round(adjrand_stab,2)
 prop_stab = round(prop_stab*100,1)
 
-rand_score = round(rand_score,2)
 adjrand_score = round(adjrand_score,2)
 prop_score = round(prop_score*100,1)
 
-rand_fixed = round(rand_fixed,2)
 adjrand_fixed = round(adjrand_fixed,2)
 prop_fixed = round(prop_fixed*100,1)
 
@@ -183,7 +175,6 @@ for (i in 1:length(batches)){
   CreateScorePlot.plsda(myplsda=myplsda, type1=covars$stab_cluster, type2=covars$Family.ID,
                         legend_text = c(paste0("k=",k_stab[i]),
                                         paste0("Adj. Rand index: ",adjrand_stab[i]),
-                                        paste0("Rand index: ",rand_stab[i]),
                                         paste0(prop_stab[i],"% recovered")),
                         mycolours=mycolours, filename=paste0("../Figures/",filepaths[i],"/PLSDA_score_plot_stab_cluster.pdf"))
                    
@@ -201,7 +192,6 @@ for (i in 1:length(batches)){
   CreateScorePlot.plsda(myplsda=myplsda, type1=covars$score_cluster, type2=covars$Family.ID,
                         legend_text = c(paste0("k=",k_score[i]),
                                         paste0("Adj. Rand index: ",adjrand_score[i]),
-                                        paste0("Rand index: ",rand_score[i]),
                                         paste0(prop_score[i],"% recovered")),
                         mycolours=mycolours, filename=paste0("../Figures/",filepaths[i],"/PLSDA_score_plot_score_cluster.pdf"))
   
@@ -218,7 +208,6 @@ for (i in 1:length(batches)){
   CreateScorePlot.plsda(myplsda=myplsda, type1=covars$fixed_cluster, type2=covars$Family.ID,
                         legend_text = c(paste0("k=",k_fixed[i]),
                                         paste0("Adj. Rand index: ",adjrand_fixed[i]),
-                                        paste0("Rand index: ",rand_fixed[i]),
                                         paste0(prop_fixed[i],"% recovered")),
                         mycolours=mycolours, filename=paste0("../Figures/",filepaths[i],"/PLSDA_score_plot_fixed_cluster.pdf"))
   
