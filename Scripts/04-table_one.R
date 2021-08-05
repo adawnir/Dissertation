@@ -61,7 +61,7 @@ myp = formatC(myn/length(covars$Family.ID)*100, format = "f", digits = 1)
 out = paste0(myn, " (", myp, "%)")
 for (k in c("LUX","FRA","GS")){
   myn = sum(covars$Family.ID[covars$Batch==k]=="Isolated")
-  myp = formatC(myn/sum(covars$Batch==k), format = "f", digits = 1)
+  myp = formatC(myn/sum(covars$Batch==k)*100, format = "f", digits = 1)
   out=c(out, paste0(myn, " (", myp, "%)"))
 }
 mytable=rbind(mytable, out)
