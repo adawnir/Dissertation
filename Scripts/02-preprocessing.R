@@ -139,16 +139,12 @@ suffix = c("lux","fra","gs")
 for(i in 1:3){
   expo = eval(parse(text = paste0("expo_",suffix[i])))
   chem = eval(parse(text = paste0("chem_",suffix[i])))
-  all(colnames(expo)==chem$Compound)
+  all(colnames(expo)==rownames(chem))
   
   # Proportion of NAs per chemical compounds
   chem$NA_prop = apply(expo, 2, function(x) sum(is.na(x))/nrow(expo))
   # Proportion of detected per chemical compounds
   chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
-  # Minimum detection per chemical compound
-  chem$LOD = apply(expo, 2, function(x) min(as.numeric(unlist(x)), na.rm = T))
-  # Replace LOD of never-detected compounds with NA
-  chem$LOD[which(is.infinite(chem$LOD))] = NA
   
   # Detection rate
   if(sum(is.na(chem$nd_prop))+sum(is.na(chem$NA_prop))==0){
