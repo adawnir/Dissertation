@@ -1,18 +1,19 @@
 ## Graphical Lasso Network
 ## Rin on 14 July 
 
-## Load packages and source functions
-LoadPackages=function(packages){
-  for (i in 1:length(packages)){
-    suppressPackageStartupMessages(library(packages[i], character.only=TRUE))
-  }
-}
+## Load packages
+library(igraph)
+library(colorspace)
+library(focus)
 
-LoadPackages(c("pheatmap","corpcor","abind","parallel",
-               "RColorBrewer","igraph","ppcor","mvtnorm",
-               "pROC","glasso","stabs","huge","pulsar",
-               "QUIC","glassoFast","colorspace","glmnet","tidyverse"))
-source("penalisation_functions.R")
+# Initialise
+rm(list=ls())
+path=dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(path)
+
+# Load custom
+source("functions.R")
+source("graph_param.R")
 
 # Load data sets
 annot = readRDS("../Data/Chemical_compound_family_annotation.rds")

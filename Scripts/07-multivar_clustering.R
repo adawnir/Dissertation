@@ -4,10 +4,10 @@
 # Load packages
 library(ape)
 library(igraph)
+library(focus)
 library(colorspace)
 library(RColorBrewer)
 
-### Family ----
 # Initialise
 rm(list=ls())
 path=dirname(rstudioapi::getActiveDocumentContext()$path)
@@ -193,32 +193,37 @@ for (i in 1:length(batches)){
       gender_diff[f] = NA
     } else if (length(unique(tmp))==1){
       if (unique(tmp)=="Male"){
-        gender_diff[f]=1
+        gender_diff[f]="All male"
       }
       if (unique(tmp)=="Female"){
-        gender_diff[f]=2
+        gender_diff[f]="All female"
       }
     } else {
-      gender_diff[f]=3
+      gender_diff[f]="Different genders"
     }
   }
   names(gender_diff)=families
   
-  model1 = lm(fsp[!is.na(gender_diff)] ~ as.factor(gender_diff[!is.na(gender_diff)]))
+  gender_col = c("skyblue", "pink", "tan")
+  names(gender_col) = c("All male", "All female", "Different genders")
+  
+  model1 = lm(fsp[!is.na(gender_diff)] ~ gender_diff[!is.na(gender_diff)])
+  print(summary(model1))
   model0 = lm(fsp[!is.na(gender_diff)] ~ 1)
   {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_by_gender.pdf"))
     par(mar=c(5,5,1,1))
-    plot(fsp[!is.na(gender_diff)], pch=19, cex=1, cex.lab=1.5, las=1, 
-         col=c("skyblue", "pink", "tan")[gender_diff[!is.na(gender_diff)]],
+    plot(fsp, pch=19, cex=1, cex.lab=1.5, las=1, 
+         col=gender_col[gender_diff],
          xlab="Family", ylab="Shortest path length between siblings")
-    text(fsp[!is.na(gender_diff)], labels=names(gender_diff)[!is.na(gender_diff)], pos=3, col=darken(family.colours[names(gender_diff[!is.na(gender_diff)])], amount=0.5))
+    text(fsp, labels=ifelse(!is.na(gender_diff),names(gender_diff),""), pos=3,
+         col=darken(family.colours[names(gender_diff)], amount=0.5))
     legend("topleft", pch=19, col=c("skyblue", "pink", "tan"), ncol=1,
            legend=c("All Male", "All Female", "Different genders"))
     legend("topright", bty="n", cex=1.5,
            legend=paste0("p=",formatC(anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2], format="e", digits=2)))
     dev.off()
   }
-  if (i == 4){
+  if (i %in% c(2,4)){
     Region=rep(NA, length(families))
     Department=rep(NA, length(families))
     for (f in 1:length(families)){
@@ -237,7 +242,7 @@ for (i in 1:length(batches)){
     Department = ifelse(Department=="Paris",1,0)
     Region = ifelse(Region=="Île-de-France",1,0)
     
-    model1 = lm(fsp ~ as.factor(Region))
+    model = lm(fsp ~ as.factor(Region))
     {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_by_Region.pdf"))
       par(mar=c(5,5,1,1))
       plot(fsp, pch=19, cex=1, cex.lab=1.5, las=1, 
@@ -251,7 +256,7 @@ for (i in 1:length(batches)){
       dev.off()
     }
     
-    model1 = lm(fsp ~ as.factor(Department))
+    model = lm(fsp ~ as.factor(Department))
     {pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_cont_all_by_Department.pdf"))
       par(mar=c(5,5,1,1))
       plot(fsp, pch=19, cex=1, cex.lab=1.5, las=1, 
@@ -265,6 +270,224 @@ for (i in 1:length(batches)){
       dev.off()
     }
   }
+  
+  ## Delta exposure
+  delta_mat=matrix(NA, nrow=length(families), ncol=ncol(expo))
+  for (f in 1:length(families)){
+    for (k in 1:ncol(expo)){
+      tmp = expo[covars$Family.ID==families[f],k]
+      delta_mat[f,k] = abs(tmp[1] - tmp [2])
+    }
+  }
+  rownames(delta_mat)=families
+  colnames(delta_mat)=colnames(expo)
+  
+  ### Multivariate analysis using stability selection LASSO regression ----
+  if (i == 1){
+    X = cbind(age_mu, age_diff, gender_diff,
+              length_mu, length_diff, weight_mu, weight_diff,
+              as.data.frame(delta_mat))
+  }
+  if (i %in% c(2,4)){
+    X = cbind(age_mu, age_diff, gender_diff,
+              Region,
+              as.data.frame(delta_mat))
+  }
+  if (i %in% c(3,5)){
+    X = cbind(age_mu, age_diff, gender_diff,
+              as.data.frame(delta_mat))
+  }
+  
+  Y = fsp[complete.cases(X)]
+  X = model.matrix(~., X)[,-1]
+  
+  stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
+  
+  pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_multivariate_output.pdf"))
+  par(mar = c(7, 5, 7, 6))
+  CalibrationPlot(stab)
+  dev.off()
+  
+  # Checking consistency in sign of the beta coefficients for the variables with high selprop
+  # Ideally no point around 0.5 with high selection proportion
+  selprop=SelectionProportions(stab)
+  a=apply(stab$Beta[ArgmaxId(stab)[1],,],1,FUN=function(x){sum(x>0)})
+  a = a[-length(a)]
+  b=apply(stab$Beta[ArgmaxId(stab)[1],,],1,FUN=function(x){sum(x<0)})
+  b = b[-length(b)]
+  pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_multivariate_beta_consistency.pdf"))
+  par(mar=c(5,5,1,1))
+  plot(a/(a+b), selprop, las=1, pch=19, col="navy", cex.lab=1.5,
+       xlab="Proportion of positive beta among non-zero betas", 
+       ylab="Selection Proportion") # Ideally no point around 0.5 with high selection proportion
+  dev.off()
+  
+  # Extract beta
+  beta = stab$Beta[ArgmaxId(stab)[1],,]
+  beta_mu = rowMeans(beta[-nrow(beta),] %*% diag(beta[nrow(beta),]))
+  names(beta_mu) = names(selprop)
+  
+  selprop_ranked <- sort(selprop, decreasing = TRUE)
+  beta_mu_ranked <- beta_mu[order(-selprop)]
+  print(all(names(selprop_ranked)==names(beta_mu_ranked)))
+  
+  mylabels = gsub("`","",names(selprop_ranked))
+  mylabels = gsub("age_mu","Mean age",mylabels)
+  mylabels = gsub("age_diff","Age difference",mylabels)
+  mylabels = gsub("gender_diff","",mylabels)
+  mylabels = gsub("All male","All male (ref. All female)",mylabels)
+  mylabels = gsub("Different genders","Different genders (ref. All female)",mylabels)
+  mylabels = gsub("length_mu","Mean sample length",mylabels)
+  mylabels = gsub("length_diff","Sample length difference",mylabels)
+  mylabels = gsub("weight_mu","Mean sample weight",mylabels)
+  mylabels = gsub("weight_diff","Sample weight difference",mylabels)
+  mylabels = gsub("Region","Île-de-France (Y/N)",mylabels)
+  
+  pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_multivariate_selprop.pdf"), width = 14)
+  par(mar=c(15, 5, 1, 1))
+  plot(selprop_ranked,
+       type = "h", lwd = 3, las = 1, cex.lab = 1.3, bty = "n", ylim = c(0, 1),
+       col = ifelse(selprop_ranked >= Argmax(stab)[2], yes = batch.colours[i], no = "grey"),
+       xaxt = "n", xlab = "", ylab = "Selection proportions"
+  )
+  abline(h = Argmax(stab)[2], lty = 2, col = "darkred")
+  axis(side = 1, at = 1:length(selprop_ranked), labels = NA)
+  for (k in 1:length(selprop_ranked)){
+    if (beta_mu_ranked[k] > 0){
+      col = "red"
+    } else if (beta_mu_ranked[k] < 0){
+      col = "blue"
+    } else {
+      col = "black"
+    }
+    if (mylabels[k] %in% colnames(delta_mat)){
+      label = substitute(Delta~tmp, list(tmp = mylabels[k]))
+    } else {
+      label = mylabels[k]
+    }
+    axis(side = 1, at = k, las = 2, labels = label,
+         col.axis = ifelse(selprop_ranked[k] >= Argmax(stab)[2], col, "grey"))
+  }
+  dev.off()
+  
+  ## Only covariates ----
+  # This line throws error in sgPLS::sPLS internal function, unless scale = FALSE
+  stab = VariableSelection(xdata = X[,1:(ncol(X)-ncol(delta_mat))], ydata = Y,
+                           implementation = SparsePLS, Lambda = 1:(ncol(X) - 1))
+  pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_multivariate_covariates_only_output.pdf"))
+  par(mar = c(7, 5, 7, 6))
+  CalibrationPlot(stab)
+  dev.off()
+
+  # Checking consistency in sign of the beta coefficients for the variables with high selprop
+  # Ideally no point around 0.5 with high selection proportion
+  selprop=SelectionProportions(stab)
+  a=apply(stab$Beta[ArgmaxId(stab)[1],,],1,FUN=function(x){sum(x>0)})
+  a = a[-length(a)]
+  b=apply(stab$Beta[ArgmaxId(stab)[1],,],1,FUN=function(x){sum(x<0)})
+  b = b[-length(b)]
+  pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_multivariate_covariates_only_beta_consistency.pdf"))
+  par(mar=c(5,5,1,1))
+  plot(a/(a+b), selprop, las=1, pch=19, col="navy", cex.lab=1.5,
+       xlab="Proportion of positive beta among non-zero betas",
+       ylab="Selection Proportion") # Ideally no point around 0.5 with high selection proportion
+  dev.off()
+
+  # Extract beta
+  beta = stab$Beta[ArgmaxId(stab)[1],,]
+  beta_mu = rowMeans(beta[-nrow(beta),] %*% diag(beta[nrow(beta),]))
+  names(beta_mu) = names(selprop)
+
+  selprop_ranked <- sort(selprop, decreasing = TRUE)
+  beta_mu_ranked <- beta_mu[order(-selprop)]
+  print(all(names(selprop_ranked)==names(beta_mu_ranked)))
+
+  mylabels = gsub("age_mu","Mean age",names(selprop_ranked))
+  mylabels = gsub("age_diff","Age difference",mylabels)
+  mylabels = gsub("gender_diff","",mylabels)
+  mylabels = gsub("All male","All male (ref. All female)",mylabels)
+  mylabels = gsub("Different genders","Different genders (ref. All female)",mylabels)
+  mylabels = gsub("length_mu","Mean sample length",mylabels)
+  mylabels = gsub("length_diff","Sample length difference",mylabels)
+  mylabels = gsub("weight_mu","Mean sample weight",mylabels)
+  mylabels = gsub("weight_diff","Sample weight difference",mylabels)
+  mylabels = gsub("Region","Île-de-France (Y/N)",mylabels)
+
+  pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_multivariate_covariates_only_selprop.pdf"), width = 14)
+  par(mar=c(15, 5, 1, 1))
+  plot(selprop_ranked,
+       type = "h", lwd = 3, las = 1, cex.lab = 1.3, bty = "n", ylim = c(0, 1),
+       col = ifelse(selprop_ranked >= Argmax(stab)[2], yes = batch.colours[i], no = "grey"),
+       xaxt = "n", xlab = "", ylab = "Selection proportions"
+  )
+  abline(h = Argmax(stab)[2], lty = 2, col = "darkred")
+  axis(side = 1, at = 1:length(selprop_ranked), labels = NA)
+  for (k in 1:length(selprop_ranked)){
+    if (beta_mu_ranked[k] > 0){
+      col = "red"
+    } else if (beta_mu_ranked[k] < 0){
+      col = "blue"
+    } else {
+      col = "black"
+    }
+    axis(side = 1, at = k, las = 2, labels = mylabels[k],
+         col.axis = ifelse(selprop_ranked[k] >= Argmax(stab)[2], col, "grey"))
+  }
+  dev.off()
+
+  ## Only exposures ----
+  stab = VariableSelection(xdata = X[,(ncol(X)-ncol(delta_mat)+1):ncol(X)], ydata = Y, implementation = SparsePLS)
+  pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_multivariate_exposures_only_output.pdf"))
+  par(mar = c(7, 5, 7, 6))
+  CalibrationPlot(stab)
+  dev.off()
+  
+  # Checking consistency in sign of the beta coefficients for the variables with high selprop
+  # Ideally no point around 0.5 with high selection proportion
+  selprop=SelectionProportions(stab)
+  a=apply(stab$Beta[ArgmaxId(stab)[1],,],1,FUN=function(x){sum(x>0)})
+  a = a[-length(a)]
+  b=apply(stab$Beta[ArgmaxId(stab)[1],,],1,FUN=function(x){sum(x<0)})
+  b = b[-length(b)]
+  pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_multivariate_exposures_only_beta_consistency.pdf"))
+  par(mar=c(5,5,1,1))
+  plot(a/(a+b), selprop, las=1, pch=19, col="navy", cex.lab=1.5,
+       xlab="Proportion of positive beta among non-zero betas", 
+       ylab="Selection Proportion") # Ideally no point around 0.5 with high selection proportion
+  dev.off()
+  
+  # Extract beta
+  beta = stab$Beta[ArgmaxId(stab)[1],,]
+  beta_mu = rowMeans(beta[-nrow(beta),] %*% diag(beta[nrow(beta),]))
+  names(beta_mu) = names(selprop)
+  
+  selprop_ranked <- sort(selprop, decreasing = TRUE)
+  beta_mu_ranked <- beta_mu[order(-selprop)]
+  print(all(names(selprop_ranked)==names(beta_mu_ranked)))
+  
+  mylabels = gsub("`","",names(selprop_ranked))
+  
+  pdf(paste0("../Figures/",filepaths[i],"/Shortest_path_multivariate_exposures_only_selprop.pdf"), width = 14)
+  par(mar=c(15, 5, 1, 1))
+  plot(selprop_ranked,
+       type = "h", lwd = 3, las = 1, cex.lab = 1.3, bty = "n", ylim = c(0, 1),
+       col = ifelse(selprop_ranked >= Argmax(stab)[2], yes = batch.colours[i], no = "grey"),
+       xaxt = "n", xlab = "", ylab = "Selection proportions"
+  )
+  abline(h = Argmax(stab)[2], lty = 2, col = "darkred")
+  axis(side = 1, at = 1:length(selprop_ranked), labels = NA)
+  for (k in 1:length(selprop_ranked)){
+    if (beta_mu_ranked[k] > 0){
+      col = "red"
+    } else if (beta_mu_ranked[k] < 0){
+      col = "blue"
+    } else {
+      col = "black"
+    }
+    axis(side = 1, at = k, las = 2, labels = substitute(Delta~tmp, list(tmp=mylabels[k])),
+         col.axis = ifelse(selprop_ranked[k] >= Argmax(stab)[2], col, "grey"))
+  }
+  dev.off()
 }
 
 ### Geographical ----
@@ -327,7 +550,7 @@ for (i in 4:5){
     {pdf(paste0("../Figures/",filepaths[i],"/Hierarchical_cont_graph_expo_all_depart.pdf"))
       g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = depart.colours[as.character(covars$Department)])
       legend("bottomright", pch=19, col=depart.colours[levels(covars$Department)],
-             legend=leves(covars$Department), cex = 0.4, ncol = 1)
+             legend=levels(covars$Department), cex = 0.4, ncol = 1)
       dev.off()
     }
   }

@@ -25,12 +25,11 @@ for (i in 1:length(batches)){
   print(all(rownames(expo)==rownames(covars)))
   
   X = t(expo)
-  
-  out = GraphicalModel(xdata = X, verbose = TRUE)
+  start.type = ifelse(i %in% c(4,5),"cold","warm")
   
   zero = NULL
   for (n in c(Inf, seq(1000,200,-100), seq(100,10,-10))){
-    out = GraphicalModel(xdata = X, PFER_thr = n, verbose = FALSE)
+    out = GraphicalModel(xdata = X, PFER_thr = n, start = start.type)
     zero = c(zero, sum(rowSums(Adjacency(out))==0))
   }
   
@@ -51,7 +50,7 @@ for (i in 1:length(batches)){
     
     if(is.infinite(start)){
       for (n in c(Inf, seq(10000,1000,-1000))){
-        out = GraphicalModel(xdata = X, PFER_thr = n, verbose = FALSE)
+        out = GraphicalModel(xdata = X, PFER_thr = n, start = start.type)
         zero = c(zero, sum(rowSums(Adjacency(out))==0))
         
         pdf(paste0("../Figures/",filepaths[i],"/Graphical_network_children_PFER_thres_broad.pdf"))
@@ -70,7 +69,7 @@ for (i in 1:length(batches)){
       
       zero = NULL
       for (n in seq(start,stop, int)){
-        out = GraphicalModel(xdata = X, PFER_thr = n, verbose = FALSE)
+        out = GraphicalModel(xdata = X, PFER_thr = n)
         zero = c(zero, sum(rowSums(Adjacency(out))==0))
       }
       
@@ -101,8 +100,9 @@ for(i in 1:length(batches)){
   X = t(expo)
   
   n = c(110,920,79)[i]
+  start.type = ifelse(i %in% c(4,5),"cold","warm")
   
-  out = GraphicalModel(xdata = X, PFER_thr = n, verbose = FALSE)
+  out = GraphicalModel(xdata = X, PFER_thr = n, start = start.type)
   
   pdf(paste0("../Figures/",filepaths[i],"/Graphical_network_children_output.pdf"))
   par(mar = c(7, 5, 7, 6))
