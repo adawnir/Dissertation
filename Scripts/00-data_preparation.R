@@ -5,6 +5,7 @@
 library(openxlsx)
 library(tidyverse)
 
+options(warn = 2)
 ### Prepare data (LUX) ----
 # Initialise
 rm(list=ls())
@@ -42,10 +43,13 @@ expo = mydata[1:39,8:ncol(mydata)]
 rownames(expo) = covars$Indiv.ID
 expo = na_if(expo, "No result")
 
+colnames(expo)
+
 # Translate chemical names to English
 colnames(expo) = readLines(paste0("../Dictionaries/Chemical_names_",filepath,".txt"))
 
 ## Chemical compound information
+options(stringsAsFactors = FALSE)
 chem = data.frame(Compound = colnames(expo),
                   Family = unlist(mydata[42,8:ncol(mydata)]),
                   LOQ = as.numeric(gsub("\\*","",mydata[40,8:ncol(mydata)])),
@@ -75,36 +79,29 @@ rownames(chem) = chem$Compound
 # Sort by family then compound name
 chem = chem[order(chem$Family,chem$Compound),]
 # Sort exposure matrix in same order
-expo = expo[,chem$Compound]
+expo = expo[,rownames(chem)]
 # Check consistency
-all(colnames(expo)==chem$Compound)
+all(colnames(expo)==rownames(chem))
 
 # Number of chemical compounds measured
 nrow(chem) # Fipronil and Fipronil-sulfone are in duplicate
 
 # Remove Fipronil and Fipronil-sulfonate extracted using SPME
-chem = chem[-which(chem$Compound %in% c("Fipronil.SPME", "Fipronil-sulfone.SPME")),]
+chem = chem[-which(rownames(chem) %in% c("Fipronil.SPME", "Fipronil-sulfone.SPME")),]
 expo = expo[,-which(colnames(expo) %in% c("Fipronil.SPME", "Fipronil-sulfone.SPME"))]
 
-# Proportion of NAs per chemical compounds
-all(colnames(expo)==chem$Compound)
-chem$NA_prop = apply(expo, 2, function(x) sum(is.na(x))/nrow(expo))
-
-# Proportion of detected per chemical compounds
-all(colnames(expo)==chem$Compound)
-chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
-
 # Minimum detection per chemical compound
-all(colnames(expo)==chem$Compound)
-chem$LOD = apply(expo, 2, function(x) min(as.numeric(unlist(x)), na.rm = T))
+all(colnames(expo)==rownames(chem))
+chem$LOD = apply(expo, 2,
+                 function(x) suppressWarnings(min(as.numeric(unlist(x)), na.rm = T)))
 # Check for infinite values
 summary(chem$nd_prop[is.infinite(chem$LOD)]) # never-detected compounds have infinite values
 # Replace LOD of never-detected compounds with NA
 chem$LOD[which(is.infinite(chem$LOD))] = NA
 
 ## Save chemical family annotation as named list
-annot = as.character(chem$Family)
-names(annot) = chem$Compound
+annot = chem$Family
+names(annot) = rownames(chem)
 ifelse(dir.exists("../Data"),"",dir.create("../Data"))
 saveRDS(annot, "../Data/Chemical_compound_family_annotation.rds")
 
@@ -130,7 +127,7 @@ filepath = filepaths[2]
 ## Covariate information
 covars = mydata[1:142,1:5]
 colnames(covars) = c("Siblings.Groups", "Indiv.ID", "Age", "Gender","Area")
-covars$Age = as.numeric(covars$Age)
+covars$Age = suppressWarnings(as.numeric(covars$Age))
 
 ## Gender
 table(covars$Gender, useNA = "ifany")
@@ -182,24 +179,17 @@ rownames(chem) = chem$Compound
 # Sort by family then compound name
 chem = chem[order(chem$Family,chem$Compound),]
 # Sort exposure matrix in same order
-expo = expo[,chem$Compound]
+expo = expo[,rownames(chem)]
 # Check consistency
-all(colnames(expo)==chem$Compound)
+print(all(colnames(expo)==rownames(chem)))
 
 # Number of chemical compounds measured
 nrow(chem)
 
-# Proportion of NAs per chemical compounds
-all(colnames(expo)==chem$Compound)
-chem$NA_prop = apply(expo, 2, function(x) sum(is.na(x))/nrow(expo))
-
-# Proportion of detected per chemical compounds
-all(colnames(expo)==chem$Compound)
-chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
-
 # Minimum detection per chemical compound
-all(colnames(expo)==chem$Compound)
-chem$LOD = apply(expo, 2, function(x) min(as.numeric(unlist(x)), na.rm = T))
+all(colnames(expo)==rownames(chem))
+chem$LOD = apply(expo, 2,
+                 function(x) suppressWarnings(min(as.numeric(unlist(x)), na.rm = T)))
 # Check for infinite values
 summary(chem$nd_prop[is.infinite(chem$LOD)]) # never-detected compounds have infinite values
 # Replace LOD of never-detected compounds with NA
@@ -258,15 +248,12 @@ expo = na_if(expo, "No result") %>% na_if("No result (interf.)")
 colnames(expo) = readLines(paste0("../Dictionaries/Chemical_names_",filepath,".txt"))
 
 ## Chemical compound information
-annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
-# Reorder expo to be consistent with Luxembourg data set
-expo = expo[,order(match(colnames(expo),names(annot)))]
-
 chem = data.frame(Compound = colnames(expo),
                   Family = unlist(mydata[47,5:ncol(mydata)]),
-                  LOQ = as.numeric(gsub("\\*","",mydata[45,5:ncol(mydata)])),
+                  LOQ = suppressWarnings(as.numeric(gsub("\\*","",mydata[45,5:ncol(mydata)]))),
                   Extraction = unlist(mydata[46,5:ncol(mydata)]))
 chem = chem %>% fill(Family)
+str(chem)
 
 # Translate chemical family names from French to English
 table(chem$Family, useNA = "ifany")
@@ -286,12 +273,26 @@ rownames(chem) = chem$Compound
 # Sort by family then compound name
 chem = chem[order(chem$Family,chem$Compound),]
 # Sort exposure matrix in same order
-expo = expo[,chem$Compound]
+expo = expo[,rownames(chem)]
 # Check consistency
-all(colnames(expo)==chem$Compound)
+all(colnames(expo)==rownames(chem))
 
 # Number of chemical compounds measured
 nrow(chem)
+
+# Minimum detection per chemical compound
+all(colnames(expo)==rownames(chem))
+chem$LOD = apply(expo, 2,
+                 function(x) suppressWarnings(min(as.numeric(unlist(x)), na.rm = T)))
+# Check for infinite values
+summary(chem$nd_prop[is.infinite(chem$LOD)]) # never-detected compounds have infinite values
+# Replace LOD of never-detected compounds with NA
+chem$LOD[which(is.infinite(chem$LOD))] = NA
+
+annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
+# Reorder expo to be consistent with Luxembourg data set
+expo = expo[,order(match(colnames(expo),names(annot)))]
+chem = chem[colnames(expo),]
 
 ifelse(dir.exists(paste0("../Data/",filepath)),"",dir.create(paste0("../Data/",filepath)))
 saveRDS(covars, paste0("../Data/",filepath,"/Participant_covariate_info.rds"))
