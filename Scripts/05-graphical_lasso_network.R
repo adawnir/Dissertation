@@ -8,7 +8,7 @@ library(focus)
 
 # Initialise
 rm(list=ls())
-path=dirname(rstudioapi::getActiveDocumentContext()$path)
+path="~/Dissertation/Scripts"
 setwd(path)
 
 # Load custom
