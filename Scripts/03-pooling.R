@@ -51,12 +51,16 @@ colnames(chem) = ifelse(grepl("\\.", colnames(chem))|colnames(chem)%in%c("Compou
                         colnames(chem), paste0(colnames(chem),".gs"))
 rownames(chem) = chem$Compound
 
+# Reorder columns
+all(colnames(expo)==rownames(chem))
+expo = expo[,match(rownames(chem),colnames(expo))]
+all(colnames(expo)==rownames(chem))
+
 # Proportion of NAs per chemical compounds
-all(colnames(expo)==chem$Compound)
 chem$NA_prop = apply(expo, 2, function(x) sum(is.na(x))/nrow(expo))
 
 # Proportion of non-detects per chemical compounds
-all(colnames(expo)==chem$Compound)
+all(colnames(expo)==rownames(chem))
 chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
 
 # Detection rate
@@ -75,18 +79,20 @@ saveRDS(chem, paste0("../Processed/",filepaths[4],"/Chemical_compound_info.rds")
 saveRDS(expo, paste0("../Processed/",filepaths[4],"/Exposure_matrix_raw.rds"))
 
 # Filter out compounds with 10% or less detected
+all(colnames(expo)==rownames(chem))
 expo = expo[,which(chem$detect_rate>0.1)]
 chem = chem[which(chem$detect_rate>0.1),]
 ncol(expo)
 
 # Number of chemical compounds not detected in one data set
-grep = intersect(chem_lux$Compound[which(chem_lux$detect_rate!=0)],chem_fra$Compound[which(chem_fra$detect_rate!=0)]) %>%
-  intersect(chem_gs$Compound[which(chem_gs$detect_rate!=0)])
+grep = intersect(rownames(chem_lux)[which(chem_lux$detect_rate!=0)],
+                 rownames(chem_fra)[which(chem_fra$detect_rate!=0)]) %>%
+  intersect(rownames(chem_gs)[which(chem_gs$detect_rate!=0)])
 
-sum(chem$Compound %in% grep)
+sum(rownames(chem) %in% grep)
 
-expo = expo[,which(chem$Compound %in% grep)]
-chem = chem[which(chem$Compound %in% grep),]
+expo = expo[,which(rownames(chem) %in% grep)]
+chem = chem[which(rownames(chem) %in% grep),]
 ncol(expo)
 
 table(chem$Family)
@@ -112,15 +118,15 @@ saveRDS(extract_diff, paste0("../Results/",filepaths[4],"/Chemical_compound_info
 # Set LOD for each data set
 tmp1 = expo[covars$Batch=="LUX",]
 lod1 = chem$LOD.lux
-names(lod1) = chem$Compound
+names(lod1) = rownames(chem)
 
 tmp2 = expo[covars$Batch=="FRA",]
 lod2 = chem$LOD.fra
-names(lod2) = chem$Compound
+names(lod2) = rownames(chem)
 
 tmp3 = expo[covars$Batch=="GS",]
 lod3 = chem$LOD.gs
-names(lod3) = chem$Compound
+names(lod3) = rownames(chem)
 
 for(k in 1:ncol(expo)){
   set.seed(150621)
@@ -178,6 +184,11 @@ extract_diff = full_join(chem_lux, chem_gs, by = "Compound", suffix = c(".lux", 
   .[!is.equal(list(.$Extraction.lux, .$Extraction.gs)),]
 dim(extract_diff)
 
+if(nrow(extract_diff)>0){
+  ifelse(dir.exists(paste0("../Results/",filepaths[5])),"",dir.create(paste0("../Results/",filepaths[5])))
+  saveRDS(extract_diff, paste0("../Results/",filepaths[5],"/Chemical_compound_info_extract_diff.rds"))
+}
+
 # Merge chemical compound information
 expo = bind_rows(expo_lux, expo_gs)
 expo = expo[rownames(covars),]
@@ -187,12 +198,18 @@ chem = full_join(chem_lux, chem_gs, by = "Compound", suffix = c(".lux", ".gs")) 
   mutate(Family = coalesce(Family.lux,Family.gs)) %>%
   select(Compound, Family, starts_with("LOD"), starts_with("LOQ"),starts_with("Extraction"))
 
+rownames(chem) = chem$Compound
+
+# Reorder columns
+all(colnames(expo)==rownames(chem))
+expo = expo[,match(rownames(chem),colnames(expo))]
+all(colnames(expo)==rownames(chem))
+
 # Proportion of NAs per chemical compounds
-all(colnames(expo)==chem$Compound)
 chem$NA_prop = apply(expo, 2, function(x) sum(is.na(x))/nrow(expo))
 
 # Proportion of detected per chemical compounds
-all(colnames(expo)==chem$Compound)
+all(colnames(expo)==rownames(chem))
 chem$nd_prop = apply(expo, 2, function(x) sum(x=="nd", na.rm = TRUE)/nrow(expo))
 
 # Detection rate
@@ -218,10 +235,10 @@ ncol(expo)
 # Number of chemical compounds not detected in one data set
 grep = intersect(chem_lux$Compound[which(chem_lux$detect_rate!=0)], chem_gs$Compound[which(chem_gs$detect_rate!=0)])
 
-sum(chem$Compound %in% grep)
+sum(rownames(chem) %in% grep)
 
-expo = expo[,which(chem$Compound %in% grep)]
-chem = chem[which(chem$Compound %in% grep),]
+expo = expo[,which(rownames(chem) %in% grep)]
+chem = chem[which(rownames(chem) %in% grep),]
 ncol(expo)
 
 table(chem$Family)
@@ -237,11 +254,11 @@ saveRDS(expo, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw_thresh.r
 # Set LOD for each data set
 tmp1 = expo[covars_lux$Indiv.ID,]
 lod1 = chem$LOD.lux
-names(lod1) = chem$Compound
+names(lod1) = rownames(chem)
 
 tmp3 = expo[covars_gs$Indiv.ID,]
 lod3 = chem$LOD.gs
-names(lod3) = chem$Compound
+names(lod3) = rownames(chem)
 
 for(k in 1:ncol(expo)){
   set.seed(150621)
