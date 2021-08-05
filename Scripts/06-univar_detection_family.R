@@ -6,6 +6,8 @@ library(tidyverse)
 library(RColorBrewer)
 library(colorspace)
 
+options(warn = 0)
+
 ### Detection ~ Family ID ----
 # Initialise
 rm(list=ls())
@@ -48,6 +50,7 @@ for (i in 1:length(batches)){
   t1=Sys.time()
   print(t1-t0)
   names(pvals) = colnames(expo)
+  ifelse(dir.exists(paste0("../Results/",filepaths[i])),"",dir.create(paste0("../Results/",filepaths[i])))
   saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_detection_family_pvals.rds"))
   assign(paste0("pvals_",suffix[i]),pvals)
 }
