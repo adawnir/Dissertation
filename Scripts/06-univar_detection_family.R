@@ -1,4 +1,4 @@
-## Univariate regression modelling association between detection and Family ID
+## Univariate regression: Detection vs Family ID
 ## Rin 29 July
 
 # Load packages
