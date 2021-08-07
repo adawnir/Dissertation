@@ -6,7 +6,7 @@
 *.rds
 
 # Jobs
-/Jobs
+Scripts/Jobs
 *.sh
 *.sh.*
 
