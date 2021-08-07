@@ -88,59 +88,162 @@ ifelse(dir.exists("../Figures"), "", dir.create("../Figures"))
   dev.off()
 }
 
-prop = t(bind_rows(tmp1, tmp2, tmp3, tmp4))
+### Overlay ----
+prop = t(bind_rows(tmp1, tmp2, tmp3))
 prop[which(is.na(prop))] = 0 # Replace NA with 0
-prop = prop[names(annot),]
+prop = prop[order(as.factor(annot[rownames(prop)]),-prop[,1],-prop[,2],-prop[,3]),]
 mylabels = rownames(prop)
+prop = cbind(prop[,1],rep(NA,nrow(prop)),prop[,2],rep(NA,nrow(prop)),prop[,3],rep(NA,nrow(prop)),rep(NA,nrow(prop)))
+prop = as.vector(t(prop))
+prop=prop[c(length(prop),1:length(prop)-1)]
 
-myspacing = 1
-xseq = 1:nrow(prop)
+background = TRUE
+myspacing = 7
+xseq = seq(myspacing/2,length(mylabels)*myspacing, by=myspacing)
 annot_sub = annot[mylabels]
-
-{pdf("../Figures/Detection_prop.pdf", width=14, height=11)
-  par(oma=c(21,0,0,0),mar=c(0,5,1,1), mfrow = c(3,1))
-  for (i in 1:3){
-    plot(prop[,i],
-         col=annot.colours[annot_sub],
-         xaxt="n", ylab=paste0("Proportion detected"," (", batches[i] ,")"), xlab = "", cex.lab=1.2,
-         type="h", lwd=2, ylim = c(0,1.1))
+{pdf("../Figures/Detection_prop.pdf", width=14, height=8)
+  par(mar=c(20,5,1,1))
+  plot(prop,
+       col=c(NA, batch.colours[1],NA, batch.colours[2], NA, batch.colours[3], NA),
+       xaxt="n", ylab="", xlab = "",
+       type="n", lwd=2, ylim = c(0,1.1))
+  xseqgreysep=c(min(xseq)-myspacing/2,apply(rbind(xseq[-1],xseq[-length(xseq)]),2,mean),max(xseq)+myspacing/2)
+  if (background){
+    for (k in seq(1,length(xseqgreysep),by=2)){
+      polygon(x=c(xseqgreysep[k],xseqgreysep[k+1],xseqgreysep[k+1],xseqgreysep[k]),
+              y=c(-10,-10,10,10), col=lighten(annot.colours[annot_sub[k]],0.95), border=NA)
+    }
+    for (k in seq(2,length(xseqgreysep),by=2)){
+      polygon(x=c(xseqgreysep[k],xseqgreysep[k+1],xseqgreysep[k+1],xseqgreysep[k]),
+              y=c(-10,-10,10,10), col=lighten(annot.colours[annot_sub[k]],0.99), border=NA)
+    }
+    box()
   }
+  abline(v=xseqgreysep,lty=1,lwd=0.1,col="grey")
+  par(new = TRUE)
+  plot(prop,
+       col=c(NA, batch.colours[1],NA, batch.colours[2], NA, batch.colours[3], NA),
+       xaxt="n", ylab="Proportion detected", xlab = "", cex.lab=1.5,
+       type="h", lwd=2, ylim = c(0,1.1))
   for(i in 1:length(xseq)){
-    axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.8)
+    axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.6)
   }
   xseqblack=c(xseq[!duplicated(annot_sub)]-myspacing/2, max(xseq)+myspacing/2)
-  axis(side=1, line=9, at=xseqblack, labels=NA)
+  abline(v=xseqblack,lty=3,col="black")
+  axis(side=1, line=7, at=xseqblack, labels=NA)
   tmp=apply(rbind(xseqblack[-length(xseqblack)],xseqblack[-1]),2,mean)
   for (k in 1:length(unique(annot_sub))){
-    axis(side=1, line=9, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
+    axis(side=1, line=7, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2,
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
+  legend("top", lty=1, lwd=2, col=batch.colours[1:3], cex = 0.7,
+         legend = batches[1:3], bg="white", horiz = TRUE)
   dev.off()
 }
 
-{pdf("../Figures/Detection_prop_thresh.pdf", width=14, height=11)
-  par(oma=c(21,0,0,0),mar=c(0,5,1,1), mfrow = c(3,1))
-  for (i in 1:3){
-    plot(prop[,i],
-         col=ifelse(prop>0.1,annot.colours[annot_sub],alpha(annot.colours[annot_sub], 0.3)),
-         xaxt="n", ylab=paste0("Proportion detected"," (", batches[i] ,")"), xlab = "", cex.lab=1.2,
-         type="h", lwd=2, ylim = c(0,1.1))
-    abline(h = 0.1, lty = 2)
+{pdf("../Figures/Detection_prop_thresh.pdf", width=14, height=8)
+  par(mar=c(20,5,1,1))
+  plot(prop,
+       col=c(NA, batch.colours[1],NA, batch.colours[2], NA, batch.colours[3], NA),
+       xaxt="n", ylab="", xlab = "",
+       type="n", lwd=2, ylim = c(0,1.1))
+  xseqgreysep=c(min(xseq)-myspacing/2,apply(rbind(xseq[-1],xseq[-length(xseq)]),2,mean),max(xseq)+myspacing/2)
+  if (background){
+    for (k in seq(1,length(xseqgreysep),by=2)){
+      polygon(x=c(xseqgreysep[k],xseqgreysep[k+1],xseqgreysep[k+1],xseqgreysep[k]),
+              y=c(-10,-10,10,10), col=lighten(annot.colours[annot_sub[k]],0.95), border=NA)
+    }
+    for (k in seq(2,length(xseqgreysep),by=2)){
+      polygon(x=c(xseqgreysep[k],xseqgreysep[k+1],xseqgreysep[k+1],xseqgreysep[k]),
+              y=c(-10,-10,10,10), col=lighten(annot.colours[annot_sub[k]],0.99), border=NA)
+    }
+    box()
   }
+  abline(v=xseqgreysep,lty=1,lwd=0.1,col="grey")
+  par(new = TRUE)
+  plot(prop,
+       col=ifelse(prop>0.1,
+                  c(NA, batch.colours[1],NA, batch.colours[2], NA, batch.colours[3], NA),
+                  alpha(c(NA, batch.colours[1],NA, batch.colours[2],NA, batch.colours[3], NA), 0.5)),
+       xaxt="n", ylab="Proportion detected", xlab = "", cex.lab=1.5,
+       type="h", lwd=2, ylim = c(0,1.1))
   for(i in 1:length(xseq)){
-    axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.8,
+    axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.6,
          col.axis = ifelse(mylabels[i] %in% names(tmp4) & tmp4[mylabels[i]] > 0.1,
-                           darken(annot.colours[(annot_sub)[i]], amount=0.5),"black"))
+                           darken(annot.colours[(annot_sub)[i]], amount=0.5),
+                           ifelse(mylabels[i] %in% names(tmp5) & tmp5[mylabels[i]] > 0.1,
+                                  alpha(darken(annot.colours[(annot_sub)[i]], amount=0.5),0.5),
+                                  "black")))
   }
   xseqblack=c(xseq[!duplicated(annot_sub)]-myspacing/2, max(xseq)+myspacing/2)
-  axis(side=1, line=9, at=xseqblack, labels=NA)
+  abline(v=xseqblack,lty=3,col="black")
+  abline(h = 0.1, lty = 2)
+  axis(side=1, line=7, at=xseqblack, labels=NA)
   tmp=apply(rbind(xseqblack[-length(xseqblack)],xseqblack[-1]),2,mean)
   for (k in 1:length(unique(annot_sub))){
-    axis(side=1, line=9, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
+    axis(side=1, line=7, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2,
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
+  legend("top", lty=1, lwd=2, col=batch.colours[1:3], cex = 0.7,
+         legend = batches[1:3], bg="white", horiz = TRUE)
   dev.off()
 }
+
+# ### Multi-panel ----
+# prop = t(bind_rows(tmp1, tmp2, tmp3, tmp4))
+# prop[which(is.na(prop))] = 0 # Replace NA with 0
+# prop = prop[names(annot),]
+# mylabels = rownames(prop)
+# 
+# myspacing = 1
+# xseq = 1:nrow(prop)
+# annot_sub = annot[mylabels]
+# 
+# {pdf("../Figures/Detection_prop.pdf", width=14, height=11)
+#   par(oma=c(21,0,0,0),mar=c(0,5,1,1), mfrow = c(3,1))
+#   for (i in 1:3){
+#     plot(prop[,i],
+#          col=annot.colours[annot_sub],
+#          xaxt="n", ylab=paste0("Proportion detected"," (", batches[i] ,")"), xlab = "", cex.lab=1.2,
+#          type="h", lwd=2, ylim = c(0,1.1))
+#   }
+#   for(i in 1:length(xseq)){
+#     axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.8)
+#   }
+#   xseqblack=c(xseq[!duplicated(annot_sub)]-myspacing/2, max(xseq)+myspacing/2)
+#   axis(side=1, line=9, at=xseqblack, labels=NA)
+#   tmp=apply(rbind(xseqblack[-length(xseqblack)],xseqblack[-1]),2,mean)
+#   for (k in 1:length(unique(annot_sub))){
+#     axis(side=1, line=9, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
+#          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
+#   }
+#   dev.off()
+# }
+# 
+# {pdf("../Figures/Detection_prop_thresh.pdf", width=14, height=11)
+#   par(oma=c(21,0,0,0),mar=c(0,5,1,1), mfrow = c(3,1))
+#   for (i in 1:3){
+#     plot(prop[,i],
+#          col=ifelse(prop>0.1,annot.colours[annot_sub],alpha(annot.colours[annot_sub], 0.3)),
+#          xaxt="n", ylab=paste0("Proportion detected"," (", batches[i] ,")"), xlab = "", cex.lab=1.2,
+#          type="h", lwd=2, ylim = c(0,1.1))
+#     abline(h = 0.1, lty = 2)
+#   }
+#   for(i in 1:length(xseq)){
+#     axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.8,
+#          col.axis = ifelse(mylabels[i] %in% names(tmp4) & tmp4[mylabels[i]] > 0.1,
+#                            darken(annot.colours[(annot_sub)[i]], amount=0.5),"black"))
+#   }
+#   xseqblack=c(xseq[!duplicated(annot_sub)]-myspacing/2, max(xseq)+myspacing/2)
+#   axis(side=1, line=9, at=xseqblack, labels=NA)
+#   tmp=apply(rbind(xseqblack[-length(xseqblack)],xseqblack[-1]),2,mean)
+#   for (k in 1:length(unique(annot_sub))){
+#     axis(side=1, line=9, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
+#          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
+#   }
+#   dev.off()
+# }
+# 
 
 
 # ### Age distribution ----
