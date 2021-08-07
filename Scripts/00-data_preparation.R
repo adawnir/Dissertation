@@ -5,7 +5,7 @@
 library(openxlsx)
 library(tidyverse)
 
-options(warn = 2)
+options(warn = 2, stringsAsFactors = FALSE)
 ### Prepare data (LUX) ----
 # Initialise
 rm(list=ls())
@@ -49,7 +49,6 @@ colnames(expo)
 colnames(expo) = readLines(paste0("../Dictionaries/Chemical_names_",filepath,".txt"))
 
 ## Chemical compound information
-options(stringsAsFactors = FALSE)
 chem = data.frame(Compound = colnames(expo),
                   Family = unlist(mydata[42,8:ncol(mydata)]),
                   LOQ = as.numeric(gsub("\\*","",mydata[40,8:ncol(mydata)])),
@@ -61,6 +60,7 @@ table(chem$Family, useNA = "ifany")
 chem$Family[which(chem$Family=="PHENYLPYRAZOLES LC")] = "PHENYLPYRAZOLES"
 chem_family = names(annot.colours)
 names(chem_family) = unique(chem$Family)
+
 chem$Family = factor.order(chem_family[chem$Family])
 table(chem$Family, useNA = "ifany")
 
@@ -99,16 +99,18 @@ summary(chem$nd_prop[is.infinite(chem$LOD)]) # never-detected compounds have inf
 # Replace LOD of never-detected compounds with NA
 chem$LOD[which(is.infinite(chem$LOD))] = NA
 
-## Save chemical family annotation as named list
-annot = chem$Family
-names(annot) = rownames(chem)
-ifelse(dir.exists("../Data"),"",dir.create("../Data"))
-saveRDS(annot, "../Data/Chemical_compound_family_annotation.rds")
 
 ifelse(dir.exists(paste0("../Data/",filepath)),"",dir.create(paste0("../Data/",filepath)))
 saveRDS(covars, paste0("../Data/",filepath,"/Participant_covariate_info.rds"))
 saveRDS(chem, paste0("../Data/",filepath,"/Chemical_compound_info.rds"))
 saveRDS(expo, paste0("../Data/",filepath,"/Exposure_matrix_raw.rds"))
+
+## Save chemical family annotation as named list
+annot = chem_family[chem$Family]
+names(annot) = rownames(chem)
+ifelse(dir.exists("../Data"),"",dir.create("../Data"))
+saveRDS(annot, "../Data/Chemical_compound_family_annotation.rds")
+
 
 ### Prepare data (FRA) ----
 # Initialise
