@@ -91,33 +91,33 @@ for (i in 1:length(batches)){
   saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_exposure_covariate_pvals.rds"))
   saveRDS(betas, paste0("../Results/",filepaths[i],"/Univariate_exposure_covariate_betas.rds"))
   
-  # Pooled analysis: by Batch, Region and Department
-  pvals = NULL
-  if (i %in% 4:5){
-    if (i==4){X = covars %>% select(Batch, Region, Department)}
-    if (i==5){X = covars %>% select(Batch)}
-    ncol(expo) * ncol(X) # number of tests
-    betas = pvals = NULL
-    f1='expo[,k] ~ X[,j]'
-    f0='expo[,k] ~ 1'
-    t0=Sys.time()
-    for (j in 1:ncol(X)){
-      for (k in 1:ncol(expo)){
-        model1=lm(as.formula(f1))
-        model0=lm(as.formula(f0))
-        pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
-      }
-    }
-    t1=Sys.time()
-    print(t1-t0)
-    pvals = ifelse(pvals ==0, .Machine$double.xmin, pvals)
-    pvals = matrix(pvals, nrow = ncol(expo), ncol = ncol(X))
-    rownames(pvals)=colnames(expo)
-    colnames(pvals)=colnames(X)
-    # If p-value = 0 replace with smallest double in R
-    saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_exposure_geo_pvals.rds"))
-    # assign(paste0("pvals_",suffix[i]),pvals)
-  }
+  # # Pooled analysis: by Batch, Region and Department
+  # pvals = NULL
+  # if (i %in% 4:5){
+  #   if (i==4){X = covars %>% select(Batch, Region, Department)}
+  #   if (i==5){X = covars %>% select(Batch)}
+  #   ncol(expo) * ncol(X) # number of tests
+  #   betas = pvals = NULL
+  #   f1='expo[,k] ~ X[,j]'
+  #   f0='expo[,k] ~ 1'
+  #   t0=Sys.time()
+  #   for (j in 1:ncol(X)){
+  #     for (k in 1:ncol(expo)){
+  #       model1=lm(as.formula(f1))
+  #       model0=lm(as.formula(f0))
+  #       pvals=c(pvals, anova(model0, model1, test = 'Chisq')$`Pr(>Chi)`[2])
+  #     }
+  #   }
+  #   t1=Sys.time()
+  #   print(t1-t0)
+  #   pvals = ifelse(pvals ==0, .Machine$double.xmin, pvals)
+  #   pvals = matrix(pvals, nrow = ncol(expo), ncol = ncol(X))
+  #   rownames(pvals)=colnames(expo)
+  #   colnames(pvals)=colnames(X)
+  #   # If p-value = 0 replace with smallest double in R
+  #   saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_exposure_geo_pvals.rds"))
+  #   # assign(paste0("pvals_",suffix[i]),pvals)
+  # }
 }
 
 # annot_sub = annot[rownames(pvals_pooled3)]
