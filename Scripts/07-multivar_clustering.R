@@ -87,7 +87,7 @@ tmp = NULL
 for (f in 1:length(families)){
   tmp = c(tmp, abs(covars$Age[covars$Family.ID==families[f]][1]-covars$Age[covars$Family.ID==families[f]][2]))
 }
-X=cbind(X, tmp)
+X=cbind(as.data.frame(X), tmp)
 colnames(X)[ncol(X)] = "age_diff"
 
 if (m==1){
@@ -159,10 +159,54 @@ for (k in 1:ncol(expo)){
     delta = expo[covars$Family.ID==families[f],k]
     tmp[f] = abs(delta[1] - delta [2])
   }
-  X=cbind(X, tmp)
+  X=cbind(X, as.numeric(tmp))
   colnames(X)[ncol(X)] = colnames(expo)[k]
 }
 
 # Save covariates and exposures
 saveRDS(X, paste0("../Results/",filepaths[m],"/Family_covariates_delta_exposures.rds"))
 
+# ### Geographical ----
+# {pdf(paste0("../Figures/",filepaths[m],"/Hierarchical_cont_expo_all_batch.pdf"),width=14)
+#   par(mar=c(0,0,0,0))
+#   plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
+#        tip.color=batch.colours[as.character(covars$Batch)])
+#   dev.off()
+# }
+# {pdf(paste0("../Figures/",filepaths[m],"/Hierarchical_cont_graph_expo_all_batch.pdf"))
+#   g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = batch.colours[as.character(covars$Batch)])
+#   dev.off()
+# }
+# if (m == 4){
+#   families=unique(covars$Region)
+#   mycolours = region.colours
+#   names(mycolours)=families
+#   
+#   {pdf(paste0("../Figures/",filepaths[m],"/Hierarchical_cont_expo_all_region.pdf"),width=14)
+#     par(mar=c(0,0,0,0))
+#     plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
+#          tip.color=region.colours[as.character(covars$Region)])
+#     dev.off()
+#   }
+#   
+#   {pdf(paste0("../Figures/",filepaths[m],"/Hierarchical_cont_graph_expo_all_region.pdf"))
+#     g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = region.colours[as.character(covars$Region)])
+#     legend("bottomright", pch=19, col=region.colours[levels(covars$Region)],
+#            legend=levels(covars$Region), cex = 0.4, ncol = 1)
+#     dev.off()
+#   }
+#   
+#   {pdf(paste0("../Figures/",filepaths[m],"/Hierarchical_cont_expo_all_depart.pdf"),width=14)
+#     par(mar=c(0,0,0,0))
+#     plot(myphylo, direction="downwards", cex=0.5, #srt=180, adj=1,
+#          tip.color=depart.colours[as.character(covars$Department)])
+#     dev.off()
+#   }
+#   
+#   {pdf(paste0("../Figures/",filepaths[m],"/Hierarchical_cont_graph_expo_all_depart.pdf"))
+#     g=ClusteringToGraph(covars=covars, myphylo=myphylo, mycol = depart.colours[as.character(covars$Department)])
+#     legend("bottomright", pch=19, col=depart.colours[levels(covars$Department)],
+#            legend=levels(covars$Department), cex = 0.4, ncol = 1)
+#     dev.off()
+#   }
+# }
