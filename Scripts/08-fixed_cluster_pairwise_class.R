@@ -5,11 +5,16 @@
 library(tidyverse)
 library(RColorBrewer)
 library(colorspace)
+library(focus)
 
 # Initialisation
 rm(list=ls())
-path=dirname(rstudioapi::getActiveDocumentContext()$path)
+path="~/Dissertation/Scripts"
 setwd(path)
+
+## Parameters
+args=commandArgs(trailingOnly=TRUE)
+m=as.numeric(args[1])
 
 # Load custom
 source("functions.R")
@@ -21,7 +26,6 @@ annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 #### Fixed clustering ####
 # Load data
 covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
-# sc = readRDS(paste0("../Results/",filepaths[m],"/Stable_clusters.rds"))
 fc = readRDS(paste0("../Results/",filepaths[m],"/Fixed_clusters.rds"))
 expo  = readRDS(paste0("../Processed/",filepaths[m],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
 print(all(rownames(expo)==rownames(covars)))
@@ -216,7 +220,7 @@ mylabels = gsub("weight_diff","Sample weight difference",mylabels)
 names(pvals)=names(betas)=mylabels
 
 saveRDS(pvals, paste0("../Results/",filepaths[m],"/Fixed_cluster_stranger_class_univar_pvals.rds"))
-saveRDS(betas, paste0("../Results/",filepaths[m],"/Fixed_cluster__stranger_class_univar_betas.rds"))
+saveRDS(betas, paste0("../Results/",filepaths[m],"/Fixed_cluster_stranger_class_univar_betas.rds"))
 
 ### Plotting ----
 annot_sub = annot[which(names(annot) %in% mylabels)]
@@ -251,34 +255,3 @@ mycolours = c(rep(batch.colours[m],length(mylabels)-length(annot_sub)),annot.col
   abline(h = -log10(0.05/ncol(X)), lty = 2, col = "darkred")
   dev.off()
 }
-
-# ncol(expo)
-# betas = pvals = NULL
-# f1='covars$stab_outcome ~ expo[,k]'
-# t0=Sys.time()
-# for (k in 1:ncol(expo)){
-#   model1=lm(as.formula(f1))
-#   betas=c(betas, coefficients(model1)[2])
-#   pvals=c(pvals, summary(model1)$coefficients[2,4])
-# }
-# t1=Sys.time()
-# print(t1-t0)
-# names(pvals)=names(betas)=colnames(expo)
-#
-# annot_sub = annot[names(betas)]
-#
-# ## Volcano plot
-# pdf(paste0("../Figures/",filepaths[m],"/Univariate_stab_misclassified_exposure.pdf"), width = 5, height = 5)
-# par(mar=c(5,5,1,1))
-# plot(betas, -log10(pvals), pch=19,
-#        col=ifelse(pvals < 0.05/length(betas), annot.colours[annot_sub], "grey"),
-#        cex.lab=1, cex = 0.7,
-#        ylim = c(0, max(-log10(pvals))+0.25),
-#        xlim = c(-max(abs(betas))-0.4, max(abs(betas))+0.4),
-#        ylab=expression(-log[10](p)),
-#        xlab=expression(beta))
-# text(betas+sign(betas)*0.1, -log10(pvals)+0.25,
-#      labels = ifelse(pvals < 0.05/length(betas), names(betas), ""),
-#      col = annot.colours[annot_sub])
-# abline(h = -log10(0.05/length(betas)), lty = 2)
-# dev.off()
