@@ -48,6 +48,7 @@ for (m in 1:length(batches)){
   ### Community detection
   # Louvain
   lc = cluster_louvain(mygraph)
+  saveRDS(lc, paste0("../Results/",filepaths[m],"/Graphical_network_children_community.rds"))
   
   # Set cluster colour
   cluster_colour = rainbow(length(unique(lc$membership)), alpha = 0.6)[membership(lc)]
