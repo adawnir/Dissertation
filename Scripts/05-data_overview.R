@@ -59,7 +59,7 @@ length(annot_sub)
 
 ifelse(dir.exists(paste0("../Figures/",filepaths[4])), "", dir.create(paste0("../Figures/",filepaths[4])))
 {pdf(paste0("../Figures/Pooled3/Compound_dist_extract_diff.pdf"))
-  par(mfrow = c(3, 3), oma = c(0.5,0.5,0,0.5), mar = c(2,2,2,1), mgp=c(1,0.05,0))
+  par(mfrow = c(2, 3), oma = c(0.5,0.5,0,0.5), mar = c(2,2,2,1), mgp=c(1,0.05,0))
   for (k in 1:length(annot_sub)){
     var = names(annot_sub)[k]
     print(var)
@@ -141,7 +141,7 @@ annot_sub = annot[mylabels]
 annot_sub = annot[extract_diff$Compound[extract_diff$Compound %in% mylabels]]
 
 {pdf(paste0("../Figures/Pooled3/Compound_dist_log_extract_diff.pdf"))
-  par(mfrow = c(3, 3), oma = c(0.5,0.5,0,0.5), mar = c(2,2,2,1), mgp=c(1,0.05,0))
+  par(mfrow = c(2, 3), oma = c(0.5,0.5,0,0.5), mar = c(2,2,2,1), mgp=c(1,0.05,0))
   for (k in 1:length(annot_sub)){
     var = names(annot_sub)[k]
     print(var)
@@ -221,7 +221,7 @@ annot_sub = annot[mylabels]
 
 annot_sub = annot[extract_diff$Compound[extract_diff$Compound %in% mylabels]]
 {pdf(paste0("../Figures/Pooled3/Compound_dist_log_naimp_extract_diff.pdf"))
-  par(mfrow = c(3, 3), oma = c(0.5,0.5,0,0.5), mar = c(2,2,2,1), mgp=c(1,0.05,0))
+  par(mfrow = c(2, 3), oma = c(0.5,0.5,0,0.5), mar = c(2,2,2,1), mgp=c(1,0.05,0))
   for (k in 1:length(annot_sub)){
     var = names(annot_sub)[k]
     print(var)

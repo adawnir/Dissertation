@@ -29,22 +29,8 @@ covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_inf
 print(all(rownames(expo)==rownames(covars)))
 
 ## Focus: Stability selection based HC
-out = GraphicalModel(t(expo), Lambda=1:nrow(expo), K = 100, tau = 0.5, seed = 290621, implementation = HierarchicalClustering)
+out = Clustering(expo, K = 100, tau = 0.5, seed = 290621)
 # Save outputs
 saveRDS(out, paste0("../Results/",filepaths[m],"/Stability_clustering_output.rds"))
 # Save memberships
-saveRDS(Clusters(out), paste0("../Results/",filepaths[m],"/Cluster_memberships.rds"))
-
-
-### Plotting ----
-summary = NULL
-for (m in 1:length(batches)){
-  # # Load data
-  # expo = readRDS(paste0("../Processed/",filepaths[m],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
-  # covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
-  # print(all(rownames(expo)==rownames(covars)))
-  # 
-  out = readRDS(paste0("../Results/",filepaths[m],"/Stability_clustering_output.rds"))
-  sc = readRDS(paste0("../Results/",filepaths[m],"/Cluster_memberships.rds"))
-  summary = c(summary, max(sc))
-}
+saveRDS(Clusters(out), paste0("../Results/",filepaths[m],"/Stable_clusters.rds"))

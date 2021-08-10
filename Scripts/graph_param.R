@@ -1,3 +1,4 @@
+options(ststringsAsFactors = FALSE)
 # Chemical family
 tmp = c("Organochlorines", "Organophosphate metabolites", "Pyrethroids",
         "Pyrethroid metabolites", "PCBs", "PBDEs", "Acidic herbicides",

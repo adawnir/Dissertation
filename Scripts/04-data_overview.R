@@ -91,7 +91,7 @@ ifelse(dir.exists("../Figures"), "", dir.create("../Figures"))
 ### Overlay ----
 prop = t(bind_rows(tmp1, tmp2, tmp3))
 prop[which(is.na(prop))] = 0 # Replace NA with 0
-prop = prop[order(as.factor(annot[rownames(prop)]),-prop[,1],-prop[,2],-prop[,3]),]
+prop = prop[order(factor.order(annot[rownames(prop)]),-prop[,1],-prop[,2],-prop[,3]),]
 mylabels = rownames(prop)
 prop = cbind(prop[,1],rep(NA,nrow(prop)),prop[,2],rep(NA,nrow(prop)),prop[,3],rep(NA,nrow(prop)),rep(NA,nrow(prop)))
 prop = as.vector(t(prop))

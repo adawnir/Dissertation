@@ -49,7 +49,7 @@ for (i in 1:length(batches)){
     pvals = c(pvals, summary(aov(expo[,k] ~ covars$Family.ID))[[1]]$`Pr(>F)`[1])
   }
   names(pvals) = colnames(expo)
-  saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_sd_family_overall_pvals.pdf"))
+  saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_sd_family_overall_pvals.rds"))
   bonf = 0.05/ncol(expo)
   
   {pdf(paste0("../Figures/",filepaths[i],"/Univariate_sd_family_overall_cont.pdf"), width=14, height=8)
@@ -98,7 +98,7 @@ for (i in 1:length(batches)){
       pvals = c(pvals, summary(aov(expo[,k] ~ covars$Batch))[[1]]$`Pr(>F)`[1])
     }
     names(pvals) = colnames(expo)
-    saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_sd_batch_overall_pvals.pdf"))
+    saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_sd_batch_overall_pvals.rds"))
     
     {pdf(paste0("../Figures/",filepaths[i],"/Univariate_sd_batch_overall_cont.pdf"), width=14, height=8)
       par(mar=c(20,5,1,1))
@@ -151,7 +151,7 @@ for (i in 1:length(batches)){
       pvals = c(pvals, summary(aov(expo[,k] ~ covars$Region))[[1]]$`Pr(>F)`[1])
     }
     names(pvals) = colnames(expo)
-    saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_sd_region_overall_pvals.pdf"))
+    saveRDS(pvals, paste0("../Results/",filepaths[i],"/Univariate_sd_region_overall_pvals.rds"))
     
     {pdf(paste0("../Figures/",filepaths[i],"/Univariate_sd_region_overall_cont.pdf"), width=14, height=8)
       par(mar=c(20,5,1,1))
@@ -182,8 +182,8 @@ for (i in 1:length(batches)){
 }
 
 ## Family vs batch (Pooled3)
-family = readRDS(paste0("../Results/",filepaths[4],"/Univariate_sd_family_overall_pvals.pdf"))
-batch = readRDS(paste0("../Results/",filepaths[4],"/Univariate_sd_batch_overall_pvals.pdf"))
+family = readRDS(paste0("../Results/",filepaths[4],"/Univariate_sd_family_overall_pvals.rds"))
+batch = readRDS(paste0("../Results/",filepaths[4],"/Univariate_sd_batch_overall_pvals.rds"))
 
 annot_sub = annot[names(family)]
 
@@ -209,8 +209,8 @@ annot_sub = annot[names(family)]
 }
 
 ## Family vs batch (Pooled2)
-family = readRDS(paste0("../Results/",filepaths[5],"/Univariate_sd_family_overall_pvals.pdf"))
-batch = readRDS(paste0("../Results/",filepaths[5],"/Univariate_sd_batch_overall_pvals.pdf"))
+family = readRDS(paste0("../Results/",filepaths[5],"/Univariate_sd_family_overall_pvals.rds"))
+batch = readRDS(paste0("../Results/",filepaths[5],"/Univariate_sd_batch_overall_pvals.rds"))
 
 annot_sub = annot[names(family)]
 
@@ -236,8 +236,8 @@ annot_sub = annot[names(family)]
 }
 
 ## Family vs Region (Pooled3)
-family = readRDS(paste0("../Results/",filepaths[4],"/Univariate_sd_family_overall_pvals.pdf"))
-region = readRDS(paste0("../Results/",filepaths[4],"/Univariate_sd_region_overall_pvals.pdf"))
+family = readRDS(paste0("../Results/",filepaths[4],"/Univariate_sd_family_overall_pvals.rds"))
+region = readRDS(paste0("../Results/",filepaths[4],"/Univariate_sd_region_overall_pvals.rds"))
 
 annot_sub = annot[names(family)]
 
@@ -263,8 +263,8 @@ annot_sub = annot[names(family)]
 }
 
 ## Family vs Region (France)
-family = readRDS(paste0("../Results/",filepaths[2],"/Univariate_sd_family_overall_pvals.pdf"))
-region = readRDS(paste0("../Results/",filepaths[2],"/Univariate_sd_region_overall_pvals.pdf"))
+family = readRDS(paste0("../Results/",filepaths[2],"/Univariate_sd_family_overall_pvals.rds"))
+region = readRDS(paste0("../Results/",filepaths[2],"/Univariate_sd_region_overall_pvals.rds"))
 
 annot_sub = annot[names(family)]
 
