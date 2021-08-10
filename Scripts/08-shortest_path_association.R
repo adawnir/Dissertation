@@ -102,7 +102,7 @@ X = model.matrix(~., X)[,-1]
 
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
-saveRDS(stab, paste0("../Results/",filepaths[m],"/Shortest_path_univar_stab.rds"))
+saveRDS(stab, paste0("../Results/",filepaths[m],"/Shortest_path_multivar_output.rds"))
 
 ### Plotting ----
 # pdf(paste0("../Figures/",filepaths[m],"/Shortest_path_multivariate_output.pdf"))

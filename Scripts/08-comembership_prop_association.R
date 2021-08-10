@@ -113,7 +113,7 @@ X = model.matrix(~., X)[,-1]
 
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
-saveRDS(stab, paste0("../Results/",filepaths[m],"/Comembership_prop_univar_stab.rds"))
+saveRDS(stab, paste0("../Results/",filepaths[m],"/Comembership_prop_multivar_output.rds"))
 
 ### Plotting ----
 # pdf(paste0("../Figures/",filepaths[m],"/Comembership_prop_multivariate_output.pdf"))
