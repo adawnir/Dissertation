@@ -75,6 +75,8 @@ mylabels = gsub("length_mu","Mean sample length",mylabels)
 mylabels = gsub("length_diff","Sample length difference",mylabels)
 mylabels = gsub("weight_mu","Mean sample weight",mylabels)
 mylabels = gsub("weight_diff","Sample weight difference",mylabels)
+mylabels = gsub("region","Île-de-France (Y/N)",mylabels)
+
 
 names(pvals)=names(betas)=mylabels
 
@@ -142,6 +144,7 @@ mylabels = gsub("length_mu","Mean sample length",mylabels)
 mylabels = gsub("length_diff","Sample length difference",mylabels)
 mylabels = gsub("weight_mu","Mean sample weight",mylabels)
 mylabels = gsub("weight_diff","Sample weight difference",mylabels)
+mylabels = gsub("region","Same region (Y/N)",mylabels)
 
 names(pvals)=names(betas)=mylabels
 

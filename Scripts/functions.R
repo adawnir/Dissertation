@@ -56,24 +56,24 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=1
   if (is.null(comp)){
     comp=matrix(c(1,2,1,3,2,3), byrow=TRUE, ncol=2)
   }
-  if (isTRUE(segments)){
+  if (segments){
     compare = sapply(type, function(x) x==type)
     compare[which(type=="Isolated"),which(type=="Isolated")] = FALSE
     compare[lower.tri(compare, diag = TRUE)] = NA
     start = which(compare, arr.ind=TRUE)[,1]
     end = which(compare, arr.ind=TRUE)[,2]
   }
-  if (isTRUE(legend)){
-    extra = 2.5
+  if (legend){
+    extra = ceiling(length(mycolours)/25)*1.2
   } else {
     extra = 0
   }
   if (!is.null(filename)){
     pdf(paste0(filename), width=15+extra, height=5) 
   }
-  if (isTRUE(legend)){
+  if (legend){
     par(mar = c(5,5,1,1))
-    layout(matrix(c(1,2,3,4), 1, 4, byrow = TRUE), widths=c(2,2,2,1))
+    layout(matrix(c(1,2,3,4), 1, 4, byrow = TRUE), widths=c(2,2,2,extra/5))
   } else {
     par(mar = c(5,5,1,1), mfrow = c(1,3))
   }
@@ -86,12 +86,12 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=1
          xlab=paste0("Comp ",xcomp," (", round(ev[xcomp], digits=2), "% e.v.)"),
          ylab=paste0("Comp ",ycomp," (", round(ev[ycomp], digits=2), "% e.v.)"),
          cex.lab = 1.5)
-    if (isTRUE(segments)){
+    if (segments){
       segments(S[start,1],S[start,2],S[end,1],S[end,2], col = alpha("grey",0.5))
     }
     points(S, pch=pch, cex=1.2, col=mycolours[type])
     families = unique(type)
-    if (isTRUE(ellipse)){
+    if (ellipse){
       for (f in 1:length(families)){
         tmpmat=S[type==families[f],]
         if (!is.null(nrow(tmpmat))){
@@ -108,7 +108,7 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=1
     abline(v=axTicks(1), lty=3, col="grey")
     abline(h=axTicks(2), lty=3, col="grey")
   }
-  if (isTRUE(legend)){
+  if (legend){
     par(mar = c(1,1,1,1))
     plot(0, 0, type = 'l', bty = 'n', xaxt = 'n', yaxt = 'n', xlab = "", ylab = "")
     legend("left", col=mycolours, ncol = ceiling(length(mycolours)/25),
@@ -122,7 +122,7 @@ CreateScorePlot=function(mypca, filename=NULL, type, mycolours, comp=NULL, pch=1
 
 # Creat PLS-DA score plot
 CreateScorePlot.plsda=function(myplsda, filename=NULL, type1, type2, mycolours, comp=NULL, cex = 1.5, pch=19,
-                               legend = TRUE, legend_text = NULL, legend_type1 = TRUE){
+                               legend = TRUE){
   if (is.null(comp)){
     comp=matrix(c(1,2,1,3,2,3), byrow=TRUE, ncol=2)
   }
@@ -136,17 +136,17 @@ CreateScorePlot.plsda=function(myplsda, filename=NULL, type1, type2, mycolours, 
   compare2[lower.tri(compare2, diag = TRUE)] = NA
   start2 = which(compare2, arr.ind=TRUE)[,1]
   end2 = which(compare2, arr.ind=TRUE)[,2]
-  if (isTRUE(legend)){
-    extra = 2.5
+  if (legend){
+    extra = ceiling(length(mycolours)/25)*1.2
   } else {
     extra = 0
   }
   if (!is.null(filename)){
     pdf(paste0(filename), width=15+extra, height=5) 
   }
-  if (isTRUE(legend)){
+  if (legend){
     par(mar = c(5,5,1,1))
-    layout(matrix(c(1,2,3,4), 1, 4, byrow = TRUE), widths=c(2,2,2,1))
+    layout(matrix(c(1,2,3,4), 1, 4, byrow = TRUE), widths=c(2,2,2,extra/5))
   } else {
     par(mar = c(5,5,1,1), mfrow = c(1,3))
   }
@@ -179,14 +179,11 @@ CreateScorePlot.plsda=function(myplsda, filename=NULL, type1, type2, mycolours, 
     abline(v=axTicks(1), lty=3, col="grey")
     abline(h=axTicks(2), lty=3, col="grey")
   }
-  if (isTRUE(legend)){
+  if (legend){
     par(mar = c(1,1,1,1))
     plot(0, 0, type = 'l', bty = 'n', xaxt = 'n', yaxt = 'n', xlab = "", ylab = "")
-    if (isTRUE(legend_type1)){
     legend("left", col=mycolours, ncol = ceiling(length(mycolours)/25),
            pch=pch, pt.cex=cex, legend=names(mycolours), bty = "n", cex = 1.2)
-      }
-    legend("topleft", legend=legend_text, bty = "n", cex = 1.2)
   }
   if (!is.null(filename)){
     print("Saved to filename")
@@ -203,7 +200,7 @@ ClusteringToGraph=function(covars,myphylo,mycol=NULL,verbose = TRUE){
   graph_layout = layout_with_kk(graph_net)
   nobs = nrow(expo)
   
-  if (isTRUE(verbose)){
+  if (verbose){
     par(mar=c(0,1,0,1))
     plot(graph_layout[,1], graph_layout[,2], type = "n", axes = FALSE,
          xlab = "", ylab = "")

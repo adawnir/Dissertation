@@ -46,6 +46,9 @@ for (f in 1:length(families)){
 
 if (m==1){
   X = covars %>% select(Age, Gender, Length, Weight)
+} else if(m %in% c(2,4)) {
+  X = covars %>% select(Age, Gender, Region) %>%
+    mutate(Region = ifelse(Region=="Île-de-France","Yes","No"))
 } else {X = covars %>% select(Age, Gender)}
 
 X = cbind(X, expo)

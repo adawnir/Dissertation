@@ -1,4 +1,4 @@
-## Clustering membership
+## Consensus clustering
 ## Rin Wada 22 July
 
 # Load packages
@@ -8,7 +8,6 @@ library(tidyverse)
 library(RColorBrewer)
 library(focus)
 
-### Cluster membership ascertainment ----
 # Initialisation
 rm(list=ls())
 path="~/Dissertation/Scripts"
