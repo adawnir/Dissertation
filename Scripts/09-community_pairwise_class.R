@@ -92,10 +92,10 @@ X = model.matrix(~., X)[,-1]
 
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
-saveRDS(stab, paste0("../Results/",filepaths[m],"/Community_class_cluster.rds"))
+saveRDS(stab, paste0("../Results/",filepaths[m],"/Community_family_class_multivar_output.rds"))
 
 
-### Pair-wise covariates and delta exposures ----
+### Stranger metrics----
 compare_lc = sapply(lc, function(x) x==lc)
 rownames(compare_lc)=colnames(compare_lc)=rownames(covars)
 compare_lc = compare_lc[lower.tri(compare_lc)]
@@ -122,7 +122,7 @@ betas = pvals = NULL
 f1='Y ~ X[,k]'
 t0=Sys.time()
 for (k in 1:ncol(X)){
-  Y = fclass
+  Y = sclass
   model1=lm(as.formula(f1))
   if(colnames(X)[k] == "gender_diff"){
     betas=c(betas, coefficients(model1)[2:length(coefficients(model1))])
@@ -152,3 +152,14 @@ names(pvals)=names(betas)=mylabels
 
 saveRDS(pvals, paste0("../Results/",filepaths[m],"/Community_stranger_class_univar_pvals.rds"))
 saveRDS(betas, paste0("../Results/",filepaths[m],"/Community_stranger_class_univar_betas.rds"))
+
+### Multivariate analysis using stability selection sPLS regression ----
+
+Y = sclass[complete.cases(X)]
+X = X[complete.cases(X),]
+X = model.matrix(~., X)[,-1]
+
+stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
+
+saveRDS(stab, paste0("../Results/",filepaths[m],"/Community_stranger_class_multivar_output.rds"))
+

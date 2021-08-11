@@ -72,8 +72,8 @@ length(betas)==length(mylabels)
 
 names(pvals)=names(betas)=mylabels
 
-saveRDS(pvals, paste0("../Results/",filepaths[m],"/Community_cluster_class_univar_pvals.rds"))
-saveRDS(betas, paste0("../Results/",filepaths[m],"/Community_cluster_class_univar_betas.rds"))
+saveRDS(pvals, paste0("../Results/",filepaths[m],"/Community_class_univar_pvals.rds"))
+saveRDS(betas, paste0("../Results/",filepaths[m],"/Community_class_univar_betas.rds"))
 
 ### Multivariate analysis using stability selection sPLS regression ----
 

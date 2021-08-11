@@ -89,7 +89,26 @@ X = model.matrix(~., X)[,-1]
 
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
-saveRDS(stab, paste0("../Results/",filepaths[m],"/Fixed_cluster_class_stab.rds"))
+saveRDS(stab, paste0("../Results/",filepaths[m],"/Fixed_cluster_family_class_multivar_output.rds"))
+
+
+### Stranger metrics ----
+compare_fc = sapply(fc, function(x) x==fc)
+rownames(compare_fc)=colnames(compare_fc)=rownames(covars)
+compare_fc = compare_fc[lower.tri(compare_fc)]
+
+compare_family = sapply(covars$Family.ID, function(x) x==covars$Family.ID)
+rownames(compare_family)=colnames(compare_family)=rownames(covars)
+compare_family = compare_family[lower.tri(compare_family)]
+
+pairs = sapply(rownames(covars), function(x) paste0(x,"--",rownames(covars)))
+pairs = pairs[lower.tri(pairs)]
+
+sclass = ifelse((!compare_fc & !compare_family), 1,
+                ifelse((compare_fc & !compare_family), 0, NA))
+names(sclass) = pairs
+mygrep = !is.na(sclass)
+sclass = sclass[mygrep]
 
 ### Univariate analysis----
 X = readRDS(paste0("../Results/",filepaths[m],"/Stranger_covariates_delta_exposures.rds"))
@@ -129,3 +148,12 @@ names(pvals)=names(betas)=mylabels
 saveRDS(pvals, paste0("../Results/",filepaths[m],"/Fixed_cluster_stranger_class_univar_pvals.rds"))
 saveRDS(betas, paste0("../Results/",filepaths[m],"/Fixed_cluster_stranger_class_univar_betas.rds"))
 
+### Multivariate analysis using stability selection sPLS regression ----
+
+Y = fclass[complete.cases(X)]
+X = X[complete.cases(X),]
+X = model.matrix(~., X)[,-1]
+
+stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
+
+saveRDS(stab, paste0("../Results/",filepaths[m],"/Fixed_cluster_stranger_class_multivar_output.rds"))
