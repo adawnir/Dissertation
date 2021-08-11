@@ -6,6 +6,7 @@ library(tidyverse)
 library(RColorBrewer)
 library(colorspace)
 library(focus)
+library(igraph)
 
 # Initialisation
 rm(list=ls())
@@ -34,13 +35,13 @@ print(all(names(lc)==rownames(covars)))
 families=unique(covars$Family.ID)
 lc = membership(lc)
 
-lclass=rep(NA, length(families))
+fclass=rep(NA, length(families))
 for (f in 1:length(families)){
   tmp=lc[covars$Family.ID==families[f]]
   if (length(unique(tmp))==1){
-    lclass[f] = 1
+    fclass[f] = 1
   } else {
-    lclass[f] = 0
+    fclass[f] = 0
   }
 }
 
@@ -51,7 +52,7 @@ betas = pvals = NULL
 f1='Y ~ X[,k]'
 t0=Sys.time()
 for (k in 1:ncol(X)){
-  Y = lclass
+  Y = fclass
   model1=lm(as.formula(f1))
   if(colnames(X)[k] == "gender_diff"){
     betas=c(betas, coefficients(model1)[2:length(coefficients(model1))])
@@ -82,43 +83,9 @@ names(pvals)=names(betas)=mylabels
 saveRDS(pvals, paste0("../Results/",filepaths[m],"/Community_family_class_univar_pvals.rds"))
 saveRDS(betas, paste0("../Results/",filepaths[m],"/Community_family_class_univar_betas.rds"))
 
-### Plotting ----
-# annot_sub = annot[which(names(annot) %in% mylabels)]
-# 
-# mycolours = c(rep(batch.colours[m],length(mylabels)-length(annot_sub)),annot.colours[annot_sub])
-# 
-# {pdf(paste0("../Figures/",filepaths[m],"/Community_family_class_univariate.pdf"))
-#   par(mar=c(5,5,1,1))
-#   plot(betas, -log10(pvals), pch=19,
-#        col=ifelse(pvals < 0.05, mycolours, "grey"),
-#        cex.lab=1.5, cex = 0.7,
-#        ylim = c(0, max(-log10(pvals))+0.25),
-#        xlim = c(-max(abs(betas))-0.05, max(abs(betas))+0.05),
-#        ylab=expression(-log[10](p)), 
-#        xlab=expression(beta))
-#   for (k in 1:length(mylabels)){
-#     if(mylabels[k] %in% names(annot_sub)){
-#       if(pvals[k] < 0.05){
-#         label = substitute(Delta~tmp, list(tmp=mylabels[k]))
-#         text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-#              labels = label, col = mycolours[k])
-#       }
-#     }
-#     else {
-#       text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-#            labels = mylabels[k], col = mycolours[k]) 
-#     }
-#   }
-#   text(max(abs(betas))+0.04, -log10(0.05/ncol(X))+0.01,
-#        paste0("Bonferroni threshold = ",formatC(0.05/ncol(X), digits = 2, format = "e")),
-#        adj = c(1,0), col = "darkred")
-#   abline(h = -log10(0.05/ncol(X)), lty = 2, col = "darkred", cex = 0.6)
-#   dev.off()
-# }
-
 ### Multivariate analysis using stability selection sPLS regression ----
 
-Y = lclass[complete.cases(X)]
+Y = fclass[complete.cases(X)]
 X = X[complete.cases(X),]
 X = model.matrix(~., X)[,-1]
 
@@ -139,11 +106,11 @@ compare_family = compare_family[lower.tri(compare_family)]
 pairs = sapply(rownames(covars), function(x) paste0(x,"--",rownames(covars)))
 pairs = pairs[lower.tri(pairs)]
 
-lclass = ifelse((!compare_lc & !compare_family), 1,
+sclass = ifelse((!compare_lc & !compare_family), 1,
                 ifelse((compare_lc & !compare_family), 0, NA))
-names(lclass) = pairs
-mygrep = !is.na(lclass)
-lclass = lclass[mygrep]
+names(sclass) = pairs
+mygrep = !is.na(sclass)
+sclass = sclass[mygrep]
 
 # Load covariates and exposures
 X = readRDS(paste0("../Results/",filepaths[m],"/Stranger_covariates_delta_exposures.rds"))
@@ -154,7 +121,7 @@ betas = pvals = NULL
 f1='Y ~ X[,k]'
 t0=Sys.time()
 for (k in 1:ncol(X)){
-  Y = lclass
+  Y = fclass
   model1=lm(as.formula(f1))
   if(colnames(X)[k] == "gender_diff"){
     betas=c(betas, coefficients(model1)[2:length(coefficients(model1))])
@@ -184,37 +151,3 @@ names(pvals)=names(betas)=mylabels
 
 saveRDS(pvals, paste0("../Results/",filepaths[m],"/Community_stranger_class_univar_pvals.rds"))
 saveRDS(betas, paste0("../Results/",filepaths[m],"/Community_stranger_class_univar_betas.rds"))
-
-# ### Plotting ----
-# annot_sub = annot[which(names(annot) %in% mylabels)]
-# 
-# mycolours = c(rep(batch.colours[m],length(mylabels)-length(annot_sub)),annot.colours[annot_sub])
-# 
-# {pdf(paste0("../Figures/",filepaths[m],"/Community_class_univariate.pdf"))
-#   par(mar=c(5,5,1,1))
-#   plot(betas, -log10(pvals), pch=19,
-#        col=ifelse(pvals < 0.05, mycolours, "grey"),
-#        cex.lab=1.5, cex = 0.7,
-#        ylim = c(0, max(-log10(pvals))+0.25),
-#        xlim = c(-max(abs(betas))-0.05, max(abs(betas))+0.05),
-#        ylab=expression(-log[10](p)),
-#        xlab=expression(beta))
-#   for (k in 1:length(mylabels)){
-#     if(mylabels[k] %in% names(annot_sub)){
-#       if(pvals[k] < 0.05/ncol(X)){
-#         label = substitute(Delta~tmp, list(tmp=mylabels[k]))
-#         text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-#              labels = label, col = mycolours[k])
-#       }
-#     }
-#     else {
-#       text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-#            labels = mylabels[k], col = mycolours[k])
-#     }
-#   }
-#   text(max(abs(betas))+0.04, -log10(0.05/ncol(X))+0.01,
-#        paste0("Bonferroni threshold = ",formatC(0.05/ncol(X), digits = 2, format = "e")),
-#        adj = c(1,0), col = "darkred", cex = 0.6)
-#   abline(h = -log10(0.05/ncol(X)), lty = 2, col = "darkred")
-#   dev.off()
-# }
