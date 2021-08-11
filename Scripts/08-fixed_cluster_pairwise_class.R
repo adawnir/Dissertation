@@ -80,41 +80,7 @@ names(pvals)=names(betas)=mylabels
 
 saveRDS(pvals, paste0("../Results/",filepaths[m],"/Fixed_cluster_family_class_univar_pvals.rds"))
 saveRDS(betas, paste0("../Results/",filepaths[m],"/Fixed_cluster_family_class_univar_betas.rds"))
-
-### Plotting ----
-# annot_sub = annot[which(names(annot) %in% mylabels)]
-# 
-# mycolours = c(rep(batch.colours[m],length(mylabels)-length(annot_sub)),annot.colours[annot_sub])
-# 
-# {pdf(paste0("../Figures/",filepaths[m],"/Fixed_cluster_family_class_univariate.pdf"))
-#   par(mar=c(5,5,1,1))
-#   plot(betas, -log10(pvals), pch=19,
-#        col=ifelse(pvals < 0.05, mycolours, "grey"),
-#        cex.lab=1.5, cex = 0.7,
-#        ylim = c(0, max(-log10(pvals))+0.25),
-#        xlim = c(-max(abs(betas))-0.05, max(abs(betas))+0.05),
-#        ylab=expression(-log[10](p)), 
-#        xlab=expression(beta))
-#   for (k in 1:length(mylabels)){
-#     if(mylabels[k] %in% names(annot_sub)){
-#       if(pvals[k] < 0.05){
-#         label = substitute(Delta~tmp, list(tmp=mylabels[k]))
-#         text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-#              labels = label, col = mycolours[k])
-#       }
-#     }
-#     else {
-#       text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-#            labels = mylabels[k], col = mycolours[k]) 
-#     }
-#   }
-#   text(max(abs(betas))+0.04, -log10(0.05/ncol(X))+0.01,
-#        paste0("Bonferroni threshold = ",formatC(0.05/ncol(X), digits = 2, format = "e")),
-#        adj = c(1,0), col = "darkred")
-#   abline(h = -log10(0.05/ncol(X)), lty = 2, col = "darkred", cex = 0.6)
-#   dev.off()
-# }
-
+xs
 ### Multivariate analysis using stability selection sPLS regression ----
 
 Y = fclass[complete.cases(X)]
@@ -125,68 +91,9 @@ stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
 saveRDS(stab, paste0("../Results/",filepaths[m],"/Fixed_cluster_class_stab.rds"))
 
-
-### Pair-wise covariates and delta exposures ----
-compare_fc = sapply(fc, function(x) x==fc)
-rownames(compare_fc)=colnames(compare_fc)=rownames(covars)
-compare_fc = compare_fc[lower.tri(compare_fc)]
-
-compare_family = sapply(covars$Family.ID, function(x) x==covars$Family.ID)
-rownames(compare_family)=colnames(compare_family)=rownames(covars)
-compare_family = compare_family[lower.tri(compare_family)]
-
-pairs = sapply(rownames(covars), function(x) paste0(x,"--",rownames(covars)))
-pairs = pairs[lower.tri(pairs)]
-
-sclass = ifelse((!compare_fc & !compare_family), 1,
-                ifelse((compare_fc & !compare_family), 0, NA))
-names(sclass) = pairs
-mygrep = !is.na(sclass)
-sclass = sclass[mygrep]
-
-tmp = combn(nrow(covars), 2, function(x) mean(covars$Age[x[1]], covars$Age[x[2]]))
-X=matrix(tmp[mygrep], nrow = length(sclass))
-colnames(X)[ncol(X)] = "age_mu"
-rownames(X) = names(sclass)
-
-X=cbind(as.data.frame(X), as.numeric(dist(covars$Age))[mygrep])
-colnames(X)[ncol(X)] = "age_diff"
-
-if (m==1){
-  tmp = combn(nrow(covars), 2, function(x) mean(covars$Weight[x[1]], covars$Weight[x[2]]))
-  X=cbind(X, tmp[mygrep])
-  colnames(X)[ncol(X)] = "weight_mu"
-  
-  X=cbind(X, as.numeric(dist(covars$Weight))[mygrep])
-  colnames(X)[ncol(X)] = "weight_diff"
-  
-  tmp = combn(nrow(covars), 2, function(x) mean(covars$Length[x[1]], covars$Length[x[2]]))
-  X=cbind(X, tmp[mygrep])
-  colnames(X)[ncol(X)] = "length_mu"
-  
-  X=cbind(X, as.numeric(dist(covars$Length))[mygrep])
-  colnames(X)[ncol(X)] = "length_diff"
-}
-
-gender = combn(nrow(covars), 2, function(x) as.character(covars$Gender)[x])
-tmp = apply(gender, 2,
-            function(x) ifelse(sum(is.na(x))>0, NA,
-                               ifelse(length(unique(x))>1,"Different gender",
-                                      ifelse(unique(x)=="Male", "All male", "All female"))))
-X=cbind(X, tmp[mygrep])
-colnames(X)[ncol(X)] = "gender_diff"
-
-## Delta exposure
-for (k in 1:ncol(expo)){
-  X=cbind(X, as.numeric(dist(expo[,k]))[mygrep])
-  colnames(X)[ncol(X)] = colnames(expo)[k]
-}
-
-# Save covariates and exposures
-saveRDS(X, paste0("../Results/",filepaths[m],"/Stranger_covariates_delta_exposures.rds"))
-
-
 ### Univariate analysis----
+X = readRDS(paste0("../Results/",filepaths[m],"/Stranger_covariates_delta_exposures.rds"))
+
 betas = pvals = NULL
 f1='Y ~ X[,k]'
 t0=Sys.time()
@@ -222,36 +129,3 @@ names(pvals)=names(betas)=mylabels
 saveRDS(pvals, paste0("../Results/",filepaths[m],"/Fixed_cluster_stranger_class_univar_pvals.rds"))
 saveRDS(betas, paste0("../Results/",filepaths[m],"/Fixed_cluster_stranger_class_univar_betas.rds"))
 
-### Plotting ----
-annot_sub = annot[which(names(annot) %in% mylabels)]
-
-mycolours = c(rep(batch.colours[m],length(mylabels)-length(annot_sub)),annot.colours[annot_sub])
-
-{pdf(paste0("../Figures/",filepaths[m],"/Fixed_cluster_class_univariate.pdf"))
-  par(mar=c(5,5,1,1))
-  plot(betas, -log10(pvals), pch=19,
-       col=ifelse(pvals < 0.05, mycolours, "grey"),
-       cex.lab=1.5, cex = 0.7,
-       ylim = c(0, max(-log10(pvals))+0.25),
-       xlim = c(-max(abs(betas))-0.05, max(abs(betas))+0.05),
-       ylab=expression(-log[10](p)),
-       xlab=expression(beta))
-  for (k in 1:length(mylabels)){
-    if(mylabels[k] %in% names(annot_sub)){
-      if(pvals[k] < 0.05/ncol(X)){
-        label = substitute(Delta~tmp, list(tmp=mylabels[k]))
-        text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-             labels = label, col = mycolours[k])
-      }
-    }
-    else {
-      text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-           labels = mylabels[k], col = mycolours[k])
-    }
-  }
-  text(max(abs(betas))+0.04, -log10(0.05/ncol(X))+0.01,
-       paste0("Bonferroni threshold = ",formatC(0.05/ncol(X), digits = 2, format = "e")),
-       adj = c(1,0), col = "darkred", cex = 0.6)
-  abline(h = -log10(0.05/ncol(X)), lty = 2, col = "darkred")
-  dev.off()
-}
