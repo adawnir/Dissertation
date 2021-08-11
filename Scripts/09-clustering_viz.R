@@ -21,7 +21,7 @@ source("graph_param.R")
 perf = NULL
 for (m in 1:length(batches)){# Load data
 sc = readRDS(paste0("../Results/",filepaths[m],"/Stable_clusters.rds"))
-stab = readRDS(paste0("../Results/",filepaths[m],"/Stability_clustering_output.rds"))
+stab = readRDS(paste0("../Results/",filepaths[m],"/Consensus_clustering_output.rds"))
 covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
 expo = readRDS(paste0("../Processed/",filepaths[m],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
 
@@ -45,7 +45,7 @@ myplsda = plsda(expo, as.factor(sc), ncomp = 3)
 
 CreateScorePlot.plsda(myplsda=myplsda, type1=sc, type2=covars$Family.ID,
                       mycolours=mycolours,
-                      filename=paste0("../Figures/",filepaths[m],"/Stable_cluster_PLSDA_score_plot.pdf"))
+                      filename=paste0("../Figures/",filepaths[m],"/Consensus_clustering_PLSDA_score_plot.pdf"))
 
 myadjacency = Adjacency(stab)
 mynode_colour = family.colours[as.character(covars$Family.ID)]
@@ -68,7 +68,7 @@ V(mygraph)$size = 9
 V(mygraph)$label.cex = 0.7
 
 # Plot clusters in graph
-pdf(paste0("../Figures/",filepaths[m],"/Stable_cluster_graph.pdf"))
+pdf(paste0("../Figures/",filepaths[m],"/Consensus_clustering_graph.pdf"))
 par(mar=c(0,0,0,5), xpd = TRUE)
 set.seed(1)
 plot(mygraph,
@@ -82,7 +82,7 @@ legend("right",pch=19, inset = c(-0.15,0),
        ncol = ceiling(length(unique(cluster_colour))/10), bty = "n")
 dev.off()
 }
-saveRDS(perf, "../Results/Stab_cluster_performance.rds")
+saveRDS(perf, "../Results/Consensus_clustering_performance.rds")
 
 # sclc = cluster_louvain(mygraph)
 # set.seed(1)
