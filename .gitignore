@@ -1,6 +1,7 @@
 # Data
 /Data
 /Processed
+/Packages
 *.xlsm
 *.xlsx
 *.rds
