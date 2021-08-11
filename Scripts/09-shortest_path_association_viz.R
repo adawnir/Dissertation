@@ -134,8 +134,6 @@ m = 5
 }
 
 ## Univariate vs Multivariate
-m = 2
-m = 5
 {
   X = readRDS(paste0("../Results/",filepaths[m],"/Family_covariates_delta_exposures.rds"))
   pvals = readRDS(paste0("../Results/",filepaths[m],"/Shortest_path_univar_pvals.rds"))
