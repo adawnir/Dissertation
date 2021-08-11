@@ -1,6 +1,8 @@
 ## Graphical Lasso Network
 ## Rin on 14 July 
 
+options(warn=0)
+
 ## Load packages
 library(tidyverse)
 library(igraph)
@@ -29,6 +31,9 @@ suffix = c("lux","fra","gs","pooled3","pooled2")
 expo = readRDS(paste0("../Processed/",filepaths[m],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
 covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh.rds"))
 print(all(rownames(expo)==rownames(covars)))
+
+# Standardisaiton
+expo = scale(expo)
 
 # Running stability selection
 t0=Sys.time()
