@@ -33,14 +33,14 @@ print(all(names(sc)==rownames(covars)))
 
 families=unique(covars$Family.ID)
 
-sclass=NULL
+fclass=NULL
 for (f in 1:length(families)){
   mygrep = c(f, f*2)
   tmp=sc[covars$Family.ID==families[f]]
   if (length(unique(tmp))==1){
-    sclass = c(sclass,rep(1,2))
+    fclass = c(fclass,rep(1,2))
   } else {
-    sclass = c(sclass,rep(0,2))
+    fclass = c(fclass,rep(0,2))
   }
 }
 
@@ -55,7 +55,7 @@ betas = pvals = NULL
 f1='Y ~ X[,k]'
 t0=Sys.time()
 for (k in 1:ncol(X)){
-  Y = sclass
+  Y = fclass
   model1=lm(as.formula(f1))
   betas=c(betas, coefficients(model1)[2])
   pvals=c(pvals, summary(model1)$coefficients[2,4])
@@ -72,48 +72,13 @@ names(pvals)=names(betas)=mylabels
 saveRDS(pvals, paste0("../Results/",filepaths[m],"/Stable_cluster_class_univar_pvals.rds"))
 saveRDS(betas, paste0("../Results/",filepaths[m],"/Stable_cluster_class_univar_betas.rds"))
 
-### Plotting ----
-# annot_sub = annot[which(names(annot) %in% mylabels)]
-# 
-# mycolours = c(rep(batch.colours[m],length(mylabels)-length(annot_sub)),annot.colours[annot_sub])
-# 
-# {pdf(paste0("../Figures/",filepaths[m],"/Stable_cluster_family_class_univariate.pdf"))
-#   par(mar=c(5,5,1,1))
-#   plot(betas, -log10(pvals), pch=19,
-#        col=ifelse(pvals < 0.05, mycolours, "grey"),
-#        cex.lab=1.5, cex = 0.7,
-#        ylim = c(0, max(-log10(pvals))+0.25),
-#        xlim = c(-max(abs(betas))-0.05, max(abs(betas))+0.05),
-#        ylab=expression(-log[10](p)), 
-#        xlab=expression(beta))
-#   for (k in 1:length(mylabels)){
-#     if(mylabels[k] %in% names(annot_sub)){
-#       if(pvals[k] < 0.05){
-#         label = substitute(Delta~tmp, list(tmp=mylabels[k]))
-#         text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-#              labels = label, col = mycolours[k])
-#       }
-#     }
-#     else {
-#       text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-#            labels = mylabels[k], col = mycolours[k]) 
-#     }
-#   }
-#   text(max(abs(betas))+0.04, -log10(0.05/ncol(X))+0.01,
-#        paste0("Bonferroni threshold = ",formatC(0.05/ncol(X), digits = 2, format = "e")),
-#        adj = c(1,0), col = "darkred")
-#   abline(h = -log10(0.05/ncol(X)), lty = 2, col = "darkred", cex = 0.6)
-#   dev.off()
-# }
-
 ### Multivariate analysis using stability selection sPLS regression ----
 
-Y = sclass[complete.cases(X)]
+Y = fclass[complete.cases(X)]
 X = X[complete.cases(X),]
 X = model.matrix(~., X)[,-1]
 
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
 saveRDS(stab, paste0("../Results/",filepaths[m],"/Stable_cluster_class__multivar_output.rds"))
-
 
