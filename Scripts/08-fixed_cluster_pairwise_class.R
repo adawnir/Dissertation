@@ -80,7 +80,7 @@ names(pvals)=names(betas)=mylabels
 
 saveRDS(pvals, paste0("../Results/",filepaths[m],"/Fixed_cluster_family_class_univar_pvals.rds"))
 saveRDS(betas, paste0("../Results/",filepaths[m],"/Fixed_cluster_family_class_univar_betas.rds"))
-xs
+
 ### Multivariate analysis using stability selection sPLS regression ----
 
 Y = fclass[complete.cases(X)]
