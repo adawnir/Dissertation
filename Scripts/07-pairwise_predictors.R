@@ -6,7 +6,7 @@ library(tidyverse)
 
 # Initialisation
 rm(list=ls())
-path="~/HDAML/Dissertation/Scripts"
+path=dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(path)
 
 # Load custom
