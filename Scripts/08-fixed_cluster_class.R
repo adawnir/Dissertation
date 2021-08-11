@@ -81,6 +81,8 @@ Y = fclass[complete.cases(X)]
 X = X[complete.cases(X),]
 X = model.matrix(~., X)[,-1]
 
+X = scale(X)
+
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
 saveRDS(stab, paste0("../Results/",filepaths[m],"/Fixed_cluster_class_multivar_output.rds"))

@@ -68,6 +68,8 @@ Y = fsp[complete.cases(X)]
 X = X[complete.cases(X),]
 X = model.matrix(~., X)[,-1]
 
+X = scale(X)
+
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
 saveRDS(stab, paste0("../Results/",filepaths[m],"/Shortest_path_multivar_output.rds"))

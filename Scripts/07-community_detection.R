@@ -27,11 +27,14 @@ expo = readRDS(paste0("../Processed/",filepaths[m],"/Exposure_matrix_ndimp_thres
 covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
 print(all(rownames(expo)==rownames(covars)))
 
+# Standardisation
+expo = scale(expo)
+
 X = t(expo)
 
-n = c(120,490,80,840,240)[m]
+n = c(120,240,110,n,800)[m]
 start.type = ifelse(m %in% c(4,5),"cold","warm")
-
+q
 out = GraphicalModel(xdata = X, PFER_thr = n, start = start.type)
 
 pdf(paste0("../Figures/",filepaths[m],"/Graphical_network_children_output.pdf"))

@@ -27,9 +27,12 @@ expo = readRDS(paste0("../Processed/",filepaths[m],"/Exposure_matrix_ndimp_thres
 covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
 print(all(rownames(expo)==rownames(covars)))
 
-## Focus: Stability selection based HC
+# Standardisation
+expo = scale(expo)
+
+## Focus: Consensus clustering
 out = Clustering(expo, K = 100, tau = 0.5, seed = 290621)
 # Save outputs
-saveRDS(out, paste0("../Results/",filepaths[m],"/Stability_clustering_output.rds"))
+saveRDS(out, paste0("../Results/",filepaths[m],"/Consensus_clustering_output.rds"))
 # Save memberships
 saveRDS(Clusters(out), paste0("../Results/",filepaths[m],"/Stable_clusters.rds"))

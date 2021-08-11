@@ -29,6 +29,9 @@ expo = readRDS(paste0("../Processed/",filepaths[m],"/Exposure_matrix_ndimp_thres
 covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
 print(all(rownames(expo)==rownames(covars)))
 
+# Standardisation
+expo = scale(expo)
+
 X = t(expo)
 start.type = ifelse(m %in% c(4,5),"cold","warm")
 n = c(Inf, seq(1000,200,-100), seq(100,10,-10))

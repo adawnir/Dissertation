@@ -15,14 +15,15 @@ setwd(path)
 source("functions.R")
 source("graph_param.R")
 
-# ## Parameters
-# args=commandArgs(trailingOnly=TRUE)
-# m=as.numeric(args[1])
+## Parameters
+args=commandArgs(trailingOnly=TRUE)
+m=as.numeric(args[1])
 
+#### Between siblings ####
 # Load data sets
 covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
 X = readRDS(paste0("../Results/",filepaths[m],"/Family_covariates_delta_exposures.rds"))
-out = readRDS(paste0("../Results/",filepaths[m],"/Stability_clustering_output.rds"))
+out = readRDS(paste0("../Results/",filepaths[m],"/Consensus_clustering_output.rds"))
 
 selprop = SelectionProportions(out)
 families=levels(covars$Family.ID)
@@ -36,6 +37,7 @@ names(fprop)=families
 
 saveRDS(fprop, paste0("../Results/",filepaths[m],"/Comembership_prop.rds"))
 
+### Univariate analysis ---
 betas = pvals = NULL
 f1='Y ~ X[,k]'
 t0=Sys.time()
@@ -78,6 +80,8 @@ Y = fprop[complete.cases(X)]
 X = X[complete.cases(X),]
 X = model.matrix(~., X)[,-1]
 
+X = scale(X)
+
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
 saveRDS(stab, paste0("../Results/",filepaths[m],"/Comembership_prop_multivar_output.rds"))
@@ -85,7 +89,7 @@ saveRDS(stab, paste0("../Results/",filepaths[m],"/Comembership_prop_multivar_out
 #### Between Strangers ####
 covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
 X = readRDS(paste0("../Results/",filepaths[m],"/Stranger_covariates_delta_exposures.rds"))
-out = readRDS(paste0("../Results/",filepaths[m],"/Stability_clustering_output.rds"))
+out = readRDS(paste0("../Results/",filepaths[m],"/Consensus_clustering_output.rds"))
 
 compare_family = sapply(covars$Family.ID, function(x) x==covars$Family.ID)
 rownames(compare_family)=colnames(compare_family)=rownames(covars)
@@ -147,6 +151,8 @@ saveRDS(betas, paste0("../Results/",filepaths[m],"/Comembership_prop_stranger_un
 Y = sprop[complete.cases(X)]
 X = X[complete.cases(X),]
 X = model.matrix(~., X)[,-1]
+
+X = scale(X)
 
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 

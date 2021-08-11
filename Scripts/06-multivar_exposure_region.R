@@ -28,6 +28,9 @@ for (i in c(2,4)){
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh_no_isolated.rds"))
   print(all(rownames(expo)==rownames(covars)))
   
+  # Standardisation
+  expo = scale(expo)
+  
   ### Region (Ile-de-France Y/N) ----
   Y = ifelse(covars$Region=="Île-de-France",1,0)
   X = expo
