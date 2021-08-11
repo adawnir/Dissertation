@@ -145,7 +145,7 @@ if (m %in% c(2,4)){
   tmp = NULL
   for (f in 1:length(families)){
     region=as.character(covars$Region)[covars$Family.ID==families[f]]
-    if (region=="Île-de-France"){
+    if (unique(region)=="Île-de-France"){
       tmp[f] = "Yes"
     } else {tmp[f] = "No"}
     }
