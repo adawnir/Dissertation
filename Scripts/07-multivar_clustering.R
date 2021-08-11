@@ -135,7 +135,7 @@ for (f in 1:length(families)){
       tmp[f]="All female"
     }
   } else {
-    tmp[f]="Different genders"
+    tmp[f]="Different gender"
   }
 }
 X=cbind(X, tmp)

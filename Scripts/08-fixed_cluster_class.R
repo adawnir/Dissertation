@@ -72,40 +72,6 @@ names(pvals)=names(betas)=mylabels
 saveRDS(pvals, paste0("../Results/",filepaths[m],"/Fixed_cluster_class_univar_pvals.rds"))
 saveRDS(betas, paste0("../Results/",filepaths[m],"/Fixed_cluster_class_univar_betas.rds"))
 
-### Plotting ----
-# annot_sub = annot[which(names(annot) %in% mylabels)]
-# 
-# mycolours = c(rep(batch.colours[m],length(mylabels)-length(annot_sub)),annot.colours[annot_sub])
-# 
-# {pdf(paste0("../Figures/",filepaths[m],"/Fixed_cluster_family_class_univariate.pdf"))
-#   par(mar=c(5,5,1,1))
-#   plot(betas, -log10(pvals), pch=19,
-#        col=ifelse(pvals < 0.05, mycolours, "grey"),
-#        cex.lab=1.5, cex = 0.7,
-#        ylim = c(0, max(-log10(pvals))+0.25),
-#        xlim = c(-max(abs(betas))-0.05, max(abs(betas))+0.05),
-#        ylab=expression(-log[10](p)), 
-#        xlab=expression(beta))
-#   for (k in 1:length(mylabels)){
-#     if(mylabels[k] %in% names(annot_sub)){
-#       if(pvals[k] < 0.05){
-#         label = substitute(Delta~tmp, list(tmp=mylabels[k]))
-#         text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-#              labels = label, col = mycolours[k])
-#       }
-#     }
-#     else {
-#       text(betas[k]+sign(betas[k])*0.01, -log10(pvals[k])+0.1,
-#            labels = mylabels[k], col = mycolours[k]) 
-#     }
-#   }
-#   text(max(abs(betas))+0.04, -log10(0.05/ncol(X))+0.01,
-#        paste0("Bonferroni threshold = ",formatC(0.05/ncol(X), digits = 2, format = "e")),
-#        adj = c(1,0), col = "darkred")
-#   abline(h = -log10(0.05/ncol(X)), lty = 2, col = "darkred", cex = 0.6)
-#   dev.off()
-# }
-
 ### Multivariate analysis using stability selection sPLS regression ----
 
 Y = fclass[complete.cases(X)]
@@ -114,6 +80,6 @@ X = model.matrix(~., X)[,-1]
 
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
-saveRDS(stab, paste0("../Results/",filepaths[m],"/Comembership_prop_multivar_output.rds"))
+saveRDS(stab, paste0("../Results/",filepaths[m],"/Fixed_cluster_class_multivar_output.rds"))
 
 

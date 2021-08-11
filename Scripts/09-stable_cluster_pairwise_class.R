@@ -123,7 +123,7 @@ X = model.matrix(~., X)[,-1]
 
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
-saveRDS(stab, paste0("../Results/",filepaths[m],"/Comembership_prop_univar_stab.rds"))
+saveRDS(stab, paste0("../Results/",filepaths[m],"/Stable_cluster_class_multivar_output.rds"))
 
 
 ### Pair-wise covariates and delta exposures ----

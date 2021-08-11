@@ -115,6 +115,6 @@ X = model.matrix(~., X)[,-1]
 
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
-saveRDS(stab, paste0("../Results/",filepaths[m],"/Comembership_prop_multivar_output.rds"))
+saveRDS(stab, paste0("../Results/",filepaths[m],"/Community_class_multivar_output.rds"))
 
 

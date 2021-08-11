@@ -123,7 +123,7 @@ X = model.matrix(~., X)[,-1]
 
 stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
 
-saveRDS(stab, paste0("../Results/",filepaths[m],"/Comembership_prop_univar_stab.rds"))
+saveRDS(stab, paste0("../Results/",filepaths[m],"/Fixed_cluster_class_stab.rds"))
 
 
 ### Pair-wise covariates and delta exposures ----
@@ -171,7 +171,7 @@ if (m==1){
 gender = combn(nrow(covars), 2, function(x) as.character(covars$Gender)[x])
 tmp = apply(gender, 2,
             function(x) ifelse(sum(is.na(x))>0, NA,
-                               ifelse(length(unique(x))>1,"Different genders",
+                               ifelse(length(unique(x))>1,"Different gender",
                                       ifelse(unique(x)=="Male", "All male", "All female"))))
 X=cbind(X, tmp[mygrep])
 colnames(X)[ncol(X)] = "gender_diff"
