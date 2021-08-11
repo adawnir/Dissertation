@@ -27,13 +27,14 @@ annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 #### Community clustering ####
 # Load data
 covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
-lc = readRDS(paste0("../Results/",filepaths[m],"/Graphical_network_children_community.rds"))
 expo  = readRDS(paste0("../Processed/",filepaths[m],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
 print(all(rownames(expo)==rownames(covars)))
+
+lc = readRDS(paste0("../Results/",filepaths[m],"/Graphical_network_children_community.rds"))
+lc = membership(lc)
 print(all(names(lc)==rownames(covars)))
 
 families=unique(covars$Family.ID)
-lc = membership(lc)
 
 fclass=NULL
 for (f in 1:length(families)){
