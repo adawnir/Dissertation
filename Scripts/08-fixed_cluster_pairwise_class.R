@@ -155,7 +155,7 @@ saveRDS(betas, paste0("../Results/",filepaths[m],"/Fixed_cluster_stranger_class_
 
 ### Multivariate analysis using stability selection sPLS regression ----
 
-Y = fclass[complete.cases(X)]
+Y = sclass[complete.cases(X)]
 X = X[complete.cases(X),]
 X = model.matrix(~., X)[,-1]
 
