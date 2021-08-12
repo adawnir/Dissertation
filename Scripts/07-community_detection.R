@@ -45,3 +45,9 @@ dev.off()
 # Adjacency matrix of the calibrated network
 A=Adjacency(out)
 saveRDS(A, paste0("../Results/",filepaths[m],"/Graphical_network_children_adjacency_matrix.rds"))
+
+
+mygraph=Graph(adjacency=A,satellites = TRUE)
+lc = cluster_louvain(mygraph)
+
+saveRDS(lc, paste0("../Results/",filepaths[m],"/Graphical_network_children_community.rds"))
