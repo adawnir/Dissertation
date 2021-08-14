@@ -1,4 +1,4 @@
-### Multivariate clusterinL Shortest path between siblings
+### Multivariate clustering Shortest path between siblings
 ### Rin on 10 Aug
 
 # Load packages
@@ -8,7 +8,7 @@ library(RColorBrewer)
 
 # Initialise
 rm(list=ls())
-path="~/Dissertation/Scripts"
+path=dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(path)
 
 # Load custom
@@ -19,11 +19,7 @@ annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 
 suffix = c("lux","fra","gs","pooled3","pooled2")
 
-m = 1
-m = 2
-m = 3
-m = 4
-m = 5
+## Univariate
 {
   X = readRDS(paste0("../Results/",filepaths[m],"/Family_covariates_delta_exposures.rds"))
   pvals = readRDS(paste0("../Results/",filepaths[m],"/Shortest_path_univar_pvals.rds"))
@@ -63,6 +59,8 @@ m = 5
     dev.off()
   }
 }
+
+## Multivariate
 {stab = readRDS(paste0("../Results/",filepaths[m],"/Shortest_path_multivar_output.rds"))
 
   pdf(paste0("../Figures/",filepaths[m],"/Shortest_path_multivariate_output.pdf"))
@@ -159,37 +157,70 @@ m = 5
   annot_sub = annot[which(names(annot) %in% mylabels)]
   
   mycolours = c(rep(batch.colours[m],length(mylabels)-length(annot_sub)),annot.colours[annot_sub])
+
+  x = sign(betas)*-log10(pvals)
   
-  {pdf(paste0("../Figures/",filepaths[m],"/Shortest_path_univar_vs_multivar.pdf"))
-    par(mar=c(5,5,1,1))
-    plot(sign(betas)*-log10(pvals), selprop, pch=19,
+  {pdf(paste0("../Figures/",filepaths[m],"/Shortest_path_univar_vs_multivar.pdf"), width = 9, height = 7)
+    par(mar=c(5,5,5,15), xpd = TRUE)
+    plot(x, selprop, pch=19,
          col=ifelse(pvals < 0.05/ncol(X) | selprop > Argmax(stab)[2], mycolours, "grey"),
-         cex.lab=1.5, cex = 0.7,
+         cex.lab=1.5, cex = 3,
          ylim = c(0, 1),
-         xlim = c(-max(-log10(pvals))-1, max(-log10(pvals))+1),
+         xlim = range(x),
          ylab="Selection Proportion",
          xlab=expression(Signed~-log[10](p)))
+    # jitter = seq(10,-10,length.out = )
     for (k in 1:length(mylabels)){
       if(pvals[k] < 0.05/ncol(X)){
-        if(mylabels[k] %in% names(annot_sub)){
-          label = substitute(Delta~tmp, list(tmp=mylabels[k]))
-          text(sign(betas[k])*-log10(pvals[k])*1, selprop[k]+0.05,
-               labels = label, col = mycolours[k], cex = 1)
-          } else {
-            text(sign(betas[k])*-log10(pvals[k])*1, selprop[k]+0.05,
-                 labels = mylabels[k], col = mycolours[k], cex = 1)
-          }
+        if(min(abs(x[-k]-x[k]))<3 & min(abs(selprop[-k]-selprop[k]))<0.05 & selprop[k] < Argmax(stab)[2]){
+          mygrep = pvals < 0.05/ncol(X) & selprop < Argmax(stab)[2]
+          jitter = seq(min(selprop),max(selprop),length.out = sum(mygrep))
+          names(jitter) = mylabels[mygrep][order(selprop[mygrep])]
+          jitter = jitter[mylabels[k]]
+          segments(x[k], selprop[k], max(x)+1, jitter, col = mycolours[k])
+          points(max(x)+1, jitter,
+                 col = mycolours[k],
+                 pch = 19,
+                 cex = 3)
+          text(max(x)+1, jitter,
+               labels = which(mylabels[k] == mylabels[pvals < 0.05/ncol(X)]),
+               cex = 0.8)
+        } else if(min(abs(selprop[-k]-selprop[k]))<0.05 & min(abs(x[-k]-x[k]))<3  & selprop[k] > Argmax(stab)[2]){
+          mygrep = selprop > Argmax(stab)[2]
+          jitter = seq(min(x),max(x),length.out = sum(mygrep))
+          names(jitter) = mylabels[mygrep][order(x[mygrep])]
+          jitter = jitter[mylabels[k]]
+          segments(x[k], selprop[k], jitter, max(selprop)+0.1, col = mycolours[k])
+          points(jitter, max(selprop)+0.1,
+                 col = mycolours[k],
+                 pch = 19,
+                 cex = 3)
+          text(jitter, max(selprop)+0.1,
+               labels = which(mylabels[k] == mylabels[pvals < 0.05/ncol(X)]),
+               cex = 0.8)
+        } else {
+          text(x[k],
+               selprop[k],
+               labels = which(mylabels[k] == mylabels[pvals < 0.05/ncol(X)]),
+               cex = 0.8)
+          
+        }
       }
     }
-    abline(h = Argmax(stab)[2], lty = 2, col = "darkred")
-    abline(v= -log10(0.05/ncol(X)), lty = 2, col = "darkred")
-    text(-max(-log10(pvals))-1, Argmax(stab)[2],
+    # abline(v= -log10(0.05/ncol(X)), lty = 2, col = "darkred")
+    text(min(x), Argmax(stab)[2],
          paste0("Selection proportion threshold = ",formatC(Argmax(stab)[2], digits = 2, format = "f")),
-         adj = c(0,0), col = "darkred", cex = 0.8)
-    text(-log10(0.05/ncol(X)), 1,
-         paste0("Bonferroni threshold = ",formatC(0.05/ncol(X), digits = 2, format = "e")),
-         adj = c(0,0), srt = 270, col = "darkred", cex = 0.8)
-    
+         adj = c(0,1), col = "darkred", cex = 1)
+    # text(-log10(0.05/ncol(X)), 1,
+    #      paste0("Bonferroni threshold = ",formatC(0.05/ncol(X), digits = 2, format = "e")),
+    #      adj = c(0,0), srt = 270, col = "darkred", cex = 0.8)
+    coord = par("usr")
+    legend(x = coord[2]*1.05, y = coord[4],
+           legend = paste0(1:length(mylabels[pvals < 0.05/ncol(X)]),". ", mylabels[pvals < 0.05/ncol(X)]),
+           text.col = darken(mycolours[pvals < 0.05/ncol(X)],0.5),
+           bty = "n",  x.intersp = 0)
+    par(xpd = FALSE)
+    abline(h = Argmax(stab)[2], lty = 2, col = "darkred")
     dev.off()
   }
 }
