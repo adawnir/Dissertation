@@ -32,7 +32,7 @@ expo = scale(expo)
 
 X = t(expo)
 
-n = c(120,240,110,720,800)[m]
+n = c(120,240,110,Inf,70)[m]
 start.type = ifelse(m %in% c(4,5),"cold","warm")
 
 out = GraphicalModel(xdata = X, PFER_thr = n, start = start.type)
