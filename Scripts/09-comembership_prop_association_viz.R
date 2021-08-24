@@ -1,5 +1,5 @@
 ### Multivariate clustering: Shortest path between siblings
-### Rin on 10 Aug
+### 10 Aug
 
 # Load packages
 library(focus)

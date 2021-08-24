@@ -1,5 +1,5 @@
 ## Raw data overview
-## Rin Wada 8 July
+## 8 July
 
 # Load packages
 library(openxlsx)

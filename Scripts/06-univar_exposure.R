@@ -1,5 +1,5 @@
 ## Univariate regression modelling association with exposure
-## Rin 29 July
+## 29 July
 
 # Load packages
 library(tidyverse)

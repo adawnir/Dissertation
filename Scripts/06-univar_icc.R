@@ -1,5 +1,5 @@
 ## Intra-class correlation (excluding isolated children)
-## Rin 30 July
+## 30 July
 
 # Load packages
 library(tidyverse)

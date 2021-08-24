@@ -1,5 +1,5 @@
 ## Pairwise: covariate mean and difference/delta exposure
-## Rin Wada 15 July
+## 15 July
 
 # Load packages
 library(tidyverse)

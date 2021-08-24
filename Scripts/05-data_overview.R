@@ -1,5 +1,5 @@
 ## Density plots
-## Rin Wada 10 July
+## 10 July
 
 # Load packages
 library(tidyverse)

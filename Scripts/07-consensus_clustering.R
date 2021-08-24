@@ -1,5 +1,5 @@
 ## Consensus clustering
-## Rin Wada 22 July
+## 22 July
 
 # Load packages
 library(ape)

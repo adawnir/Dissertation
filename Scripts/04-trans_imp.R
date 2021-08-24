@@ -1,5 +1,5 @@
 ## Log transformation and imputation
-## Rin Wada 10 July
+## 10 July
 
 # Load packages
 library(tidyverse)

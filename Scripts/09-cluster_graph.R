@@ -1,5 +1,5 @@
 ## Clustering visualisations
-## Rin Wada 11 Aug
+## 11 Aug
 
 ### Consensus clustering ----
 # Load packages

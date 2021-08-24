@@ -1,5 +1,5 @@
 ## Descriptive analysis: Correlation matrix
-## Rin Wada 22 June
+## 22 June
 
 # Initialisation
 rm(list=ls())

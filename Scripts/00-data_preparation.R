@@ -1,5 +1,5 @@
 ## Data cleaning
-## Rin Wada 24 May
+## 24 May
 
 # Load packages
 library(openxlsx)

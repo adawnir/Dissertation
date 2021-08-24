@@ -1,5 +1,5 @@
 # Community detection: PFER
-# Rin 4 Aug
+# 4 Aug
 
 # Load packages
 library(tidyverse)

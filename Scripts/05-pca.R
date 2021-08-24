@@ -1,5 +1,5 @@
 ## Descriptive analysis: PCA
-## Rin Wada 22 June
+## 22 June
 
 # Initialisation
 rm(list=ls())

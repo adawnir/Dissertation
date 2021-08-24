@@ -1,5 +1,5 @@
 ## Graphical Lasso Network Visualisation
-## Rin on 14 July 
+## 14 July 
 
 ## Load packages
 library(tidyverse)

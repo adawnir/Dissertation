@@ -1,5 +1,5 @@
 ## Graphical Lasso Network
-## Rin on 14 July 
+## 14 July 
 
 options(warn=0)
 

@@ -1,5 +1,5 @@
 ## Within family variation (excluding isolated children)
-## Rin 30 July
+## 30 July
 
 # Load packages
 library(tidyverse)

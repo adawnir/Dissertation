@@ -1,5 +1,5 @@
 ## Table 2s
-## Rin Wada 12 July
+## 12 July
 
 # Load packages
 library(tidyverse)

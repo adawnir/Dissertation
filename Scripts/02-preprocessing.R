@@ -1,5 +1,5 @@
 ## Data exploration and pre-processing
-## Rin Wada 15 June
+## 15 June
 
 # Load packages
 library(tidyverse)

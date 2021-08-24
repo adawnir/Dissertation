@@ -1,5 +1,5 @@
 ## Pooling data sets
-## Rin Wada 21 June 2021
+## 21 June 2021
 
 # Load packages
 library(tidyverse)

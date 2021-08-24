@@ -1,5 +1,5 @@
 ### Community characterisation
-### Rin on 15 Aug
+### 15 Aug
 
 # Load packages
 library(igraph)

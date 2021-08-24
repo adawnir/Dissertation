@@ -1,5 +1,5 @@
 ## Multivariate clustering - Association with shortest path
-## Rin Wada 7 Aug
+## 7 Aug
 
 # Load packages
 library(focus)

@@ -1,5 +1,5 @@
 ## Removing isolated children for family association analysis
-## Rin 29 July
+## 29 July
 
 # Load packages
 library(tidyverse)
