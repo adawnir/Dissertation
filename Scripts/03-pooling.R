@@ -129,7 +129,6 @@ lod3 = chem$LOD.gs
 names(lod3) = rownames(chem)
 
 for(k in 1:ncol(expo)){
-  set.seed(150621)
   tmp1[which(tmp1[,k]=="nd"),k] = rtruncnorm(sum(tmp1[,k]=="nd", na.rm = T),min=0,max=lod1[colnames(expo)[k]]) 
   tmp2[which(tmp2[,k]=="nd"),k] = rtruncnorm(sum(tmp2[,k]=="nd", na.rm = T),min=0,max=lod2[colnames(expo)[k]]) 
   tmp3[which(tmp3[,k]=="nd"),k] = rtruncnorm(sum(tmp3[,k]=="nd", na.rm = T),min=0,max=lod3[colnames(expo)[k]]) 
@@ -252,17 +251,18 @@ saveRDS(expo, paste0("../Processed/",filepaths[5],"/Exposure_matrix_raw_thresh.r
 ## Recoding nd
 # Replace nd with random values from 0 to minimum detection (Gaussian)
 # Set LOD for each data set
-tmp1 = expo[covars_lux$Indiv.ID,]
+tmp1 = expo[covars$Batch=="LUX",]
 lod1 = chem$LOD.lux
 names(lod1) = rownames(chem)
 
-tmp3 = expo[covars_gs$Indiv.ID,]
+tmp3 = expo[covars$Batch=="GS",]
 lod3 = chem$LOD.gs
 names(lod3) = rownames(chem)
 
 for(k in 1:ncol(expo)){
   set.seed(150621)
   tmp1[which(tmp1[,k]=="nd"),k] = rtruncnorm(sum(tmp1[,k]=="nd", na.rm = T),min=0,max=lod1[colnames(expo)[k]]) 
+  set.seed(150621)
   tmp3[which(tmp3[,k]=="nd"),k] = rtruncnorm(sum(tmp3[,k]=="nd", na.rm = T),min=0,max=lod3[colnames(expo)[k]]) 
 }
 

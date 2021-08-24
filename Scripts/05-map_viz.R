@@ -57,7 +57,7 @@ new_centroids = centroids %>%
             Y = mean(Y))
 new_centroids$pop = as.vector(table(covars$Region)[new_centroids$group])
 new_centroids$label = new_centroids$group
-new_centroids$label[new_centroids$label=="Hauts-de-France"] = "Hauts-de-France \n(Grande-Synthe)"
+new_centroids$label[new_centroids$label=="Hauts-de-France"] = "Grande-Synthe"
 pdf("../Figures/Section1/Map_of_France_Luxembourg_region.pdf")
   ggplot() +
     geom_sf(data = world, alpha = 0.5, lwd = 0.2, color = "grey") +

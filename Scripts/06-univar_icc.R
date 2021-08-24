@@ -34,7 +34,7 @@ for (i in 1:length(batches)){
                            "Brittany/Normandy/Pays de la Loire", as.character(covars$Region))
     covars$Region = factor.order(covars$Region)
     table(covars$Region)
-    names(region.colours)[names(region.colours)=="Normandy"] = "Brittany/Normandy/Pays de la Loire"
+    names(region.colours)[names(region.colours)=="Brittany"] = "Brittany/Normandy/Pays de la Loire"
     for (p in 1:ncol(expo)){
       x=expo[,p]
       model=lmer(x~(1|covars$Family.ID) + (1|covars$Region))
@@ -59,42 +59,23 @@ for (i in 1:length(batches)){
   }
 }
 
+### Plotting ----
 ## Family vs Region
 # Scatter plot
 annot_sub = annot[names(icc_family_pooled3)]
-{pdf(paste0("../Figures/",filepaths[4],"/Intra_class_correlation_family_region.pdf"), width = 5, height = 5)
+{pdf(paste0("../Figures/Section2/Intra_class_correlation_family_region_pooled3.pdf"), width = 5, height = 5)
   par(mar=c(5,5,1,1))
   plot(icc_family_pooled3, icc_region_pooled3, pch=19,
-       col=ifelse(icc_family_pooled3 > 0.5 | icc_region_pooled3 > 0.5, annot.colours[annot_sub], alpha(annot.colours[annot_sub],0.5)),
-       cex.lab=1.5, cex = 0.7,
+       col=ifelse(icc_family_pooled3 > 0.7 | icc_region_pooled3 > 0.7, annot.colours[annot_sub], alpha(annot.colours[annot_sub],0.5)),
+       cex.lab=1.5,
        ylim = c(0, 1),
        xlim = c(0, 1),
-       ylab="Within-region ICC", 
-       xlab="Within-family ICC")
-  text(icc_family_pooled3, icc_region_pooled3+0.05, cex = 0.7,
-       labels = ifelse(icc_family_pooled3 > 0.5 | icc_region_pooled3 > 0.5, names(icc_family_pooled3), ""),
+       ylab="Region ICC", 
+       xlab="Family ICC", cex = 1.5)
+  text(icc_family_pooled3, icc_region_pooled3+0.03,
+       labels = ifelse(icc_family_pooled3 > 0.7 | icc_region_pooled3 > 0.7, names(icc_family_pooled3), ""),
        col = annot.colours[annot_sub])
-  abline(0,1, lty = 2, col = batch.colours[4])    
-  abline(v=axTicks(1), lty=3, col="grey")
-  abline(h=axTicks(2), lty=3, col="grey")
-  dev.off()
-}
-
-# Scatter plot
-annot_sub = annot[names(icc_family_pooled2)]
-{pdf(paste0("../Figures/",filepaths[5],"/Intra_class_correlation_family_batch.pdf"), width = 5, height = 5)
-  par(mar=c(5,5,1,1))
-  plot(icc_family_pooled2, icc_region_pooled2, pch=19,
-       col=ifelse(icc_family_pooled2 > 0.5 | icc_region_pooled2 > 0.5, annot.colours[annot_sub], alpha(annot.colours[annot_sub],0.5)),
-       cex.lab=1.5, cex = 0.7,
-       ylim = c(0, 1),
-       xlim = c(0, 1),
-       ylab="Within-batch ICC", 
-       xlab="Within-family ICC")
-  text(icc_family_pooled2, icc_region_pooled2+0.05, cex = 0.7,
-       labels = ifelse(icc_family_pooled2 > 0.5 | icc_region_pooled2 > 0.5, names(icc_family_pooled2), ""),
-       col = annot.colours[annot_sub])
-  abline(0,1, lty = 2, col = batch.colours[5])    
+  abline(0,1, lty = 2, col = "grey")    
   abline(v=axTicks(1), lty=3, col="grey")
   abline(h=axTicks(2), lty=3, col="grey")
   dev.off()
@@ -102,196 +83,115 @@ annot_sub = annot[names(icc_family_pooled2)]
 
 # Scatter plot
 annot_sub = annot[names(icc_family_fra)]
-{pdf(paste0("../Figures/",filepaths[2],"/Intra_class_correlation_family_region.pdf"), width = 5, height = 5)
+{pdf(paste0("../Figures/Supplementary/Section2/Intra_class_correlation_family_region_fra.pdf"), width = 5, height = 5)
   par(mar=c(5,5,1,1))
   plot(icc_family_fra, icc_region_fra, pch=19,
-       col=ifelse(icc_family_fra > 0.5 | icc_region_fra > 0.5, annot.colours[annot_sub], alpha(annot.colours[annot_sub],0.5)),
-       cex.lab=1.5, cex = 0.7,
+       col=ifelse(icc_family_fra > 0.7 | icc_region_fra > 0.7, annot.colours[annot_sub], alpha(annot.colours[annot_sub],0.5)),
+       cex.lab=1.5,
        ylim = c(0, 1),
        xlim = c(0, 1),
-       ylab="Within-region ICC", 
-       xlab="Within-family ICC")
-  text(icc_family_fra, icc_region_fra+0.05, cex = 0.7,
-       labels = ifelse(icc_family_fra > 0.5 | icc_region_fra > 0.5, names(icc_family_fra), ""),
+       ylab="Region ICC", 
+       xlab="Family ICC", cex = 1.5)
+  text(icc_family_fra, icc_region_fra+0.03,
+       labels = ifelse(icc_family_fra > 0.7 | icc_region_fra > 0.7, names(icc_family_fra), ""),
        col = annot.colours[annot_sub])
-  abline(0,1, lty = 2, col = region.colours[2])    
+  abline(0,1, lty = 2, col = "grey")    
   abline(v=axTicks(1), lty=3, col="grey")
   abline(h=axTicks(2), lty=3, col="grey")
   dev.off()
 }
 
-## Family
-icc = t(bind_rows(icc_family_lux, icc_family_fra, icc_family_gs, icc_family_pooled3,
-                  icc_family_pooled2))
-annot_sub = factor.order(annot)[rownames(icc)]
-annot_sub = annot_sub[order(annot_sub)]
-icc = icc[names(annot_sub),]
-mylabels = rownames(icc)
 
-myspacing = 1
-xseq = 1:nrow(icc)
+# Scatter plot
+annot_sub = annot[names(icc_family_pooled2)]
+{pdf(paste0("../Figures/Section2/Intra_class_correlation_family_batch_pooled2.pdf"), width = 5, height = 5)
+  par(mar=c(5,5,1,1))
+  plot(icc_family_pooled2, icc_region_pooled2, pch=19,
+       col=ifelse(icc_family_pooled2 > 0.7 | icc_region_pooled2 > 0.7, annot.colours[annot_sub], alpha(annot.colours[annot_sub],0.5)),
+       cex.lab=1.5,
+       ylim = c(0, 1),
+       xlim = c(0, 1),
+       ylab="Country ICC", 
+       xlab="Family ICC", cex = 1.5)
+  mygrep = icc_family_pooled2 > 0.7
+  jitter = seq(0.7,0.9,length.out = sum(mygrep))
+  names(jitter) = names(icc_family_pooled2)[mygrep][order(icc_family_pooled2[mygrep])]
+  yjitter = seq(0.2,0.4,length.out = sum(mygrep))
+  names(yjitter) = names(icc_family_pooled2)[mygrep][order(icc_family_pooled2[mygrep])]
+  
+  mygrep2 = icc_region_pooled2 > 0.7
+  jitter2 = seq(0.7,0.9,length.out = sum(mygrep2))
+  names(jitter2) = names(icc_region_pooled2)[mygrep2][order(icc_region_pooled2[mygrep2])]
+  for(k in 1:length(icc_family_pooled2)){
+    if(icc_family_pooled2[k] > 0.7){
+        x = jitter[names(icc_family_pooled2)[k]]
+        y = yjitter[names(icc_family_pooled2)[k]]
+        segments(icc_family_pooled2[k], icc_region_pooled2[k], x,  y, col = annot.colours[annot_sub][k])
+        text(x, y, labels = names(icc_family_pooled2)[k],col = annot.colours[annot_sub][k], adj = c(0.5,0))
+    } else if (icc_region_pooled2[k] > 0.7){
+      y = jitter2[names(icc_region_pooled2)[k]]
+      x = 0.3
+      segments(icc_family_pooled2[k], icc_region_pooled2[k], x,  y, col = annot.colours[annot_sub][k])
+      text(x, y, labels = names(icc_family_pooled2)[k],col = annot.colours[annot_sub][k], adj = c(0,0.5))
+    }
+  }
+  abline(0,1, lty = 2, col = "grey")    
+  abline(v=axTicks(1), lty=3, col="grey")
+  abline(h=axTicks(2), lty=3, col="grey")
+  dev.off()
+}
 
-{pdf("../Figures/Intra_class_correlation_family_removed_region.pdf", width=14, height=12)
-  par(oma=c(21,0,0,0),mar=c(0,5,2,1), mfrow = c(2,1))
-  for (i in c(5,4)){
-    plot(icc[,i],
-         col=annot.colours[annot_sub],
-         xaxt="n", ylab=paste0("Intra-class correlation"," (", batches[i] ,")"), xlab = "", cex.lab=1.2,
-         type="p", pch=19, ylim = c(0,1.1),
-         panel.first=abline(v=1:nrow(icc),lty=3,col="grey"))
+## Family (LUX)
+annot_sub = annot[names(icc_family_lux)]
+xseq = seq(1, length(icc_family_lux))
+
+{pdf(paste0("../Figures/Supplementary/Section2/Intra_class_correlation_family_",suffix[1],".pdf"), width=13, height=6.5)
+  par(mar=c(20,5,1,1))
+  plot(icc_family_lux,
+       col=annot.colours[annot_sub],
+       xaxt="n", xlab="", ylab = "Family ICC", cex.lab=1.5,
+       type="p", pch = 19, cex = 1.5,)
+  abline(v = xseq, lty = 3, col = "grey")
+  for (k in xseq){
+    if(icc_family_lux[k] > 0.7){
+      colour = darken(annot.colours[annot_sub][k],0.5)
+    } else {colour = "black"}
+    axis(1, at=k, labels = names(icc_family_lux)[k],col.axis = colour, las=2, cex.axis = 0.8)
   }
-  for(i in 1:length(xseq)){
-    axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.8)
-  }
-  xseqblack=c(xseq[!duplicated(annot_sub)]-myspacing/2, max(xseq)+myspacing/2)
-  axis(side=1, line=9, at=xseqblack, labels=NA)
-  tmp=apply(rbind(xseqblack[-length(xseqblack)],xseqblack[-1]),2,mean)
+  xgroup=c(which(!duplicated(annot_sub))-0.5, length(names(icc_family_lux))+0.5)
+  axis(side=1, line=8, at=xgroup, labels=NA)
+  tmp=apply(rbind(xgroup[-length(xgroup)],xgroup[-1]),2,mean)
   for (k in 1:length(unique(annot_sub))){
-    axis(side=1, line=9, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
+    axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2,
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
   dev.off()
 }
 
+## Family (GS)
+annot_sub = annot[names(icc_family_gs)]
+xseq = seq(1, length(icc_family_gs))
 
-
-## Region
-icc = t(bind_rows(icc_region_fra, icc_region_pooled3))
-annot_sub = factor.order(annot)[rownames(icc)]
-annot_sub = annot_sub[order(annot_sub)]
-icc = icc[names(annot_sub),]
-mylabels = rownames(icc)
-
-myspacing = 1
-xseq = 1:nrow(icc)
-
-{pdf("../Figures/Intra_class_correlation_region_removed_family.pdf", width=14, height=11)
-  par(oma=c(21,0,0,0),mar=c(0,5,2,1), mfrow = c(2,1))
-  for (i in c(2,4)){
-    plot(icc[,i/2],
-         col=annot.colours[annot_sub],
-         xaxt="n", ylab=paste0("Intra-class correlation"," (", batches[i] ,")"), xlab = "", cex.lab=1.2,
-         type="p", pch=19, ylim = c(0,1.1),
-         panel.first=abline(v=1:nrow(icc),lty=3,col="grey"))
+{pdf(paste0("../Figures/Supplementary/Section2/Intra_class_correlation_family_",suffix[3],".pdf"), width=13, height=6.5)
+  par(mar=c(20,5,1,1))
+  plot(icc_family_gs,
+       col=annot.colours[annot_sub],
+       xaxt="n", xlab="", ylab = "Family ICC", cex.lab=1.5,
+       type="p", pch = 19, cex = 1.5,)
+  abline(v = xseq, lty = 3, col = "grey")
+  for (k in xseq){
+    if(icc_family_gs[k] > 0.7){
+      colour = darken(annot.colours[annot_sub][k],0.5)
+    } else {colour = "black"}
+    axis(1, at=k, labels = names(icc_family_gs)[k],col.axis = colour, las=2, cex.axis = 0.8)
   }
-  for(i in 1:length(xseq)){
-    axis(1, at=xseq[i], labels = mylabels[i], las=2, cex.axis = 0.8)
-  }
-  xseqblack=c(xseq[!duplicated(annot_sub)]-myspacing/2, max(xseq)+myspacing/2)
-  axis(side=1, line=9, at=xseqblack, labels=NA)
-  tmp=apply(rbind(xseqblack[-length(xseqblack)],xseqblack[-1]),2,mean)
+  xgroup=c(which(!duplicated(annot_sub))-0.5, length(names(icc_family_gs))+0.5)
+  axis(side=1, line=8, at=xgroup, labels=NA)
+  tmp=apply(rbind(xgroup[-length(xgroup)],xgroup[-1]),2,mean)
   for (k in 1:length(unique(annot_sub))){
-    axis(side=1, line=9, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
+    axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2,
          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5), cex.axis = 0.9)
   }
   dev.off()
 }
 
-# # Manhattan plot (Family ID, Main)
-# values = t(bind_rows(icc_family_lux, icc_family_fra, icc_family_gs, icc_family_pooled3, icc_family_pooled2))
-# annot_sub = annot[rownames(values)]
-# annot_sub = annot_sub[order(annot_sub)]
-# values = values[names(annot_sub),]
-# 
-# xseq = seq(1, nrow(values))
-# 
-# {pdf(paste0("../Figures/Intra_class_correlation_univariate_expo_cont.pdf"), width=14, height=8)
-#   par(mar=c(20,5,1,1))
-#   plot(values[,1], pch=19, las=1, xaxt="n", type = "n",
-#        ylim = c(0,1),
-#        xlab="", ylab="Intra-Class Correlation within families", cex.lab=1.2,
-#        panel.first=abline(v=xseq,lty=3,col="grey"),
-#        col=batch.colours[1])
-#   points(values[,1], pch = 19, col = batch.colours[1], cex = 0.8)
-#   points(values[,2], pch = 19, col = batch.colours[2], cex = 0.8)
-#   points(values[,3], pch = 19, col = batch.colours[3], cex = 0.8)
-#   points(values[,4], pch = 17, col = batch.colours[4], cex = 0.8)
-#   for (k in 1:length(xseq)){
-#     axis(side=1, at=xseq[k], labels=rownames(values)[k], cex.axis=0.8, las=2)
-#   }
-#   xgroup=c(which(!duplicated(annot_sub))-0.5, length(rownames(values))+0.5)
-#   axis(side=1, line=8, at=xgroup, labels=NA)
-#   tmp=apply(rbind(xgroup[-length(xgroup)],xgroup[-1]),2,mean)
-#   for (k in 1:length(unique(annot_sub))){
-#     axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2,
-#          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5),
-#          cex.axis=0.9)
-#   }
-#   legend("top", pch=c(rep(19,3),17),
-#          col=batch.colours[1:4],
-#          legend = batches[1:4],
-#          horiz = TRUE,
-#          bg="white", cex = 0.8)
-#   dev.off()
-# }
-# 
-# {pdf(paste0("../Figures/Intra_class_correlation_univariate_expo_cont_Pooled2.pdf"), width=14, height=8)
-#   par(mar=c(20,5,1,1))
-#   plot(values[,1], pch=19, las=1, xaxt="n", type = "n",
-#        ylim = c(0,1),
-#        xlab="", ylab="Intra-Class Correlation within families", cex.lab=1.2,
-#        panel.first=abline(v=xseq,lty=3,col="grey"),
-#        col=batch.colours[1])
-#   points(values[,1], pch = 19, col = batch.colours[1], cex = 0.8)
-#   points(values[,3], pch = 19, col = batch.colours[3], cex = 0.8)
-#   points(values[,5], pch = 17, col = batch.colours[5], cex = 0.8)
-#   for (k in 1:length(xseq)){
-#     axis(side=1, at=xseq[k], labels=rownames(values)[k], cex.axis=0.8, las=2)
-#   }
-#   xgroup=c(which(!duplicated(annot_sub))-0.5, length(rownames(values))+0.5)
-#   axis(side=1, line=8, at=xgroup, labels=NA)
-#   tmp=apply(rbind(xgroup[-length(xgroup)],xgroup[-1]),2,mean)
-#   for (k in 1:length(unique(annot_sub))){
-#     axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2,
-#          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5),
-#          cex.axis=0.9)
-#   }
-#   legend("top", pch=c(rep(19,2),17),
-#          col=batch.colours[c(1,3,5)],
-#          legend = batches[c(1,3,5)],
-#          horiz = TRUE,
-#          bg="white", cex = 0.8)
-#   dev.off()
-# }
-
-# annot_sub=annot[names(icc_batch_pooled2)]
-# {pdf("../Figures/Pooled2/Intra_class_correlation_batch_univariate_expo_cont.pdf", width=14, height=8)
-#   par(mar=c(20,5,1,1))
-#   plot(icc_batch_pooled2, pch=19, cex=1, las=1, xaxt="n",
-#        xlab="", ylab="Intra-Class Correlation wtihin batch", cex.lab=1.2,
-#        panel.first=abline(v=1:length(icc_batch_pooled2),lty=3,col="grey"),
-#        col=annot.colours[annot_sub])
-#   for (k in 1:length(icc_batch_pooled2)){
-#     axis(side=1, at=k, labels=names(icc_batch_pooled2)[k], cex.axis=0.8, las=2)
-#   }
-#   xgroup=c(which(!duplicated(annot_sub))-0.5, length(icc_batch_pooled2)+0.5)
-#   axis(side=1, line=8, at=xgroup, labels=NA)
-#   tmp=apply(rbind(xgroup[-length(xgroup)],xgroup[-1]),2,mean)
-#   for (k in 1:length(unique(annot_sub))){
-#     axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
-#          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5),
-#          cex.axis = 0.9)
-#   }
-#   dev.off()
-# }
-# 
-# annot_sub=annot[names(icc_batch_pooled3)]
-# {pdf("../Figures/Pooled3/Intra_class_correlation_batch_univariate_expo_cont.pdf", width=14, height=8)
-#   par(mar=c(20,5,1,1))
-#   plot(icc_batch_pooled3, pch=19, cex=1, las=1, xaxt="n",
-#        xlab="", ylab="Intra-Class Correlation wtihin batch", cex.lab=1.2,
-#        panel.first=abline(v=1:length(icc_batch_pooled3),lty=3,col="grey"),
-#        col=annot.colours[annot_sub])
-#   for (k in 1:length(icc_batch_pooled3)){
-#     axis(side=1, at=k, labels=names(icc_batch_pooled3)[k], cex.axis=0.8, las=3)
-#   }
-#   xgroup=c(which(!duplicated(annot_sub))-0.5, length(icc_batch_pooled3)+0.5)
-#   axis(side=1, line=8, at=xgroup, labels=NA)
-#   tmp=apply(rbind(xgroup[-length(xgroup)],xgroup[-1]),2,mean)
-#   for (k in 1:length(unique(annot_sub))){
-#     axis(side=1, line=8, at=tmp[k], labels=unique(annot_sub)[k], tick=FALSE, las=2, 
-#          col.axis=darken(annot.colours[unique(annot_sub)[k]], amount=0.5),
-#          cex.axis = 0.9)
-#   }
-#   dev.off()
-# }

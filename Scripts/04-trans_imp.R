@@ -17,7 +17,7 @@ for (i in 1:length(batches)){
   # Load data
   covars = readRDS(paste0("../Processed/",filepaths[i],"/Participant_covariate_info_thresh.rds"))
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh.rds"))
-  # Transformation
+  # Transformationlod
   expo = log10(expo)
   saveRDS(expo, paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log.rds"))
   # Missing rate per participant

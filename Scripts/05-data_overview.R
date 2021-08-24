@@ -219,6 +219,103 @@ annot_sub = annot[mylabels]
   dev.off()
 }
 
+### Pooled then stratified 
+suffix = c("lux","fra","gs","pooled3","pooled2")
+for (i in 1:3){
+  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
+  assign(paste0("expo_",suffix[i]),expo)
+}
+expo = readRDS(paste0("../Processed/",filepaths[4],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
+covars = readRDS(paste0("../Processed/",filepaths[4],"/Participant_covariate_info_thresh.rds"))
+
+annot_sub = annot[colnames(expo)]
+{pdf(paste0("../Figures/Pooled3/Compound_dist_log_naimp_stratified.pdf"), width = 14, height = 8)
+  par(mfrow = c(4, 7), oma = c(0.5,0.5,0,0.5), mar = c(2,2,2,1), mgp=c(1,0.05,0))
+  for (k in 1:length(annot_sub)){
+    var = names(annot_sub)[k]
+    print(var)
+    ylim = NULL
+    xlim = NULL
+    for (i in 1:3){
+      expo_sub = expo[as.numeric(covars$Batch)==i,]
+      ylim = c(ylim, range(density(expo_sub[,var], na.rm = T)$y))
+      xlim = c(xlim,range(density(expo_sub[,var], na.rm = T)$x))
+      expo_sep = eval(parse(text = paste0("expo_", suffix[i])))
+      if (var %in% colnames(expo_sep)){
+      ylim = c(ylim, range(density(expo_sep[,var], na.rm = T)$y))
+      xlim = c(xlim,range(density(expo_sep[,var], na.rm = T)$x))
+      }
+    }
+    plot(NULL, main=var, xlab="pg/mg", ylab ="Density",
+         xlim=c(min(xlim, na.rm = T),max(xlim, na.rm = T)),
+         ylim=c(min(ylim, na.rm = T),max(ylim, na.rm = T)),
+         cex.main = 1,  cex.lab=0.8, cex.axis=0.8, tck=-0.01, lwd = 0.5)
+    for (i in 1:3){
+      expo_sub = expo[as.numeric(covars$Batch)==i,]
+      x=density(expo_sub[,var], na.rm = T)
+      lines(x, col=batch.colours[i], lwd = 0.5)
+      expo_sep = eval(parse(text = paste0("expo_", suffix[i])))
+      if (var %in% colnames(expo_sep)){
+      x=density(expo_sep[,var], na.rm = T)
+      lines(x, col=darken(batch.colours[i],0.5), lwd = 0.5)
+      }
+    }
+    # legend("topright", lwd=1, col=batch.colours, legend = batches, cex=0.5)
+  }
+  dev.off()
+}
+
+suffix = c("lux","fra","gs","pooled3","pooled2")
+for (i in c(1,3)){
+  expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
+  assign(paste0("expo_",suffix[i]),expo)
+}
+expo = readRDS(paste0("../Processed/",filepaths[5],"/Exposure_matrix_ndimp_thresh_log_naimp.rds"))
+covars = readRDS(paste0("../Processed/",filepaths[5],"/Participant_covariate_info_thresh.rds"))
+
+annot_sub = annot[colnames(expo)]
+{pdf(paste0("../Figures/Pooled2/Compound_dist_log_naimp_stratified.pdf"), width = 14, height = 8)
+  par(mfrow = c(4, 7), oma = c(0.5,0.5,0,0.5), mar = c(2,2,2,1), mgp=c(1,0.05,0))
+  for (k in 1:length(annot_sub)){
+    var = names(annot_sub)[k]
+    print(var)
+    ylim = NULL
+    xlim = NULL
+    for (i in 1:2){
+      expo_sub = expo[as.numeric(covars$Batch)==i,]
+      ylim = c(ylim, range(density(expo_sub[,var], na.rm = T)$y))
+      xlim = c(xlim,range(density(expo_sub[,var], na.rm = T)$x))
+    }
+    for (i in c(1:3)){
+      expo_sep = eval(parse(text = paste0("expo_", suffix[i])))
+      if (var %in% colnames(expo_sep)){
+        ylim = c(ylim, range(density(expo_sep[,var], na.rm = T)$y))
+        xlim = c(xlim,range(density(expo_sep[,var], na.rm = T)$x))
+      }
+    }
+    plot(NULL, main=var, xlab="pg/mg", ylab ="Density",
+         xlim=c(min(xlim, na.rm = T),max(xlim, na.rm = T)),
+         ylim=c(min(ylim, na.rm = T),max(ylim, na.rm = T)),
+         cex.main = 1,  cex.lab=0.8, cex.axis=0.8, tck=-0.01, lwd = 0.5)
+    for (i in 1:2){
+      expo_sub = expo[as.numeric(covars$Batch)==i,]
+      x=density(expo_sub[,var], na.rm = T)
+      lines(x, col=batch.colours[c(1,3)][i], lwd = 0.5)
+    }
+    for (i in c(1,3)){
+      expo_sep = eval(parse(text = paste0("expo_", suffix[i])))
+      if (var %in% colnames(expo_sep)){
+        x=density(expo_sep[,var], na.rm = T)
+        lines(x, col=darken(batch.colours[i],0.5), lwd = 0.5)
+      }
+    }
+    # legend("topright", lwd=1, col=batch.colours, legend = batches, cex=0.5)
+  }
+  dev.off()
+}
+
+
+### Extracted different
 annot_sub = annot[extract_diff$Compound[extract_diff$Compound %in% mylabels]]
 {pdf(paste0("../Figures/Pooled3/Compound_dist_log_naimp_extract_diff.pdf"))
   par(mfrow = c(2, 3), oma = c(0.5,0.5,0,0.5), mar = c(2,2,2,1), mgp=c(1,0.05,0))
@@ -249,5 +346,6 @@ annot_sub = annot[extract_diff$Compound[extract_diff$Compound %in% mylabels]]
   }
   dev.off()
 }
+
 
 

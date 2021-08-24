@@ -17,7 +17,7 @@ source("graph_param.R")
 # Load data
 annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 
-### LOD, Detection rate and concentration range ----
+### LOD, Detection proportion, missing proportion and concentration range ----
 ifelse(dir.exists("../Exports"), "", dir.create("../Exports"))
 for (i in 1:3){
   expo = readRDS(paste0("../Processed/",filepaths[i],"/Exposure_matrix_ndimp_thresh.rds"))
@@ -28,10 +28,11 @@ for (i in 1:3){
   for (k in 1:length(colnames(expo))){
     print(colnames(expo)[k])
     lod = flex_format(chem$LOD[k], 2, 0.1)
-    detect_rate = formatC(1-(chem$nd_prop[k]+chem$NA_prop[k]), format="f", digits=2)
+    detect = formatC(1-(chem$nd_prop[k]+chem$NA_prop[k]), format="f", digits=2)
+    missing = formatC(chem$NA_prop[k], format="f", digits=2)
     q = quantile(expo[,k], na.rm = T)
     q = flex_format(q, 2, 0.1)
-    tmp=c(lod,detect_rate,q)
+    tmp=c(lod,detect, missing,q)
     if(!duplicated(annot_sub)[k]){
       mytable=rbind(mytable, rep(NA,length(tmp)))
       rownames(mytable)[nrow(mytable)]=annot_sub[k]
@@ -39,8 +40,8 @@ for (i in 1:3){
     mytable=rbind(mytable, tmp)
     rownames(mytable)[nrow(mytable)]=colnames(expo)[k]
   }
-  colnames(mytable)=c("LOD (pg/mg)","Detection rate","Min", "Q1","Q2","Q3","Max")
-  mytable[,-2]=ReformatScientificNotation(mytable[,-2])
+  colnames(mytable)=c("LOD (pg/mg)","% detected","% missing","Min", "Q1","Q2","Q3","Max")
+  # mytable[,-2:3]=ReformatScientificNotation(mytable[,-2:3])
   ifelse(dir.exists(paste0("../Exports/",filepaths[i])), "", dir.create(paste0("../Exports/",filepaths[i])))
   SaveExcelWithSuperscripts(cbind(rownames(mytable),mytable), paste0("../Exports/",filepaths[i],"/Table1_chemical_compound.xlsx"))
 }

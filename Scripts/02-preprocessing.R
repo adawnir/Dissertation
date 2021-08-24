@@ -213,15 +213,12 @@ saveRDS(expo_gs,  paste0("../Processed/",filepaths[3],"/Exposure_matrix_raw_thre
 ### Recoding nd ----
 # Replace nd with random values from 0 to minimum detection (Gaussian)
 for(k in 1:ncol(expo_lux)){
-  set.seed(150621)
   expo_lux[which(expo_lux[,k]=="nd"),k] = rtruncnorm(sum(expo_lux[,k]=="nd", na.rm = T),min=0,max=chem_lux$LOD[k]) 
 }
 for(k in 1:ncol(expo_fra)){
-  set.seed(150621)
   expo_fra[which(expo_fra[,k]=="nd"),k] = rtruncnorm(sum(expo_fra[,k]=="nd", na.rm = T),min=0,max=chem_fra$LOD[k]) 
 }
 for(k in 1:ncol(expo_gs)){
-  set.seed(150621)
   expo_gs[which(expo_gs[,k]=="nd"),k] = rtruncnorm(sum(expo_gs[,k]=="nd", na.rm = T),min=0,max=chem_gs$LOD[k]) 
 }
 
@@ -234,6 +231,11 @@ rownames(expo_fra) = rownames(covars_fra)
 
 expo_gs = apply(expo_gs, 2, as.numeric)
 rownames(expo_gs) = rownames(covars_gs)
+
+# Check for NA prop
+summary(chem_lux$NA_prop)
+summary(chem_fra$NA_prop)
+summary(chem_gs$NA_prop)
 
 # Save data sets
 saveRDS(expo_lux, paste0("../Processed/",filepaths[1],"/Exposure_matrix_ndimp_thresh.rds"))

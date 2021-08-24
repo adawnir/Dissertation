@@ -2,8 +2,8 @@ ContinuousTest3=function(x, y){
   # By status
   out=NULL
   for (k in c("LUX","FRA","GS")){
-    mymean=formatC(10^mean(x[y==k], na.rm=TRUE), format="f", digits=2)
-    mysd=formatC(10^sd(x[y==k], na.rm=TRUE), format="f", digits=2)
+    mymean=formatC(mean(10^x[y==k], na.rm=TRUE), format="f", digits=2)
+    mysd=formatC(sd(10^x[y==k], na.rm=TRUE), format="f", digits=2)
     out=c(out, paste0(mymean, " (", mysd, ")"))
   }
   
@@ -19,8 +19,8 @@ ContinuousTest2=function(x, y){
   # By status
   out=NULL
   for (k in c("LUX","GS")){
-    mymean=formatC(10^mean(x[y==k], na.rm=TRUE), format="f", digits=2)
-    mysd=formatC(10^sd(x[y==k], na.rm=TRUE), format="f", digits=2)
+    mymean=formatC(mean(10^x[y==k], na.rm=TRUE), format="f", digits=2)
+    mysd=formatC(sd(10^x[y==k], na.rm=TRUE), format="f", digits=2)
     out=c(out, paste0(mymean, " (", mysd, ")"))
   }
   

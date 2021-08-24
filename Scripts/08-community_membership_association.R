@@ -1,53 +1,62 @@
-## Multivariate clustering - Association with comembership proportion
-## Rin Wada 7 Aug
+## Pairwise: Characterisitng well/ill-classified families
+## Rin Wada 15 July
 
 # Load packages
-library(focus)
-library(colorspace)
+library(tidyverse)
 library(RColorBrewer)
+library(colorspace)
+library(focus)
+library(igraph)
 
-# Initialise
+# Initialisation
 rm(list=ls())
 path=dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(path)
-
-# Load custom
-source("functions.R")
-source("graph_param.R")
 
 # ## Parameters
 # args=commandArgs(trailingOnly=TRUE)
 # m=as.numeric(args[1])
 
-#### Between siblings ####
-# Load data sets
-annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
+# Load custom
+source("functions.R")
+source("graph_param.R")
 
 suffix = c("lux","fra","gs","pooled3","pooled2")
+annot = readRDS("../Data/Chemical_compound_family_annotation.rds")
 
+#### Community ####
 for (m in 1:length(batches)){
+  # Load data
   covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
-  X = readRDS(paste0("../Results/",filepaths[m],"/Family_covariates_delta_exposures.rds"))
-  out = readRDS(paste0("../Results/",filepaths[m],"/Consensus_clustering_output.rds"))
+  expo  = readRDS(paste0("../Processed/",filepaths[m],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
+  print(all(rownames(expo)==rownames(covars)))
   
-  selprop = SelectionProportions(out)
-  families=levels(covars$Family.ID)
+  lc = readRDS(paste0("../Results/",filepaths[m],"/Graphical_network_children_community.rds"))
+  lc = membership(lc)
+  print(all(names(lc)==rownames(covars)))
   
-  fprop=NULL
+  families=unique(covars$Family.ID)
+  
+  fclass=rep(NA, length(families))
   for (f in 1:length(families)){
-    tmpmat=selprop[covars$Family.ID==families[f],covars$Family.ID==families[f]]
-    fprop=c(fprop,mean(tmpmat[upper.tri(tmpmat)]))
+    tmp=lc[covars$Family.ID==families[f]]
+    if (length(unique(tmp))==1){
+      fclass[f] = 1
+    } else {
+      fclass[f] = 0
+    }
   }
-  names(fprop)=families
   
-  saveRDS(fprop, paste0("../Results/",filepaths[m],"/Comembership_prop.rds"))
+  names(fclass) = families
   
-  ### Univariate analysis ---
+  X = readRDS(paste0("../Results/",filepaths[m],"/Family_covariates_delta_exposures.rds"))
+  
+  ### Univariate analysis ----
   betas = pvals = NULL
   f1='Y ~ X[,k]'
   t0=Sys.time()
   for (k in 1:ncol(X)){
-    Y = fprop
+    Y = fclass
     model1=lm(as.formula(f1))
     if(colnames(X)[k] == "gender_diff"){
       betas=c(betas, coefficients(model1)[2:length(coefficients(model1))])
@@ -76,27 +85,25 @@ for (m in 1:length(batches)){
   
   names(pvals)=names(betas)=mylabels
   
-  saveRDS(pvals, paste0("../Results/",filepaths[m],"/Comembership_prop_univar_pvals.rds"))
-  saveRDS(betas, paste0("../Results/",filepaths[m],"/Comembership_prop_univar_betas.rds"))
-  
-  ### Multivariate analysis using stability selection sPLS regression ----
-  Y = fprop[complete.cases(X)]
-  X = X[complete.cases(X),]
-  X = model.matrix(~., X)[,-1]
-  
-  X = scale(X)
-  
-  stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
-  
-  saveRDS(stab, paste0("../Results/",filepaths[m],"/Comembership_prop_multivar_output.rds"))
+  saveRDS(pvals, paste0("../Results/",filepaths[m],"/Community_family_class_univar_pvals.rds"))
+  saveRDS(betas, paste0("../Results/",filepaths[m],"/Community_family_class_univar_betas.rds"))
 }
 
-
-#### Between Strangers ####
+### Stranger metrics----
 for (m in 1:length(batches)){
   covars = readRDS(paste0("../Processed/",filepaths[m],"/Participant_covariate_info_thresh_no_isolated.rds"))
-  X = readRDS(paste0("../Results/",filepaths[m],"/Stranger_covariates_delta_exposures.rds"))
-  out = readRDS(paste0("../Results/",filepaths[m],"/Consensus_clustering_output.rds"))
+  expo  = readRDS(paste0("../Processed/",filepaths[m],"/Exposure_matrix_ndimp_thresh_log_naimp_no_isolated.rds"))
+  print(all(rownames(expo)==rownames(covars)))
+  
+  lc = readRDS(paste0("../Results/",filepaths[m],"/Graphical_network_children_community.rds"))
+  lc = membership(lc)
+  print(all(names(lc)==rownames(covars)))
+  
+  families=unique(covars$Family.ID)
+  
+  compare_lc = sapply(lc, function(x) x==lc)
+  rownames(compare_lc)=colnames(compare_lc)=rownames(covars)
+  compare_lc = compare_lc[lower.tri(compare_lc)]
   
   compare_family = sapply(covars$Family.ID, function(x) x==covars$Family.ID)
   rownames(compare_family)=colnames(compare_family)=rownames(covars)
@@ -105,23 +112,19 @@ for (m in 1:length(batches)){
   pairs = sapply(rownames(covars), function(x) paste0(x,"--",rownames(covars)))
   pairs = pairs[lower.tri(pairs)]
   
-  mygrep = which(!compare_family)
-  pairs = pairs[mygrep]
+  sclass = ifelse(compare_lc, 1, 0)
+  sclass = sclass[!compare_family]
+  names(sclass) = pairs[!compare_family]
   
-  selprop = SelectionProportions(out)
+  # Load covariates and exposures
+  X = readRDS(paste0("../Results/",filepaths[m],"/Stranger_covariates_delta_exposures.rds"))
   
-  tmp=as.vector(combn(rownames(covars), 2, function(x) selprop[x[1],x[2]]))
-  sprop=tmp[mygrep]
-  names(sprop)=pairs
-  
-  saveRDS(sprop, paste0("../Results/",filepaths[m],"/Comembership_prop_stranger.rds"))
-  
-  ### Univariate analysis ----
+  ### Univariate analysis----
   betas = pvals = NULL
   f1='Y ~ X[,k]'
   t0=Sys.time()
   for (k in 1:ncol(X)){
-    Y = sprop
+    Y = sclass
     model1=lm(as.formula(f1))
     if(colnames(X)[k] == "gender_diff"){
       betas=c(betas, coefficients(model1)[2:length(coefficients(model1))])
@@ -150,12 +153,12 @@ for (m in 1:length(batches)){
   
   names(pvals)=names(betas)=mylabels
   
-  saveRDS(pvals, paste0("../Results/",filepaths[m],"/Comembership_prop_stranger_univar_pvals.rds"))
-  saveRDS(betas, paste0("../Results/",filepaths[m],"/Comembership_prop_stranger_univar_betas.rds"))
+  saveRDS(pvals, paste0("../Results/",filepaths[m],"/Community_stranger_class_univar_pvals.rds"))
+  saveRDS(betas, paste0("../Results/",filepaths[m],"/Community_stranger_class_univar_betas.rds"))
   
   ### Multivariate analysis using stability selection sPLS regression ----
   
-  Y = sprop[complete.cases(X)]
+  Y = sclass[complete.cases(X)]
   X = X[complete.cases(X),]
   X = model.matrix(~., X)[,-1]
   
@@ -163,7 +166,6 @@ for (m in 1:length(batches)){
   
   stab = VariableSelection(xdata = X, ydata = Y, implementation = SparsePLS)
   
-  saveRDS(stab, paste0("../Results/",filepaths[m],"/Comembership_prop_stranger_multivar_output.rds"))
+  saveRDS(stab, paste0("../Results/",filepaths[m],"/Community_stranger_class_multivar_output.rds"))
 }
-
 
