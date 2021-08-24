@@ -1,5 +1,5 @@
 ## Pairwise: Characterisitng well/ill-classified families
-## Rin Wada 15 July
+## 15 July
 
 # Load packages
 library(tidyverse)
